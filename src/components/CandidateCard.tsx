@@ -42,7 +42,7 @@ const CandidateCard = ({
             <CheckCircle className="h-4 w-4" /> {matchPercentage}% match
           </span>
           {openToOffers && (
-            <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full bg-tag-blue text-tag-blue-text">
+            <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full bg-tag-green text-tag-green-text">
               Open to offers
             </span>
           )}

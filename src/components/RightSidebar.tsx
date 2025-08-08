@@ -10,7 +10,7 @@ const RightSidebar = () => {
   return (
     <aside className="w-96 glass-sidebar h-screen flex flex-col animate-slide-in-right">
       {/* Top tag */}
-      <div className="h-14 px-4 flex items-center border-b border-sidebar-border">
+      <div className="h-14 px-4 flex items-center border-b border-sidebar-border/30">
         <span className="inline-block bg-tag-blue text-tag-blue-text px-3 py-1 rounded-full text-sm font-medium">fintech</span>
       </div>
 
@@ -36,7 +36,7 @@ const RightSidebar = () => {
       </div>
 
       {/* Controls */}
-      <div className="p-4 border-t border-sidebar-border space-y-3 relative">
+      <div className="p-4 border-t border-sidebar-border/30 space-y-3 relative">
         <div className="flex items-center justify-between">
           <Button variant="outline" size="sm" className="flex items-center gap-2 hover-scale bg-card-hover border-card-border text-card-foreground hover:bg-card-hover/70"><RotateCcw className="h-4 w-4" /> Reset</Button>
           <Button variant="outline" size="sm" className="flex items-center gap-2 hover-scale bg-card-hover border-card-border text-card-foreground hover:bg-card-hover/70"><Filter className="h-4 w-4" /> Filters</Button>
@@ -50,7 +50,7 @@ const RightSidebar = () => {
             <span>Senior Data Scientist</span>
           </div>
         </div>
-        <button aria-label="Send" className="absolute bottom-6 right-6 w-10 h-10 rounded-full bg-tag-purple text-tag-purple-text flex items-center justify-center shadow">
+        <button aria-label="Send" className="absolute bottom-4 right-4 w-10 h-10 rounded-full bg-tag-purple text-tag-purple-text flex items-center justify-center shadow">
           <Send className="h-5 w-5" />
         </button>
       </div>

@@ -17,12 +17,12 @@ const CandidateList = () => {
   return (
     <main className="flex-1 glass-surface flex flex-col animate-fade-in">
       {/* Header (consistent height) */}
-      <div className="h-14 border-b border-card-border px-6 flex items-center">
-        <h1 className="text-2xl font-semibold text-card-foreground">Found Candidates (2739)</h1>
+      <div className="h-14 border-b border-card-border/30 px-6 flex items-center">
+        <h1 className="text-lg font-semibold text-card-foreground">Found Candidates (2739)</h1>
       </div>
 
       {/* Scrollable content only here */}
-      <div className="flex-1 overflow-auto p-6 space-y-6">
+      <div className="flex-1 overflow-auto p-6 space-y-4">
         <CandidateCard
           {...base}
           skills={[
@@ -71,7 +71,7 @@ const CandidateList = () => {
       </div>
 
       {/* Fixed footer within central section */}
-      <div className="h-14 border-t border-card-border px-6 glass-surface flex items-center justify-between">
+      <div className="h-14 border-t border-card-border/30 px-6 glass-surface flex items-center justify-between">
         <span className="text-sm text-muted-foreground">41-60 of 2,739 candidates</span>
 
         <div className="flex items-center gap-2">
