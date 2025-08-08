@@ -2,114 +2,199 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Modern Design System - Professional & Data-Intensive Applications
-All colors MUST be HSL for consistency.
-*/
+/* Modern SaaS Design System - Gradient & Glassmorphism */
 
 @layer base {
   :root {
-    /* Clean, modern color palette */
-    --background: 0 0% 100%; /* Pure white for main content */
-    --foreground: 0 0% 9%; /* Near black for primary text (#171717) */
+    /* Base surfaces */
+    --background: 240 10% 98%; /* Subtle warm white */
+    --foreground: 224 71% 4%; /* Deep navy text */
     
-    /* Sidebar with subtle gray tones */
-    --sidebar-bg: 0 0% 98%; /* Very light gray (#FAFAFA) */
-    --sidebar-border: 0 0% 91%; /* Light gray (#E5E5E5) */
-    --sidebar-text: 0 0% 45%; /* Medium gray (#737373) */
-    --sidebar-text-active: 0 0% 9%; /* Near black (#171717) */
-    --sidebar-hover: 0 0% 96%; /* Subtle hover (#F5F5F5) */
+    /* Primary gradient system - Purple to Blue */
+    --primary: 262 83% 58%; /* Rich purple (#8B5CF6) */
+    --primary-glow: 217 91% 60%; /* Electric blue (#3B82F6) */
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 262 83% 65%;
     
-    /* Card system with clean borders */
-    --card: 0 0% 100%; /* White cards */
-    --card-foreground: 0 0% 9%; /* Near black text */
-    --card-border: 0 0% 91%; /* Light gray borders */
+    /* Glassmorphism surfaces */
+    --glass: 0 0% 100% / 0.8; /* Semi-transparent white */
+    --glass-border: 0 0% 100% / 0.2; /* Subtle glass border */
+    --glass-shadow: 0 0% 0% / 0.1; /* Soft shadow */
     
-    /* Modern blue primary palette */
-    --primary: 217 91% 60%; /* Modern blue (#2563EB) */
-    --primary-foreground: 0 0% 100%; /* White text on blue */
-    --primary-hover: 217 91% 55%; /* Slightly darker blue for hover */
+    /* Sidebar glassmorphism */
+    --sidebar-bg: 240 10% 98% / 0.95; /* Frosted glass */
+    --sidebar-border: 220 13% 91% / 0.5;
+    --sidebar-text: 215 16% 47%;
+    --sidebar-text-active: 224 71% 4%;
+    --sidebar-hover: 220 13% 91% / 0.7;
+    --sidebar-accent: 262 83% 58% / 0.1; /* Purple glow */
     
-    /* Neutral secondary palette */
-    --secondary: 0 0% 96%; /* Light gray (#F5F5F5) */
-    --secondary-foreground: 0 0% 9%; /* Near black text */
+    /* Card system with elevation */
+    --card: 0 0% 100%;
+    --card-foreground: 224 71% 4%;
+    --card-border: 220 13% 91%;
+    --card-shadow: 220 43% 11% / 0.06; /* Elegant shadow */
+    --card-hover: 262 83% 58% / 0.02; /* Subtle purple tint */
+    
+    /* Accent system */
+    --accent: 262 83% 97%; /* Very light purple */
+    --accent-foreground: 262 83% 20%;
+    --accent-glow: 262 83% 58% / 0.15;
+    
+    /* Secondary surfaces */
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 220 9% 46%;
     
     /* Muted elements */
-    --muted: 0 0% 96%; /* Light gray background */
-    --muted-foreground: 0 0% 45%; /* Medium gray text */
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 9% 46%;
     
-    /* Accent colors */
-    --accent: 0 0% 96%; /* Light gray */
-    --accent-foreground: 0 0% 9%; /* Near black */
+    /* Status colors with glow effects */
+    --success: 142 76% 36%;
+    --success-glow: 142 76% 36% / 0.2;
+    --success-foreground: 0 0% 100%;
     
-    /* Success green - improved contrast */
-    --success: 142 76% 36%; /* Enhanced green (#16A34A) */
-    --success-foreground: 0 0% 100%; /* White text */
+    --warning: 38 92% 50%;
+    --warning-glow: 38 92% 50% / 0.2;
+    --warning-foreground: 0 0% 100%;
     
-    /* Specialized colors for data */
-    --match-green: 142 76% 36%; /* Enhanced green */
-    --tag-blue: 217 91% 95%; /* Light blue background */
-    --tag-blue-text: 217 91% 40%; /* Darker blue text */
-    --tag-purple: 262 83% 95%; /* Light purple background */
-    --tag-purple-text: 262 83% 40%; /* Darker purple text */
+    --destructive: 0 84% 60%;
+    --destructive-glow: 0 84% 60% / 0.2;
+    --destructive-foreground: 0 0% 100%;
     
-    /* Destructive colors */
-    --destructive: 0 84% 60%; /* Red */
-    --destructive-foreground: 0 0% 100%; /* White text */
+    /* Match indicators */
+    --match-excellent: 142 76% 36%; /* Green for 90%+ */
+    --match-good: 45 93% 47%; /* Yellow for 70-89% */
+    --match-fair: 25 95% 53%; /* Orange for 50-69% */
+    --match-poor: 0 84% 60%; /* Red for <50% */
+    
+    /* Tag system with gradients */
+    --tag-blue: 217 91% 95%;
+    --tag-blue-text: 217 91% 35%;
+    --tag-blue-glow: 217 91% 60% / 0.1;
+    
+    --tag-purple: 262 83% 95%;
+    --tag-purple-text: 262 83% 35%;
+    --tag-purple-glow: 262 83% 58% / 0.1;
+    
+    --tag-green: 142 76% 95%;
+    --tag-green-text: 142 76% 30%;
+    --tag-green-glow: 142 76% 36% / 0.1;
     
     /* Form elements */
-    --border: 0 0% 91%; /* Light gray (#E5E5E5) */
-    --input: 0 0% 100%; /* White input background */
-    --input-border: 0 0% 87%; /* Input border (#DEDEDE) */
-    --ring: 217 91% 60%; /* Blue focus ring */
+    --border: 220 13% 91%;
+    --input: 0 0% 100%;
+    --input-border: 220 13% 91%;
+    --ring: 262 83% 58%;
+    
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    --gradient-card: linear-gradient(145deg, hsl(var(--card)), hsl(var(--card)) 50%, hsl(220 13% 91% / 0.3));
+    --gradient-glass: linear-gradient(145deg, hsl(var(--glass)), hsl(0 0% 100% / 0.6));
+    --gradient-sidebar: linear-gradient(180deg, hsl(var(--sidebar-bg)), hsl(240 10% 96% / 0.9));
+    
+    /* Shadows with color */
+    --shadow-sm: 0 1px 2px 0 hsl(var(--glass-shadow));
+    --shadow-md: 0 4px 6px -1px hsl(var(--glass-shadow)), 0 2px 4px -2px hsl(var(--glass-shadow));
+    --shadow-lg: 0 10px 15px -3px hsl(var(--glass-shadow)), 0 4px 6px -4px hsl(var(--glass-shadow));
+    --shadow-xl: 0 20px 25px -5px hsl(var(--glass-shadow)), 0 8px 10px -6px hsl(var(--glass-shadow));
+    --shadow-glow: 0 0 0 1px hsl(var(--primary) / 0.05), 0 0 20px hsl(var(--primary) / 0.1);
+    
+    /* Transitions */
+    --transition-all: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     
     /* Border radius */
-    --radius: 0.375rem;
+    --radius: 0.75rem; /* Increased for modern look */
   }
 
   .dark {
-    /* Dark theme with modern palette */
-    --background: 0 0% 7%; /* Very dark gray (#121212) */
-    --foreground: 0 0% 98%; /* Near white text */
-
-    --card: 0 0% 9%; /* Dark card background */
-    --card-foreground: 0 0% 98%; /* Light text */
-    --card-border: 0 0% 15%; /* Dark border */
-
-    --sidebar-bg: 0 0% 5%; /* Darker sidebar */
-    --sidebar-border: 0 0% 15%; /* Dark border */
-    --sidebar-text: 0 0% 65%; /* Light gray text */
-    --sidebar-text-active: 0 0% 98%; /* White active text */
-    --sidebar-hover: 0 0% 12%; /* Subtle hover */
-
-    --primary: 217 91% 60%; /* Same modern blue */
-    --primary-foreground: 0 0% 100%; /* White text */
-    --primary-hover: 217 91% 65%; /* Lighter blue for hover */
-
-    --secondary: 0 0% 15%; /* Dark gray */
-    --secondary-foreground: 0 0% 98%; /* Light text */
-
-    --muted: 0 0% 15%; /* Dark gray background */
-    --muted-foreground: 0 0% 65%; /* Medium gray text */
-
-    --accent: 0 0% 15%; /* Dark gray */
-    --accent-foreground: 0 0% 98%; /* Light text */
-
-    --success: 142 76% 45%; /* Brighter green for dark mode */
-    --success-foreground: 0 0% 100%; /* White text */
-
-    --destructive: 0 84% 65%; /* Brighter red for dark mode */
-    --destructive-foreground: 0 0% 100%; /* White text */
-
-    --border: 0 0% 15%; /* Dark border */
-    --input: 0 0% 12%; /* Dark input background */
-    --input-border: 0 0% 20%; /* Input border */
-    --ring: 217 91% 60%; /* Blue focus ring */
-
-    --match-green: 142 76% 45%;
-    --tag-blue: 217 91% 20%; /* Dark blue background */
-    --tag-blue-text: 217 91% 80%; /* Light blue text */
-    --tag-purple: 262 83% 20%; /* Dark purple background */
-    --tag-purple-text: 262 83% 80%; /* Light purple text */
+    /* Dark theme with modern glassmorphism */
+    --background: 224 71% 4%; /* Deep navy background */
+    --foreground: 210 20% 98%; /* Near white text */
+    
+    /* Primary system remains vibrant */
+    --primary: 262 83% 65%;
+    --primary-glow: 217 91% 65%;
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 262 83% 70%;
+    
+    /* Dark glassmorphism */
+    --glass: 224 71% 4% / 0.9;
+    --glass-border: 210 20% 98% / 0.1;
+    --glass-shadow: 0 0% 0% / 0.3;
+    
+    /* Dark sidebar with transparency */
+    --sidebar-bg: 224 71% 4% / 0.95;
+    --sidebar-border: 220 13% 18% / 0.5;
+    --sidebar-text: 215 16% 65%;
+    --sidebar-text-active: 210 20% 98%;
+    --sidebar-hover: 220 13% 18% / 0.7;
+    --sidebar-accent: 262 83% 65% / 0.15;
+    
+    /* Dark cards with elevation */
+    --card: 224 71% 6%;
+    --card-foreground: 210 20% 98%;
+    --card-border: 220 13% 18%;
+    --card-shadow: 0 0% 0% / 0.2;
+    --card-hover: 262 83% 65% / 0.05;
+    
+    /* Dark accents */
+    --accent: 224 71% 8%;
+    --accent-foreground: 210 20% 85%;
+    --accent-glow: 262 83% 65% / 0.2;
+    
+    /* Secondary dark surfaces */
+    --secondary: 220 13% 10%;
+    --secondary-foreground: 210 20% 85%;
+    
+    /* Muted dark elements */
+    --muted: 220 13% 10%;
+    --muted-foreground: 215 16% 65%;
+    
+    /* Enhanced status colors for dark mode */
+    --success: 142 76% 50%;
+    --success-glow: 142 76% 50% / 0.3;
+    --success-foreground: 0 0% 100%;
+    
+    --warning: 38 92% 60%;
+    --warning-glow: 38 92% 60% / 0.3;
+    --warning-foreground: 0 0% 100%;
+    
+    --destructive: 0 84% 70%;
+    --destructive-glow: 0 84% 70% / 0.3;
+    --destructive-foreground: 0 0% 100%;
+    
+    /* Dark match indicators */
+    --match-excellent: 142 76% 50%;
+    --match-good: 45 93% 60%;
+    --match-fair: 25 95% 65%;
+    --match-poor: 0 84% 70%;
+    
+    /* Dark tag system */
+    --tag-blue: 217 91% 15%;
+    --tag-blue-text: 217 91% 80%;
+    --tag-blue-glow: 217 91% 60% / 0.15;
+    
+    --tag-purple: 262 83% 15%;
+    --tag-purple-text: 262 83% 80%;
+    --tag-purple-glow: 262 83% 65% / 0.15;
+    
+    --tag-green: 142 76% 15%;
+    --tag-green-text: 142 76% 80%;
+    --tag-green-glow: 142 76% 50% / 0.15;
+    
+    /* Dark form elements */
+    --border: 220 13% 18%;
+    --input: 224 71% 6%;
+    --input-border: 220 13% 18%;
+    --ring: 262 83% 65%;
+    
+    /* Dark gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    --gradient-card: linear-gradient(145deg, hsl(var(--card)), hsl(224 71% 8%));
+    --gradient-glass: linear-gradient(145deg, hsl(var(--glass)), hsl(224 71% 4% / 0.8));
+    --gradient-sidebar: linear-gradient(180deg, hsl(var(--sidebar-bg)), hsl(224 71% 3% / 0.9));
   }
 }
 
@@ -131,24 +216,134 @@ All colors MUST be HSL for consistency.
 }
 
 @layer components {
-  /* Animation utilities */
+  /* Modern interaction utilities */
   .hover-scale {
-    @apply transition-transform duration-200 hover:scale-105;
+    @apply transition-all duration-200 hover:scale-[1.02];
+  }
+  
+  .hover-glow {
+    @apply transition-all duration-300 hover:shadow-glow;
+  }
+  
+  .hover-lift {
+    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-lg;
   }
   
   .animate-fade-in {
     animation: fade-in 0.3s ease-out;
   }
   
-  /* Interactive link with underline animation */
+  .animate-slide-up {
+    animation: slide-up 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  /* Glassmorphism components */
+  .glass-card {
+    @apply bg-white/80 backdrop-blur-xl border border-white/20 shadow-xl;
+  }
+  
+  .glass-sidebar {
+    background: var(--gradient-sidebar);
+    @apply backdrop-blur-xl border-r border-sidebar-border/50;
+  }
+  
+  .glass-surface {
+    background: var(--gradient-glass);
+    @apply backdrop-blur-lg border border-glass-border;
+  }
+  
+  /* Interactive link with gradient underline */
   .story-link {
-    @apply relative inline-block after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-0.5 after:bottom-0 after:left-0 after:bg-primary after:origin-bottom-right after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-bottom-left;
+    @apply relative inline-block;
+    background: var(--gradient-primary);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    @apply after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-0.5 after:bottom-0 after:left-0 after:origin-bottom-right after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-bottom-left;
+  }
+  
+  .story-link::after {
+    background: var(--gradient-primary);
+  }
+  
+  /* Match score indicators */
+  .match-excellent { @apply bg-match-excellent text-white; }
+  .match-good { @apply bg-match-good text-white; }
+  .match-fair { @apply bg-match-fair text-white; }
+  .match-poor { @apply bg-match-poor text-white; }
+  
+  /* Gradient buttons */
+  .btn-gradient {
+    background: var(--gradient-primary);
+    @apply text-white border-0 hover-glow;
+  }
+  
+  .btn-glass {
+    @apply glass-surface text-foreground hover:bg-white/90;
+  }
+  
+  /* Card variants */
+  .card-elevated {
+    background: var(--gradient-card);
+    @apply shadow-lg hover:shadow-xl hover:scale-[1.01] transition-all duration-300;
+  }
+  
+  .card-interactive {
+    @apply card-elevated hover-lift cursor-pointer;
+  }
+  
+  /* Tag variants with glow */
+  .tag-glow {
+    @apply relative overflow-hidden;
+  }
+  
+  .tag-glow::before {
+    content: '';
+    @apply absolute inset-0 opacity-0 transition-opacity duration-300;
+    background: radial-gradient(circle at center, currentColor 0%, transparent 70%);
+  }
+  
+  .tag-glow:hover::before {
+    @apply opacity-10;
   }
 }
 
 @layer utilities {
-  /* Custom utilities for better contrast */
+  /* Enhanced color utilities */
   .text-contrast { color: hsl(var(--foreground)); }
   .text-muted { color: hsl(var(--muted-foreground)); }
   .border-subtle { border-color: hsl(var(--border)); }
+  
+  /* Gradient text utilities */
+  .text-gradient {
+    background: var(--gradient-primary);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+  }
+  
+  /* Shadow utilities */
+  .shadow-glow { box-shadow: var(--shadow-glow); }
+  .shadow-elegant { box-shadow: var(--shadow-lg); }
+  
+  /* Animation keyframes */
+  @keyframes slide-up {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+  
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
 }

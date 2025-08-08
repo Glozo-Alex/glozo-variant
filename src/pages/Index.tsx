@@ -1,14 +1,13 @@
-import Sidebar from "@/components/Sidebar";
-import CandidateList from "@/components/CandidateList";
-import RightSidebar from "@/components/RightSidebar";
+import ModernSidebar from "@/components/ModernSidebar";
+import ModernCandidateList from "@/components/ModernCandidateList";
+import ModernRightSidebar from "@/components/ModernRightSidebar";
 
 const Index = () => {
   return (
-    <div className="flex h-screen bg-background">
-      <Sidebar />
-      {/* Rail removed: sidebar now has its own toggle */}
-      <CandidateList />
-      <RightSidebar />
+    <div className="flex h-screen bg-gradient-to-br from-background via-background to-accent/10">
+      <ModernSidebar />
+      <ModernCandidateList />
+      <ModernRightSidebar />
     </div>
   );
 };
