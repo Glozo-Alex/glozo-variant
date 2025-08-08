@@ -239,7 +239,8 @@
   
   /* Glassmorphism components */
   .glass-card {
-    @apply bg-white/80 backdrop-blur-xl border border-white/20 shadow-xl;
+    background: hsl(var(--card) / 0.8);
+    @apply backdrop-blur-xl border border-card-border shadow-xl;
   }
   
   .glass-sidebar {
