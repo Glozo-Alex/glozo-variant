@@ -15,12 +15,14 @@ const CandidateList = () => {
   } as const;
 
   return (
-    <main className="flex-1 bg-background">
-      <div className="border-b border-border p-6">
+    <main className="flex-1 bg-background flex flex-col">
+      {/* Header (consistent height) */}
+      <div className="h-14 border-b border-border px-6 flex items-center">
         <h1 className="text-2xl font-semibold text-foreground">Found Candidates (2739)</h1>
       </div>
 
-      <div className="p-6 space-y-6">
+      {/* Scrollable content only here */}
+      <div className="flex-1 overflow-auto p-6 space-y-6">
         <CandidateCard
           {...base}
           skills={[
@@ -68,22 +70,21 @@ const CandidateList = () => {
         />
       </div>
 
-      <div className="border-t border-border p-6">
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-muted-foreground">41-60 of 2,739 candidates</span>
+      {/* Fixed footer within central section */}
+      <div className="h-14 border-t border-border px-6 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex items-center justify-between">
+        <span className="text-sm text-muted-foreground">41-60 of 2,739 candidates</span>
 
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm"><ChevronLeft className="h-4 w-4" /></Button>
-            <Button variant="outline" size="sm" className="bg-primary text-primary-foreground">1</Button>
-            <Button variant="outline" size="sm">2</Button>
-            <Button variant="outline" size="sm">3</Button>
-            <span className="text-muted-foreground">...</span>
-            <Button variant="outline" size="sm">24</Button>
-            <Button variant="outline" size="sm"><ChevronRight className="h-4 w-4" /></Button>
-          </div>
-
-          <div className="text-sm text-muted-foreground">20 per page</div>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" className="hover-scale"><ChevronLeft className="h-4 w-4" /></Button>
+          <Button variant="outline" size="sm" className="bg-primary text-primary-foreground hover-scale">1</Button>
+          <Button variant="outline" size="sm" className="hover-scale">2</Button>
+          <Button variant="outline" size="sm" className="hover-scale">3</Button>
+          <span className="text-muted-foreground">...</span>
+          <Button variant="outline" size="sm" className="hover-scale">24</Button>
+          <Button variant="outline" size="sm" className="hover-scale"><ChevronRight className="h-4 w-4" /></Button>
         </div>
+
+        <div className="text-sm text-muted-foreground">20 per page</div>
       </div>
     </main>
   );

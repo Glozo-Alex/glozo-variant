@@ -27,7 +27,7 @@ const CandidateCard = ({
   openToOffers,
 }: CandidateCardProps) => {
   return (
-    <article className="bg-card border border-card-border rounded-xl p-5 space-y-4">
+    <article className="bg-card border border-card-border rounded-xl p-5 space-y-4 animate-fade-in hover:shadow-lg hover-scale">
       {/* Header */}
       <header className="flex items-start justify-between">
         <div className="flex items-center gap-3 flex-wrap">
@@ -48,11 +48,11 @@ const CandidateCard = ({
           )}
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="text-sidebar-text border-border">
+          <Button variant="outline" size="sm" className="text-sidebar-text border-border hover-scale">
             <MessageSquare className="h-4 w-4 mr-1" />
             Message <ChevronDown className="h-4 w-4 ml-1" />
           </Button>
-          <Button variant="outline" size="sm" className="text-sidebar-text border-border">
+          <Button variant="outline" size="sm" className="text-sidebar-text border-border hover-scale">
             <Star className="h-4 w-4 mr-1" />
             Shortlist
           </Button>

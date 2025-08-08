@@ -8,46 +8,46 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 0 0% 97%;
-    --foreground: 220 15% 20%;
+    --background: 237 100% 93%; /* DADCFF */
+    --foreground: 0 0% 18%; /* 2F2F2F */
     
-    --sidebar-bg: 0 0% 100%;
-    --sidebar-border: 210 20% 90%;
-    --sidebar-text: 220 15% 60%;
-    --sidebar-text-active: 220 15% 20%;
-    --sidebar-hover: 210 20% 96%;
+    --sidebar-bg: 236 100% 86.6%; /* BBC0FF */
+    --sidebar-border: 226 28% 88%; /* D8DCE9 */
+    --sidebar-text: 0 0% 46%; /* 757575 */
+    --sidebar-text-active: 0 0% 18%; /* 2F2F2F */
+    --sidebar-hover: 237 100% 92%; /* ~DADCFF */
     
     --card: 0 0% 100%;
-    --card-foreground: 220 15% 20%;
-    --card-border: 210 20% 90%;
+    --card-foreground: 0 0% 18%;
+    --card-border: 226 28% 88%;
     
-    --primary: 210 100% 50%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 236 100% 86.6%; /* BBC0FF */
+    --primary-foreground: 0 0% 18%; /* 2F2F2F */
     
-    --secondary: 210 20% 96%;
-    --secondary-foreground: 220 15% 20%;
+    --secondary: 226 28% 88%; /* D8DCE9 */
+    --secondary-foreground: 0 0% 18%;
     
-    --muted: 210 20% 96%;
-    --muted-foreground: 220 15% 60%;
+    --muted: 226 28% 88%;
+    --muted-foreground: 0 0% 46%;
     
-    --accent: 210 20% 96%;
-    --accent-foreground: 220 15% 20%;
+    --accent: 237 100% 92%;
+    --accent-foreground: 0 0% 18%;
     
-    --success: 142 76% 36%;
+    --success: 152 100% 30%; /* 009951 */
     --success-foreground: 0 0% 100%;
     
-    --match-green: 142 76% 36%;
-    --tag-blue: 210 100% 96%;
-    --tag-blue-text: 210 100% 30%;
-    --tag-purple: 250 100% 96%;
-    --tag-purple-text: 250 80% 40%;
+    --match-green: 152 100% 30%;
+    --tag-blue: 236 100% 86.6%; /* BBC0FF */
+    --tag-blue-text: 0 0% 18%;
+    --tag-purple: 237 100% 93%; /* DADCFF */
+    --tag-purple-text: 0 0% 18%;
     
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
     
-    --border: 210 20% 90%;
-    --input: 210 20% 90%;
-    --ring: 210 100% 50%;
+    --border: 226 28% 88%;
+    --input: 226 28% 88%;
+    --ring: 236 100% 86.6%;
     
     --radius: 0.375rem;
   }

@@ -10,7 +10,7 @@ const RightSidebar = () => {
   return (
     <aside className="w-96 bg-card border-l border-border h-screen flex flex-col">
       {/* Top tag */}
-      <div className="p-4 border-b border-border">
+      <div className="h-14 px-4 flex items-center border-b border-border">
         <span className="inline-block bg-tag-blue text-tag-blue-text px-3 py-1 rounded-full text-sm font-medium">fintech</span>
       </div>
 
@@ -38,8 +38,8 @@ const RightSidebar = () => {
       {/* Controls */}
       <div className="p-4 border-t border-border space-y-3 relative">
         <div className="flex items-center justify-between">
-          <Button variant="outline" size="sm" className="flex items-center gap-2"><RotateCcw className="h-4 w-4" /> Reset</Button>
-          <Button variant="outline" size="sm" className="flex items-center gap-2"><Filter className="h-4 w-4" /> Filters</Button>
+          <Button variant="outline" size="sm" className="flex items-center gap-2 hover-scale"><RotateCcw className="h-4 w-4" /> Reset</Button>
+          <Button variant="outline" size="sm" className="flex items-center gap-2 hover-scale"><Filter className="h-4 w-4" /> Filters</Button>
         </div>
         <div className="space-y-2">
           <div className="relative">
