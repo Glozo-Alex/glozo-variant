@@ -11,7 +11,7 @@ const Sidebar = () => {
     <TooltipProvider>
       <aside className={`${collapsed ? "w-20" : "w-64"} glass-sidebar h-screen flex flex-col transition-[width] duration-200 animate-slide-in-left`}>
         {/* Header with centered logo */}
-        <div className="h-14 border-b border-sidebar-border/30 flex items-center justify-center px-2">
+        <div className="h-14 flex items-center justify-center px-2">
           <img
             src={collapsed ? "/lovable-uploads/3958ba4b-ab9f-4bc4-9677-5bc99ead0c0a.png" : "/lovable-uploads/fc31fa24-db3f-423a-b235-da6a49bb2bdd.png"}
             alt={collapsed ? "GLOZO mark logo (orange FC5B26)" : "GLOZO logo (orange FC5B26)"}

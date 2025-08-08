@@ -23,7 +23,7 @@
     
     /* Sidebar glassmorphism */
     --sidebar-bg: 240 10% 98% / 0.95; /* Frosted glass */
-    --sidebar-border: 220 13% 91% / 0.5;
+    --sidebar-border: 220 13% 96% / 0.3;
     --sidebar-text: 215 16% 47%;
     --sidebar-text-active: 224 71% 4%;
     --sidebar-hover: 220 13% 91% / 0.7;
@@ -32,7 +32,7 @@
     /* Card system with elevation */
     --card: 0 0% 100%;
     --card-foreground: 224 71% 4%;
-    --card-border: 220 13% 91%;
+    --card-border: 220 13% 96% / 0.3;
     --card-shadow: 220 43% 11% / 0.06; /* Elegant shadow */
     --card-hover: 262 83% 58% / 0.02; /* Subtle purple tint */
     
@@ -245,7 +245,7 @@
   
   .glass-sidebar {
     background: var(--gradient-sidebar);
-    @apply backdrop-blur-xl border-r border-sidebar-border/20;
+    @apply backdrop-blur-xl;
   }
   
   .glass-surface {
