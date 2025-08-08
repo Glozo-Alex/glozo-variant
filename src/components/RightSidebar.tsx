@@ -36,23 +36,23 @@ const RightSidebar = () => {
       </div>
 
       {/* Controls */}
-      <div className="p-4 border-t border-sidebar-border/30 space-y-3 relative">
+      <div className="p-4 border-t border-sidebar-border/30 space-y-3">
         <div className="flex items-center justify-between">
           <Button variant="outline" size="sm" className="flex items-center gap-2 hover-scale bg-card-hover border-card-border text-card-foreground hover:bg-card-hover/70"><RotateCcw className="h-4 w-4" /> Reset</Button>
           <Button variant="outline" size="sm" className="flex items-center gap-2 hover-scale bg-card-hover border-card-border text-card-foreground hover:bg-card-hover/70"><Filter className="h-4 w-4" /> Filters</Button>
         </div>
         <div className="space-y-2">
           <div className="relative">
-            <Input placeholder="Ask to refine your search.." className="pr-10 text-sm" />
-            <Paperclip className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input placeholder="Ask to refine your search.." className="pr-20 text-sm" />
+            <Paperclip className="absolute right-12 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <button aria-label="Send" className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-tag-purple text-tag-purple-text flex items-center justify-center shadow">
+              <Send className="h-4 w-4" />
+            </button>
           </div>
           <div className="flex items-center justify-between text-sm text-muted-foreground">
             <span>Senior Data Scientist</span>
           </div>
         </div>
-        <button aria-label="Send" className="absolute bottom-4 right-4 w-10 h-10 rounded-full bg-tag-purple text-tag-purple-text flex items-center justify-center shadow">
-          <Send className="h-5 w-5" />
-        </button>
       </div>
     </aside>
   );
