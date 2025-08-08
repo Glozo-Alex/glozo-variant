@@ -44,24 +44,27 @@ export default {
 					DEFAULT: 'hsl(var(--accent))',
 					foreground: 'hsl(var(--accent-foreground))'
 				},
-				popover: {
-					DEFAULT: 'hsl(var(--popover))',
-					foreground: 'hsl(var(--popover-foreground))'
-				},
 				card: {
 					DEFAULT: 'hsl(var(--card))',
-					foreground: 'hsl(var(--card-foreground))'
+					foreground: 'hsl(var(--card-foreground))',
+					border: 'hsl(var(--card-border))'
 				},
 				sidebar: {
-					DEFAULT: 'hsl(var(--sidebar-background))',
-					foreground: 'hsl(var(--sidebar-foreground))',
-					primary: 'hsl(var(--sidebar-primary))',
-					'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
-					accent: 'hsl(var(--sidebar-accent))',
-					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
+					bg: 'hsl(var(--sidebar-bg))',
 					border: 'hsl(var(--sidebar-border))',
-					ring: 'hsl(var(--sidebar-ring))'
-				}
+					text: 'hsl(var(--sidebar-text))',
+					'text-active': 'hsl(var(--sidebar-text-active))',
+					hover: 'hsl(var(--sidebar-hover))'
+				},
+				success: {
+					DEFAULT: 'hsl(var(--success))',
+					foreground: 'hsl(var(--success-foreground))'
+				},
+				'match-green': 'hsl(var(--match-green))',
+				'tag-blue': 'hsl(var(--tag-blue))',
+				'tag-blue-text': 'hsl(var(--tag-blue-text))',
+				'tag-purple': 'hsl(var(--tag-purple))',
+				'tag-purple-text': 'hsl(var(--tag-purple-text))'
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
