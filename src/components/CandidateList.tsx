@@ -15,10 +15,10 @@ const CandidateList = () => {
   } as const;
 
   return (
-    <main className="flex-1 bg-background flex flex-col">
+    <main className="flex-1 glass-surface flex flex-col animate-fade-in">
       {/* Header (consistent height) */}
-      <div className="h-14 border-b border-border px-6 flex items-center">
-        <h1 className="text-2xl font-semibold text-foreground">Found Candidates (2739)</h1>
+      <div className="h-14 border-b border-white/10 px-6 flex items-center">
+        <h1 className="text-2xl font-semibold text-white">Found Candidates (2739)</h1>
       </div>
 
       {/* Scrollable content only here */}
@@ -71,20 +71,20 @@ const CandidateList = () => {
       </div>
 
       {/* Fixed footer within central section */}
-      <div className="h-14 border-t border-border px-6 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex items-center justify-between">
-        <span className="text-sm text-muted-foreground">41-60 of 2,739 candidates</span>
+      <div className="h-14 border-t border-white/10 px-6 glass-surface flex items-center justify-between">
+        <span className="text-sm text-white/70">41-60 of 2,739 candidates</span>
 
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="hover-scale"><ChevronLeft className="h-4 w-4" /></Button>
-          <Button variant="outline" size="sm" className="bg-primary text-primary-foreground hover-scale">1</Button>
-          <Button variant="outline" size="sm" className="hover-scale">2</Button>
-          <Button variant="outline" size="sm" className="hover-scale">3</Button>
-          <span className="text-muted-foreground">...</span>
-          <Button variant="outline" size="sm" className="hover-scale">24</Button>
-          <Button variant="outline" size="sm" className="hover-scale"><ChevronRight className="h-4 w-4" /></Button>
+          <Button variant="outline" size="sm" className="hover-scale border-white/20 bg-white/10 text-white hover:bg-white/20"><ChevronLeft className="h-4 w-4" /></Button>
+          <Button variant="outline" size="sm" className="bg-primary text-primary-foreground hover-scale border-primary/50">1</Button>
+          <Button variant="outline" size="sm" className="hover-scale border-white/20 bg-white/10 text-white hover:bg-white/20">2</Button>
+          <Button variant="outline" size="sm" className="hover-scale border-white/20 bg-white/10 text-white hover:bg-white/20">3</Button>
+          <span className="text-white/70">...</span>
+          <Button variant="outline" size="sm" className="hover-scale border-white/20 bg-white/10 text-white hover:bg-white/20">24</Button>
+          <Button variant="outline" size="sm" className="hover-scale border-white/20 bg-white/10 text-white hover:bg-white/20"><ChevronRight className="h-4 w-4" /></Button>
         </div>
 
-        <div className="text-sm text-muted-foreground">20 per page</div>
+        <div className="text-sm text-white/70">20 per page</div>
       </div>
     </main>
   );

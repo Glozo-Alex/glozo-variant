@@ -5,13 +5,13 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
 
-  const navCls = "flex items-center gap-3 px-3 py-2 rounded-md text-sm text-sidebar-text hover:bg-sidebar-hover hover:text-sidebar-text-active transition-colors";
+  const navCls = "flex items-center gap-3 px-3 py-2 rounded-md text-sm text-white/70 hover:bg-white/10 hover:text-white transition-all duration-300 hover-scale";
 
   return (
     <TooltipProvider>
-      <aside className={`${collapsed ? "w-20" : "w-64"} bg-sidebar-bg border-r border-sidebar-border h-screen flex flex-col transition-[width] duration-200`}> 
+      <aside className={`${collapsed ? "w-20" : "w-64"} glass-sidebar h-screen flex flex-col transition-[width] duration-200 animate-slide-in-left`}>
         {/* Header with centered logo */}
-        <div className="h-14 border-b border-sidebar-border flex items-center justify-center px-2">
+        <div className="h-14 border-b border-white/10 flex items-center justify-center px-2">
           <img
             src={collapsed ? "/lovable-uploads/3958ba4b-ab9f-4bc4-9677-5bc99ead0c0a.png" : "/lovable-uploads/fc31fa24-db3f-423a-b235-da6a49bb2bdd.png"}
             alt={collapsed ? "GLOZO mark logo (orange FC5B26)" : "GLOZO logo (orange FC5B26)"}
@@ -61,10 +61,10 @@ const Sidebar = () => {
 
         {/* Project group */}
         <div className="px-3 mt-4">
-          <div className="px-3 py-2 rounded-lg border border-sidebar-border bg-card">
+          <div className="px-3 py-2 rounded-lg border border-white/10 glass-card">
             <div className="flex items-center gap-3 mb-2">
-              <Folder className="h-4 w-4 text-sidebar-text" />
-              {!collapsed && <span className="text-sm font-medium text-foreground truncate">Senior Data S...</span>}
+              <Folder className="h-4 w-4 text-white/70" />
+              {!collapsed && <span className="text-sm font-medium text-white truncate">Senior Data S...</span>}
             </div>
             <div className="flex flex-col gap-1">
               {collapsed ? (
@@ -167,16 +167,16 @@ const Sidebar = () => {
         <div className="mt-auto p-4 space-y-3">
           <button
             aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-            className="w-full h-10 rounded-lg bg-muted/50 text-foreground/70 hover:bg-muted hover:text-foreground flex items-center justify-center transition-colors"
+            className="w-full h-10 rounded-lg bg-white/10 text-white/70 hover:bg-white/20 hover:text-white flex items-center justify-center transition-all duration-300 hover-scale"
             onClick={() => setCollapsed((v) => !v)}
           >
             {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
           </button>
           
           {/* User */}
-          <div className={`flex items-center gap-3 px-3 py-2 rounded-lg border border-sidebar-border bg-card ${collapsed ? "justify-center" : ""}`}>
-            <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-sm font-medium text-foreground">A</div>
-            {!collapsed && <div className="text-sm font-medium text-foreground">Ana Ivanova</div>}
+          <div className={`flex items-center gap-3 px-3 py-2 rounded-lg border border-white/10 glass-card ${collapsed ? "justify-center" : ""}`}>
+            <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-sm font-medium text-white">A</div>
+            {!collapsed && <div className="text-sm font-medium text-white">Ana Ivanova</div>}
           </div>
         </div>
       </aside>
