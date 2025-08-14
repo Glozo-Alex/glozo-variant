@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { LayoutDashboard, Search, List, MessageSquare, Folder, Users, ChevronLeft, ChevronRight } from "lucide-react";
+import { NavLink } from "react-router-dom";
+import { LayoutDashboard, Search, Kanban, Users, BarChart3, Plug, Settings, ChevronLeft, ChevronRight, Folder, List, MessageSquare } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const Sidebar = () => {
@@ -22,145 +23,134 @@ const Sidebar = () => {
 
         {/* Primary nav */}
         <nav className="px-3 pt-3 space-y-1">
-          {collapsed ? (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <a className={`${navCls} justify-center`} href="#">
-                  <LayoutDashboard className="h-5 w-5" />
-                </a>
-              </TooltipTrigger>
-              <TooltipContent side="right">
-                <p>Home</p>
-              </TooltipContent>
-            </Tooltip>
-          ) : (
-            <a className={navCls} href="#">
-              <LayoutDashboard className="h-5 w-5" />
-              <span>Home</span>
-            </a>
-          )}
-          
-          {collapsed ? (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <a className={`${navCls} justify-center`} href="#">
-                  <Search className="h-5 w-5" />
-                </a>
-              </TooltipTrigger>
-              <TooltipContent side="right">
-                <p>New Search</p>
-              </TooltipContent>
-            </Tooltip>
-          ) : (
-            <a className={navCls} href="#">
-              <Search className="h-5 w-5" />
-              <span>New Search</span>
-            </a>
-          )}
+          <NavLink to="/" className={({ isActive }) => `${navCls} ${isActive ? 'bg-sidebar-accent text-sidebar-text-active' : ''}`}>
+            {collapsed ? (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center justify-center">
+                    <LayoutDashboard className="h-5 w-5" />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="right">Dashboard</TooltipContent>
+              </Tooltip>
+            ) : (
+              <>
+                <LayoutDashboard className="h-5 w-5" />
+                <span>Dashboard</span>
+              </>
+            )}
+          </NavLink>
+
+          <NavLink to="/search" className={({ isActive }) => `${navCls} ${isActive ? 'bg-sidebar-accent text-sidebar-text-active' : ''}`}>
+            {collapsed ? (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center justify-center">
+                    <Search className="h-5 w-5" />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="right">Smart Search</TooltipContent>
+              </Tooltip>
+            ) : (
+              <>
+                <Search className="h-5 w-5" />
+                <span>Smart Search</span>
+              </>
+            )}
+          </NavLink>
+
+          <NavLink to="/pipeline" className={({ isActive }) => `${navCls} ${isActive ? 'bg-sidebar-accent text-sidebar-text-active' : ''}`}>
+            {collapsed ? (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center justify-center">
+                    <Kanban className="h-5 w-5" />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="right">Pipeline</TooltipContent>
+              </Tooltip>
+            ) : (
+              <>
+                <Kanban className="h-5 w-5" />
+                <span>Pipeline</span>
+              </>
+            )}
+          </NavLink>
+
+          <NavLink to="/analytics" className={({ isActive }) => `${navCls} ${isActive ? 'bg-sidebar-accent text-sidebar-text-active' : ''}`}>
+            {collapsed ? (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center justify-center">
+                    <BarChart3 className="h-5 w-5" />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="right">Analytics</TooltipContent>
+              </Tooltip>
+            ) : (
+              <>
+                <BarChart3 className="h-5 w-5" />
+                <span>Analytics</span>
+              </>
+            )}
+          </NavLink>
         </nav>
 
-        {/* Project group */}
-        <div className="px-3 mt-4">
-          <div className="px-3 py-2 rounded-lg border border-sidebar-border glass-card">
-            <div className="flex items-center gap-3 mb-2">
-              <Folder className="h-4 w-4 text-sidebar-text" />
-              {!collapsed && <span className="text-sm font-medium text-sidebar-text-active truncate">Senior Data S...</span>}
-            </div>
-            <div className="flex flex-col gap-1">
-              {collapsed ? (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <a className="flex items-center justify-center px-3 py-2 rounded-md text-sm bg-tag-purple text-tag-purple-text" href="#">
-                      <Search className="h-4 w-4" />
-                    </a>
-                  </TooltipTrigger>
-                  <TooltipContent side="right">
-                    <p>Sourcing</p>
-                  </TooltipContent>
-                </Tooltip>
-              ) : (
-                <a className="flex items-center gap-3 px-3 py-2 rounded-md text-sm bg-tag-purple text-tag-purple-text" href="#">
-                  <Search className="h-4 w-4" />
-                  <span>Sourcing</span>
-                </a>
-              )}
-              
-              {collapsed ? (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <a className={`${navCls} justify-center`} href="#">
-                      <List className="h-4 w-4" />
-                    </a>
-                  </TooltipTrigger>
-                  <TooltipContent side="right">
-                    <p>Shortlist</p>
-                  </TooltipContent>
-                </Tooltip>
-              ) : (
-                <a className={navCls} href="#">
-                  <List className="h-4 w-4" />
-                  <span>Shortlist</span>
-                </a>
-              )}
-              
-              {collapsed ? (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <a className={`${navCls} justify-center`} href="#">
-                      <MessageSquare className="h-4 w-4" />
-                    </a>
-                  </TooltipTrigger>
-                  <TooltipContent side="right">
-                    <p>Outreach</p>
-                  </TooltipContent>
-                </Tooltip>
-              ) : (
-                <a className={navCls} href="#">
-                  <MessageSquare className="h-4 w-4" />
-                  <span>Outreach</span>
-                </a>
-              )}
-            </div>
-          </div>
-        </div>
-
         {/* Secondary nav */}
-        <nav className="px-3 mt-4 space-y-1">
-          {collapsed ? (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <a className={`${navCls} justify-center`} href="#">
-                  <Folder className="h-5 w-5" />
-                </a>
-              </TooltipTrigger>
-              <TooltipContent side="right">
-                <p>Projects</p>
-              </TooltipContent>
-            </Tooltip>
-          ) : (
-            <a className={navCls} href="#">
-              <Folder className="h-5 w-5" />
-              <span>Projects</span>
-            </a>
-          )}
-          
-          {collapsed ? (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <a className={`${navCls} justify-center`} href="#">
-                  <Users className="h-5 w-5" />
-                </a>
-              </TooltipTrigger>
-              <TooltipContent side="right">
-                <p>Candidates</p>
-              </TooltipContent>
-            </Tooltip>
-          ) : (
-            <a className={navCls} href="#">
-              <Users className="h-5 w-5" />
-              <span>Candidates</span>
-            </a>
-          )}
+        <nav className="px-3 mt-6 space-y-1">
+          <NavLink to="/team" className={({ isActive }) => `${navCls} ${isActive ? 'bg-sidebar-accent text-sidebar-text-active' : ''}`}>
+            {collapsed ? (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center justify-center">
+                    <Users className="h-5 w-5" />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="right">Team</TooltipContent>
+              </Tooltip>
+            ) : (
+              <>
+                <Users className="h-5 w-5" />
+                <span>Team</span>
+              </>
+            )}
+          </NavLink>
+
+          <NavLink to="/integrations" className={({ isActive }) => `${navCls} ${isActive ? 'bg-sidebar-accent text-sidebar-text-active' : ''}`}>
+            {collapsed ? (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center justify-center">
+                    <Plug className="h-5 w-5" />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="right">Integrations</TooltipContent>
+              </Tooltip>
+            ) : (
+              <>
+                <Plug className="h-5 w-5" />
+                <span>Integrations</span>
+              </>
+            )}
+          </NavLink>
+
+          <NavLink to="/settings" className={({ isActive }) => `${navCls} ${isActive ? 'bg-sidebar-accent text-sidebar-text-active' : ''}`}>
+            {collapsed ? (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center justify-center">
+                    <Settings className="h-5 w-5" />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="right">Settings</TooltipContent>
+              </Tooltip>
+            ) : (
+              <>
+                <Settings className="h-5 w-5" />
+                <span>Settings</span>
+              </>
+            )}
+          </NavLink>
         </nav>
 
         {/* Collapse button at bottom */}
