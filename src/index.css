@@ -6,48 +6,48 @@
 
 @layer base {
   :root {
-    /* Base surfaces */
-    --background: 240 10% 98%; /* Subtle warm white */
-    --foreground: 224 71% 4%; /* Deep navy text */
+    /* Base surfaces - Warm neutrals */
+    --background: 45 23% 97%; /* Warm off-white */
+    --foreground: 200 20% 12%; /* Deep slate text */
     
-    /* Primary gradient system - Purple to Blue */
-    --primary: 262 83% 58%; /* Rich purple (#8B5CF6) */
-    --primary-glow: 217 91% 60%; /* Electric blue (#3B82F6) */
+    /* Primary gradient system - Emerald to Teal */
+    --primary: 168 76% 42%; /* Deep emerald (#059669) */
+    --primary-glow: 187 85% 53%; /* Warm teal (#14B8A6) */
     --primary-foreground: 0 0% 100%;
-    --primary-hover: 262 83% 65%;
+    --primary-hover: 168 76% 48%;
     
     /* Glassmorphism surfaces */
-    --glass: 0 0% 100% / 0.8; /* Semi-transparent white */
-    --glass-border: 0 0% 100% / 0.2; /* Subtle glass border */
-    --glass-shadow: 0 0% 0% / 0.1; /* Soft shadow */
+    --glass: 45 23% 99% / 0.8; /* Warm semi-transparent white */
+    --glass-border: 168 25% 95% / 0.2; /* Subtle sage border */
+    --glass-shadow: 200 15% 15% / 0.08; /* Soft slate shadow */
     
     /* Sidebar glassmorphism */
-    --sidebar-bg: 240 10% 98% / 0.95; /* Frosted glass */
-    --sidebar-border: 220 13% 96% / 0.3;
-    --sidebar-text: 215 16% 47%;
-    --sidebar-text-active: 224 71% 4%;
-    --sidebar-hover: 220 13% 91% / 0.7;
-    --sidebar-accent: 262 83% 58% / 0.1; /* Purple glow */
+    --sidebar-bg: 45 23% 97% / 0.95; /* Warm frosted glass */
+    --sidebar-border: 168 15% 92% / 0.3;
+    --sidebar-text: 200 15% 45%; /* Muted slate */
+    --sidebar-text-active: 200 20% 12%; /* Deep slate */
+    --sidebar-hover: 168 25% 95% / 0.7; /* Sage hover */
+    --sidebar-accent: 168 76% 42% / 0.08; /* Emerald glow */
     
     /* Card system with elevation */
-    --card: 0 0% 100%;
-    --card-foreground: 224 71% 4%;
-    --card-border: 220 13% 96% / 0.3;
-    --card-shadow: 220 43% 11% / 0.06; /* Elegant shadow */
-    --card-hover: 262 83% 58% / 0.02; /* Subtle purple tint */
+    --card: 45 23% 99%; /* Warm white cards */
+    --card-foreground: 200 20% 12%; /* Deep slate text */
+    --card-border: 168 15% 92% / 0.3; /* Sage border */
+    --card-shadow: 200 15% 15% / 0.04; /* Elegant slate shadow */
+    --card-hover: 168 76% 42% / 0.02; /* Subtle emerald tint */
     
     /* Accent system */
-    --accent: 262 83% 97%; /* Very light purple */
-    --accent-foreground: 262 83% 20%;
-    --accent-glow: 262 83% 58% / 0.15;
+    --accent: 168 50% 96%; /* Very light sage */
+    --accent-foreground: 168 76% 25%; /* Deep emerald text */
+    --accent-glow: 168 76% 42% / 0.12; /* Emerald glow */
     
     /* Secondary surfaces */
-    --secondary: 220 14% 96%;
-    --secondary-foreground: 220 9% 46%;
+    --secondary: 168 25% 94%; /* Light sage */
+    --secondary-foreground: 200 15% 40%; /* Muted slate */
     
     /* Muted elements */
-    --muted: 220 14% 96%;
-    --muted-foreground: 220 9% 46%;
+    --muted: 168 25% 94%; /* Light sage */
+    --muted-foreground: 200 15% 40%; /* Muted slate */
     
     /* Status colors with glow effects */
     --success: 142 76% 36%;
@@ -69,29 +69,29 @@
     --match-poor: 0 84% 60%; /* Red for <50% */
     
     /* Tag system with gradients */
-    --tag-blue: 217 91% 95%;
-    --tag-blue-text: 217 91% 35%;
-    --tag-blue-glow: 217 91% 60% / 0.1;
+    --tag-blue: 187 85% 92%; /* Teal light */
+    --tag-blue-text: 187 85% 35%; /* Teal dark */
+    --tag-blue-glow: 187 85% 53% / 0.1;
     
-    --tag-purple: 262 83% 95%;
-    --tag-purple-text: 262 83% 35%;
-    --tag-purple-glow: 262 83% 58% / 0.1;
+    --tag-purple: 168 50% 92%; /* Sage light */
+    --tag-purple-text: 168 76% 30%; /* Emerald dark */
+    --tag-purple-glow: 168 76% 42% / 0.1;
     
-    --tag-green: 142 76% 95%;
-    --tag-green-text: 142 76% 30%;
+    --tag-green: 142 76% 92%; /* Green light */
+    --tag-green-text: 142 76% 28%; /* Green dark */
     --tag-green-glow: 142 76% 36% / 0.1;
     
     /* Form elements */
-    --border: 220 13% 91%;
-    --input: 0 0% 100%;
-    --input-border: 220 13% 91%;
-    --ring: 262 83% 58%;
+    --border: 168 15% 88%; /* Sage border */
+    --input: 45 23% 99%; /* Warm white input */
+    --input-border: 168 15% 88%; /* Sage input border */
+    --ring: 168 76% 42%; /* Emerald focus ring */
     
     /* Gradients */
     --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
-    --gradient-card: linear-gradient(145deg, hsl(var(--card)), hsl(var(--card)) 50%, hsl(220 13% 91% / 0.3));
-    --gradient-glass: linear-gradient(145deg, hsl(var(--glass)), hsl(0 0% 100% / 0.6));
-    --gradient-sidebar: linear-gradient(180deg, hsl(var(--sidebar-bg)), hsl(240 10% 96% / 0.9));
+    --gradient-card: linear-gradient(145deg, hsl(var(--card)), hsl(var(--card)) 50%, hsl(168 15% 92% / 0.3));
+    --gradient-glass: linear-gradient(145deg, hsl(var(--glass)), hsl(45 23% 99% / 0.6));
+    --gradient-sidebar: linear-gradient(180deg, hsl(var(--sidebar-bg)), hsl(45 23% 95% / 0.9));
     
     /* Shadows with color */
     --shadow-sm: 0 1px 2px 0 hsl(var(--glass-shadow));
@@ -110,14 +110,14 @@
 
   .dark {
     /* Dark theme with modern glassmorphism */
-    --background: 224 71% 4%; /* Deep navy background */
-    --foreground: 210 20% 98%; /* Near white text */
+    --background: 200 25% 8%; /* Deep slate background */
+    --foreground: 45 23% 96%; /* Warm near-white text */
     
-    /* Primary system remains vibrant */
-    --primary: 262 83% 65%;
-    --primary-glow: 217 91% 65%;
+    /* Primary system enhanced for dark */
+    --primary: 168 76% 55%; /* Brighter emerald */
+    --primary-glow: 187 85% 65%; /* Brighter teal */
     --primary-foreground: 0 0% 100%;
-    --primary-hover: 262 83% 70%;
+    --primary-hover: 168 76% 60%;
     
     /* Dark glassmorphism */
     --glass: 224 71% 4% / 0.9;
