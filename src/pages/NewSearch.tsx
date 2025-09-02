@@ -10,6 +10,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { X, Plus, Search } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Switch } from "@/components/ui/switch";
+import { getCandidatesByPrompt } from "@/services/candidates";
 const NewSearch = () => {
   const {
     createProject
@@ -22,6 +24,8 @@ const NewSearch = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const [skillInput, setSkillInput] = useState("");
+  const [similarRoles, setSimilarRoles] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const addSkill = (skill: string) => {
     const trimmedSkill = skill.trim();
     if (trimmedSkill && !selectedSkills.includes(trimmedSkill)) {
@@ -32,7 +36,7 @@ const NewSearch = () => {
   const removeSkill = (skill: string) => {
     setSelectedSkills(selectedSkills.filter(s => s !== skill));
   };
-  const handleCreateProject = () => {
+  const handleCreateProject = async () => {
     if (!projectName.trim()) {
       toast({
         title: "Project name required",
@@ -49,13 +53,30 @@ const NewSearch = () => {
       });
       return;
     }
+
     const fullQuery = selectedSkills.length > 0 ? `${searchQuery} Skills: ${selectedSkills.join(", ")}` : searchQuery;
-    const project = createProject(projectName, fullQuery);
-    toast({
-      title: "Project created successfully",
-      description: `"${project.name}" is ready for candidate search`
-    });
-    navigate(`/project/${project.id}/results`);
+
+    setIsLoading(true);
+    try {
+      const apiRes = await getCandidatesByPrompt({ prompt: fullQuery, similarRoles });
+      const count = Array.isArray(apiRes) ? apiRes.length : Array.isArray(apiRes?.data) ? apiRes.data.length : undefined;
+
+      const project = createProject(projectName, fullQuery);
+      toast({
+        title: "Search started",
+        description: count !== undefined ? `Found ${count} candidates for "${project.name}"` : `"${project.name}" is ready for candidate search`
+      });
+      navigate(`/project/${project.id}/results`);
+    } catch (error: any) {
+      console.error("getCandidatesByPrompt error:", error);
+      toast({
+        title: "Search failed",
+        description: error?.message ?? "Unable to fetch candidates",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && skillInput.trim()) {
@@ -100,17 +121,20 @@ const NewSearch = () => {
                 </p>
               </div>
 
-              {/* Skills */}
+              {/* Similar Roles Toggle */}
+              <div className="flex items-center justify-between rounded-md border border-input p-3">
+                <div>
+                  <Label htmlFor="similar-roles">Find similar roles</Label>
+                  <p className="text-xs text-muted-foreground">Broaden search to include adjacent titles.</p>
+                </div>
+                <Switch id="similar-roles" checked={similarRoles} onCheckedChange={setSimilarRoles} />
+              </div>
               
-
-              {/* Advanced Filters */}
-              
-
               {/* Action Buttons */}
               <div className="flex gap-3 pt-4">
-                <Button onClick={handleCreateProject} className="flex-1" size="lg">
+                <Button onClick={handleCreateProject} className="flex-1" size="lg" disabled={isLoading}>
                   <Search className="h-4 w-4 mr-2" />
-                  Create Project & Search
+                  {isLoading ? "Searching..." : "Create Project & Search"}
                 </Button>
                 <Button variant="outline" onClick={() => navigate('/')}>
                   Cancel

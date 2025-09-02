@@ -14,7 +14,156 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      project_shortlist: {
+        Row: {
+          added_at: string
+          candidate_id: string
+          candidate_snapshot: Json
+          id: string
+          project_id: string
+          user_id: string
+        }
+        Insert: {
+          added_at?: string
+          candidate_id: string
+          candidate_snapshot: Json
+          id?: string
+          project_id: string
+          user_id: string
+        }
+        Update: {
+          added_at?: string
+          candidate_id?: string
+          candidate_snapshot?: Json
+          id?: string
+          project_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_shortlist_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      projects: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          query: string
+          shortlist_count: number | null
+          similar_roles: boolean | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          query: string
+          shortlist_count?: number | null
+          similar_roles?: boolean | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          query?: string
+          shortlist_count?: number | null
+          similar_roles?: boolean | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      search_results: {
+        Row: {
+          candidate_data: Json
+          created_at: string
+          id: string
+          match_percentage: number | null
+          search_id: string
+          user_id: string
+        }
+        Insert: {
+          candidate_data: Json
+          created_at?: string
+          id?: string
+          match_percentage?: number | null
+          search_id: string
+          user_id: string
+        }
+        Update: {
+          candidate_data?: Json
+          created_at?: string
+          id?: string
+          match_percentage?: number | null
+          search_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "search_results_search_id_fkey"
+            columns: ["search_id"]
+            isOneToOne: false
+            referencedRelation: "searches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      searches: {
+        Row: {
+          candidate_count: number | null
+          completed_at: string | null
+          created_at: string
+          error_message: string | null
+          id: string
+          project_id: string
+          prompt: string
+          similar_roles: boolean | null
+          status: string | null
+          user_id: string
+        }
+        Insert: {
+          candidate_count?: number | null
+          completed_at?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          project_id: string
+          prompt: string
+          similar_roles?: boolean | null
+          status?: string | null
+          user_id: string
+        }
+        Update: {
+          candidate_count?: number | null
+          completed_at?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          project_id?: string
+          prompt?: string
+          similar_roles?: boolean | null
+          status?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "searches_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
