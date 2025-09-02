@@ -165,41 +165,26 @@ const TopNavigation = () => {
   return (
     <header className="glass-surface border-b border-sidebar-border px-6 py-4 flex-shrink-0">
       <div className="flex items-center justify-between">
-        {/* Left side - Page info and breadcrumbs */}
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-              <Icon className="h-4 w-4 text-primary" />
-            </div>
-            <div>
-              <h1 className="text-lg font-semibold text-foreground">{pageInfo.title}</h1>
-              {pageInfo.subtitle && (
-                <p className="text-sm text-muted-foreground">{pageInfo.subtitle}</p>
-              )}
-            </div>
-          </div>
-          
-          {/* Breadcrumbs */}
-          <div className="hidden md:block">
-            <Breadcrumb>
-              <BreadcrumbList>
-                {pageInfo.breadcrumbs.map((crumb, index) => (
-                  <React.Fragment key={index}>
-                    <BreadcrumbItem>
-                      {crumb.href ? (
-                        <BreadcrumbLink href={crumb.href} className="text-muted-foreground hover:text-foreground">
-                          {crumb.label}
-                        </BreadcrumbLink>
-                      ) : (
-                        <BreadcrumbPage className="font-medium">{crumb.label}</BreadcrumbPage>
-                      )}
-                    </BreadcrumbItem>
-                    {index < pageInfo.breadcrumbs.length - 1 && <BreadcrumbSeparator />}
-                  </React.Fragment>
-                ))}
-              </BreadcrumbList>
-            </Breadcrumb>
-          </div>
+        {/* Left side - Breadcrumbs only */}
+        <div className="flex items-center">
+          <Breadcrumb>
+            <BreadcrumbList>
+              {pageInfo.breadcrumbs.map((crumb, index) => (
+                <React.Fragment key={index}>
+                  <BreadcrumbItem>
+                    {crumb.href ? (
+                      <BreadcrumbLink href={crumb.href} className="text-muted-foreground hover:text-foreground">
+                        {crumb.label}
+                      </BreadcrumbLink>
+                    ) : (
+                      <BreadcrumbPage className="font-medium">{crumb.label}</BreadcrumbPage>
+                    )}
+                  </BreadcrumbItem>
+                  {index < pageInfo.breadcrumbs.length - 1 && <BreadcrumbSeparator />}
+                </React.Fragment>
+              ))}
+            </BreadcrumbList>
+          </Breadcrumb>
         </div>
 
         {/* Right side - Status indicators */}
