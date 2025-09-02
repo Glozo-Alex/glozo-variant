@@ -18,12 +18,15 @@ const Auth = () => {
   }, [user, navigate]);
 
   const handleGoogleSignIn = async () => {
+    console.log('Auth page: Starting Google sign in process...');
     setLoading(true);
 
     try {
       const { error } = await signInWithGoogle();
+      console.log('Auth page: Sign in result:', { error });
 
       if (error) {
+        console.error('Auth page: Sign in error:', error);
         toast({
           title: "Ошибка авторизации",
           description: error.message || "Произошла ошибка при входе через Google.",
@@ -31,6 +34,7 @@ const Auth = () => {
         });
       }
     } catch (error) {
+      console.error('Auth page: Unexpected error:', error);
       toast({
         title: "Ошибка",
         description: "Произошла неожиданная ошибка.",
