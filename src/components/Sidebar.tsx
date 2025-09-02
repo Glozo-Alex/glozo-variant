@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
-import { LayoutDashboard, Search, Kanban, Users, BarChart3, Plug, Settings, ChevronLeft, ChevronRight, Folder, List, MessageSquare } from "lucide-react";
+import { LayoutDashboard, Search, Kanban, Users, BarChart3, Plug, Settings, ChevronLeft, ChevronRight, List, Plus } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { useProject } from "@/contexts/ProjectContext";
+import ProjectSelector from "./ProjectSelector";
 
 const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
+  const { activeProject } = useProject();
 
   const navCls = "flex items-center gap-3 px-3 py-2 rounded-md text-sm text-sidebar-text hover:bg-sidebar-hover hover:text-sidebar-text-active transition-all duration-300 hover-scale";
 
@@ -21,7 +24,7 @@ const Sidebar = () => {
           />
         </div>
 
-        {/* Primary nav */}
+        {/* Primary nav - Top section */}
         <nav className="px-3 pt-3 space-y-1">
           <NavLink to="/" className={({ isActive }) => `${navCls} ${isActive ? 'bg-sidebar-accent text-sidebar-text-active' : ''}`}>
             {collapsed ? (
@@ -41,24 +44,47 @@ const Sidebar = () => {
             )}
           </NavLink>
 
-          <NavLink to="/search" className={({ isActive }) => `${navCls} ${isActive ? 'bg-sidebar-accent text-sidebar-text-active' : ''}`}>
+          <NavLink to="/new-search" className={({ isActive }) => `${navCls} ${isActive ? 'bg-sidebar-accent text-sidebar-text-active' : ''}`}>
             {collapsed ? (
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div className="flex items-center justify-center">
-                    <Search className="h-5 w-5" />
+                    <Plus className="h-5 w-5" />
                   </div>
                 </TooltipTrigger>
-                <TooltipContent side="right">Smart Search</TooltipContent>
+                <TooltipContent side="right">New Search</TooltipContent>
               </Tooltip>
             ) : (
               <>
-                <Search className="h-5 w-5" />
-                <span>Smart Search</span>
+                <Plus className="h-5 w-5" />
+                <span>New Search</span>
               </>
             )}
           </NavLink>
+        </nav>
 
+        {/* Project section - Dynamic */}
+        {activeProject && !collapsed && (
+          <div className="px-3 mt-6">
+            <div className="text-xs font-medium text-sidebar-text uppercase tracking-wider mb-2">
+              Current Project
+            </div>
+            <div className="space-y-1">
+              <ProjectSelector />
+              
+              <NavLink 
+                to={`/project/${activeProject.id}/shortlist`} 
+                className={({ isActive }) => `${navCls} ${isActive ? 'bg-sidebar-accent text-sidebar-text-active' : ''}`}
+              >
+                <List className="h-5 w-5" />
+                <span>Shortlist ({activeProject.shortlistCount || 0})</span>
+              </NavLink>
+            </div>
+          </div>
+        )}
+
+        {/* Bottom navigation */}
+        <nav className="px-3 mt-6 space-y-1">
           <NavLink to="/pipeline" className={({ isActive }) => `${navCls} ${isActive ? 'bg-sidebar-accent text-sidebar-text-active' : ''}`}>
             {collapsed ? (
               <Tooltip>
@@ -96,7 +122,7 @@ const Sidebar = () => {
           </NavLink>
         </nav>
 
-        {/* Secondary nav */}
+        {/* System navigation */}
         <nav className="px-3 mt-6 space-y-1">
           <NavLink to="/team" className={({ isActive }) => `${navCls} ${isActive ? 'bg-sidebar-accent text-sidebar-text-active' : ''}`}>
             {collapsed ? (
