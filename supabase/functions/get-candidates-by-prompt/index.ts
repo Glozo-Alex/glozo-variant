@@ -122,7 +122,12 @@ serve(async (req: Request) => {
         body: JSON.stringify(payload),
       });
 
+      console.log("External API response status:", extRes.status);
+      console.log("External API response headers:", Object.fromEntries(extRes.headers.entries()));
+
       const responseText = await extRes.text();
+      console.log("External API raw response:", responseText);
+      
       let data: any = null;
       try {
         data = responseText ? JSON.parse(responseText) : null;
