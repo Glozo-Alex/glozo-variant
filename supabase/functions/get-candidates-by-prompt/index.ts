@@ -63,6 +63,12 @@ serve(async (req: Request) => {
       });
     }
 
+    // Normalize defaults
+    const safeCount = (typeof count === "number" && !Number.isNaN(count)) ? count : 200;
+    const similarRolesBool = (typeof similarRoles === "string"
+      ? similarRoles.toUpperCase() === "TRUE"
+      : !!similarRoles);
+    const similarRolesFlag = similarRolesBool ? "TRUE" : "FALSE";
     // Create search record
     const { data: searchData, error: searchError } = await supabase
       .from('searches')
@@ -70,7 +76,7 @@ serve(async (req: Request) => {
         project_id: projectId,
         user_id: user.id,
         prompt,
-        similar_roles: similarRoles === "Yes" || similarRoles === true,
+        similar_roles: similarRolesBool,
         status: 'pending'
       })
       .select()
@@ -87,12 +93,13 @@ serve(async (req: Request) => {
     const searchId = searchData.id;
 
     try {
-      const payload: Record<string, unknown> = { prompt };
-      if (typeof count === "number") payload.count = count;
-      if (similarRoles === "Yes" || similarRoles === true) payload.similarRoles = "Yes";
+      const payload: Record<string, unknown> = {
+        prompt,
+        count: safeCount,
+        similarRoles: similarRolesFlag,
+      };
 
       console.log("Forwarding to external API /get-candidates-by-prompt with payload:", payload);
-
       const extRes = await fetch("http://34.75.197.68:8888/api/get-candidates-by-prompt", {
         method: "POST",
         headers: {

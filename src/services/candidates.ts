@@ -8,9 +8,15 @@ export interface GetCandidatesParams {
 }
 
 export async function getCandidatesByPrompt({ prompt, count, similarRoles, projectId }: GetCandidatesParams) {
-  const body: Record<string, any> = { prompt, projectId };
-  if (typeof count === 'number') body.count = count;
-  if (similarRoles) body.similarRoles = "Yes"; // API expects "Yes" when enabled
+  const safeCount = typeof count === 'number' ? count : 200;
+  const similarRolesFlag = similarRoles ? 'TRUE' : 'FALSE';
+
+  const body: Record<string, any> = {
+    prompt,
+    projectId,
+    count: safeCount,
+    similarRoles: similarRolesFlag,
+  };
 
   const { data, error } = await supabase.functions.invoke('get-candidates-by-prompt', {
     body,
