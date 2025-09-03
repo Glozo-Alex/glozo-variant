@@ -74,7 +74,7 @@ const CandidateCard = ({
           <BrainCircuit className="h-4 w-4 text-muted-foreground" />
         </div>
         <p className="text-sm text-card-foreground leading-relaxed">
-          Climate <LinkChunk>scientist with a PhD driving climate model evaluation</LinkChunk> at LLNL, developing cutting-edge tools for <LinkChunk>big-data visualizations</LinkChunk> and advanced metrics impacting global climate research. Jiwoo Lee is a <LinkChunk>senior p...</LinkChunk>
+          {description || 'No summary available.'}
         </p>
       </div>
 

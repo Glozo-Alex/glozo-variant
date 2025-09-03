@@ -126,6 +126,7 @@ export type Database = {
           id: string
           project_id: string
           prompt: string
+          raw_response: Json | null
           similar_roles: boolean | null
           status: string | null
           user_id: string
@@ -138,6 +139,7 @@ export type Database = {
           id?: string
           project_id: string
           prompt: string
+          raw_response?: Json | null
           similar_roles?: boolean | null
           status?: string | null
           user_id: string
@@ -150,6 +152,7 @@ export type Database = {
           id?: string
           project_id?: string
           prompt?: string
+          raw_response?: Json | null
           similar_roles?: boolean | null
           status?: string | null
           user_id?: string

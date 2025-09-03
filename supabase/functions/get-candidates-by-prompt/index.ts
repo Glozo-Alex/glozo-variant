@@ -117,53 +117,51 @@ serve(async (req: Request) => {
         data = { error: "Invalid JSON from external API" };
       }
 
-      if (extRes.ok && data && Array.isArray(data)) {
-        // Save successful results
-        const candidateResults = data.map((candidate: any) => ({
-          search_id: searchId,
-          user_id: user.id,
-          candidate_data: candidate,
-          match_percentage: candidate.match_percentage || null
-        }));
+      // Handle both array and object responses and persist full JSON
+      const isArray = Array.isArray(data);
+      const candidatesArray = isArray
+        ? (data as any[])
+        : (Array.isArray((data as any)?.candidates) ? (data as any).candidates : []);
 
-        const { error: resultsError } = await supabase
-          .from('search_results')
-          .insert(candidateResults);
+      if (extRes.ok && (isArray || typeof data === 'object')) {
+        // Update search as completed and store the full raw response
+        const candidateCount = candidatesArray.length;
 
-        if (resultsError) {
-          console.error("Failed to save search results:", resultsError);
-        }
-
-        // Update search status to completed
-        await supabase
+        const { error: updateError } = await supabase
           .from('searches')
           .update({ 
             status: 'completed', 
             completed_at: new Date().toISOString(),
-            candidate_count: data.length 
+            candidate_count: candidateCount,
+            raw_response: data
           })
           .eq('id', searchId);
 
+        if (updateError) {
+          console.error('Failed to update search with raw_response:', updateError);
+        }
+
       } else {
-        // Update search status to failed
-        const errorMessage = `${status}: ${snippet || (data?.error ?? "External API request failed")}`;
+        // Update search status to failed, store snippet/raw data for debugging
+        const errorMessage = `${status}: ${snippet || (data?.error ?? 'External API request failed')}`;
         await supabase
           .from('searches')
           .update({ 
             status: 'failed', 
             completed_at: new Date().toISOString(),
-            error_message: errorMessage
+            error_message: errorMessage,
+            raw_response: data
           })
           .eq('id', searchId);
       }
 
-      const responsePayload = extRes.ok && Array.isArray(data)
+      const responsePayload = extRes.ok && (isArray || typeof data === 'object')
         ? { data, searchId }
-        : { error: data?.error || "External API request failed", status: extRes.status, data, searchId };
+        : { error: (data as any)?.error || 'External API request failed', status, data, searchId };
 
       return new Response(JSON.stringify(responsePayload), {
         status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
 
     } catch (apiError) {
