@@ -100,11 +100,20 @@ serve(async (req: Request) => {
         body: JSON.stringify(payload),
       });
 
+      const status = extRes.status;
       const responseText = await extRes.text();
+      const snippet = responseText ? responseText.slice(0, 300) : "";
+
+      console.log("External API status:", status);
+      if (snippet) {
+        console.log("External API response snippet:", snippet);
+      }
+
       let data: any = null;
       try {
         data = responseText ? JSON.parse(responseText) : null;
       } catch (parseErr) {
+        console.error("Failed to parse external API JSON:", parseErr);
         data = { error: "Invalid JSON from external API" };
       }
 
@@ -137,7 +146,7 @@ serve(async (req: Request) => {
 
       } else {
         // Update search status to failed
-        const errorMessage = data?.error || "External API request failed";
+        const errorMessage = `${status}: ${snippet || (data?.error ?? "External API request failed")}`;
         await supabase
           .from('searches')
           .update({ 
