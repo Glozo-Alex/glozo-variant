@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
-import { LayoutDashboard, Search, Kanban, Users, BarChart3, Plug, Settings, ChevronLeft, ChevronRight, List, Plus } from "lucide-react";
+import { LayoutDashboard, Search, Kanban, Users, BarChart3, Plug, Settings, ChevronLeft, ChevronRight, List, Plus, FolderOpen } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useProject } from "@/contexts/ProjectContext";
 import ProjectSelector from "./ProjectSelector";
@@ -40,6 +40,24 @@ const Sidebar = () => {
               <>
                 <LayoutDashboard className="h-5 w-5" />
                 <span>Dashboard</span>
+              </>
+            )}
+          </NavLink>
+
+          <NavLink to="/projects" className={({ isActive }) => `${navCls} ${isActive ? 'bg-sidebar-accent text-sidebar-text-active' : ''}`}>
+            {collapsed ? (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center justify-center">
+                    <FolderOpen className="h-5 w-5" />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="right">Projects</TooltipContent>
+              </Tooltip>
+            ) : (
+              <>
+                <FolderOpen className="h-5 w-5" />
+                <span>Projects</span>
               </>
             )}
           </NavLink>

@@ -13,4 +13,6 @@ export interface ProjectContextType {
   createProject: (name: string, query: string) => Project;
   setActiveProject: (project: Project) => void;
   deleteProject: (projectId: string) => void;
+  updateProject: (projectId: string, updates: Partial<Pick<Project, 'name' | 'query'>>) => void;
+  duplicateProject: (projectId: string) => Project;
 }

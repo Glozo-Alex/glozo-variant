@@ -19,6 +19,7 @@ import Team from "./pages/Team";
 import Integrations from "./pages/Integrations";
 import Settings from "./pages/Settings";
 import Auth from "./pages/Auth";
+import Projects from "./pages/Projects";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +40,7 @@ const App = () => (
                     <Layout>
                       <Routes>
                         <Route path="/" element={<Dashboard />} />
+                        <Route path="/projects" element={<Projects />} />
                         <Route path="/new-search" element={<NewSearch />} />
                         <Route path="/project/:projectId/results" element={<SearchResults />} />
                         <Route path="/project/:projectId/shortlist" element={<Shortlist />} />

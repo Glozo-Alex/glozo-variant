@@ -68,6 +68,38 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   };
 
+  const updateProject = (projectId: string, updates: Partial<Pick<Project, 'name' | 'query'>>) => {
+    setProjects(prev => prev.map(p => 
+      p.id === projectId 
+        ? { ...p, ...updates, updatedAt: new Date() }
+        : p
+    ));
+    
+    // Update active project if it's the one being updated
+    if (activeProject?.id === projectId) {
+      setActiveProjectState(prev => prev ? { ...prev, ...updates, updatedAt: new Date() } : null);
+    }
+  };
+
+  const duplicateProject = (projectId: string): Project => {
+    const originalProject = projects.find(p => p.id === projectId);
+    if (!originalProject) {
+      throw new Error('Project not found');
+    }
+
+    const duplicatedProject: Project = {
+      id: `project-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      name: `${originalProject.name} (копия)`,
+      query: originalProject.query,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      shortlistCount: 0,
+    };
+    
+    setProjects(prev => [...prev, duplicatedProject]);
+    return duplicatedProject;
+  };
+
   return (
     <ProjectContext.Provider value={{
       projects,
@@ -75,6 +107,8 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
       createProject,
       setActiveProject,
       deleteProject,
+      updateProject,
+      duplicateProject,
     }}>
       {children}
     </ProjectContext.Provider>
