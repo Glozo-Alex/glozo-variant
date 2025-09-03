@@ -18,7 +18,7 @@ export async function getCandidatesByPrompt({ prompt, count, similarRoles, proje
   };
 
   const { data, error } = await supabase.functions.invoke('get-candidates-by-prompt', {
-    body,
+    body: JSON.stringify(body),
     headers: {
       'Content-Type': 'application/json',
     },

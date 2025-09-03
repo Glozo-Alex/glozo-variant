@@ -49,6 +49,11 @@ serve(async (req: Request) => {
   try {
     // Safely parse JSON body (handle empty or invalid JSON)
     const rawBody = await req.text();
+    console.log("Incoming request headers:", Object.fromEntries(req.headers.entries()));
+    console.log("Incoming raw body length:", rawBody?.length ?? 0);
+    if (rawBody && rawBody.length < 2048) {
+      console.log("Incoming raw body snippet:", rawBody);
+    }
     let parsed: any = {};
     try {
       parsed = rawBody ? JSON.parse(rawBody) : {};
