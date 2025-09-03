@@ -174,8 +174,12 @@ serve(async (req: Request) => {
         console.error("External API error:", errorMessage);
       }
 
-      return new Response(JSON.stringify(data), {
-        status: extRes.status,
+      const responsePayload = extRes.ok && Array.isArray(data)
+        ? { data, searchId }
+        : { error: data?.error || "External API request failed", status: extRes.status, data, searchId };
+
+      return new Response(JSON.stringify(responsePayload), {
+        status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
 
