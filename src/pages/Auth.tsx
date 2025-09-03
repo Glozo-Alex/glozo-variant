@@ -19,32 +19,40 @@ const Auth = () => {
       console.log('Auth page: URL hash:', window.location.hash);
       console.log('Auth page: URL search:', window.location.search);
       
-      // Check if this is a callback from Google OAuth
       const hashParams = new URLSearchParams(window.location.hash.substring(1));
       const searchParams = new URLSearchParams(window.location.search);
-      
+
+      const hasCode = !!(searchParams.get('code') || hashParams.get('code'));
       const accessToken = hashParams.get('access_token') || searchParams.get('access_token');
       const refreshToken = hashParams.get('refresh_token') || searchParams.get('refresh_token');
       
-      console.log('Auth page: Found tokens:', { accessToken: !!accessToken, refreshToken: !!refreshToken });
-      
-      if (accessToken || refreshToken) {
-        console.log('Auth page: OAuth callback detected, refreshing session...');
-        try {
-          // Force refresh the session to get the latest auth state
+      console.log('Auth page: Parsed params:', { hasCode, accessToken: !!accessToken, refreshToken: !!refreshToken });
+
+      try {
+        if (hasCode) {
+          console.log('Auth page: Exchanging code for session...');
+          const { data, error } = await supabase.auth.exchangeCodeForSession(window.location.href);
+          console.log('Auth page: exchangeCodeForSession result:', { data, error });
+          if (error) {
+            console.error('Auth page: exchangeCodeForSession error:', error);
+            toast({
+              title: 'Ошибка авторизации',
+              description: error.message || 'Не удалось завершить вход через Google.',
+              variant: 'destructive',
+            });
+          }
+          // Clear URL parameters regardless to avoid repeated exchanges
+          window.history.replaceState({}, document.title, '/auth');
+        } else if (accessToken || refreshToken) {
+          console.log('Auth page: OAuth tokens detected, refreshing session...');
           const { data: { session }, error } = await supabase.auth.getSession();
           console.log('Auth page: Session refresh result:', { session, error });
-          
-          if (session && !error) {
-            console.log('Auth page: Session found, redirecting to home...');
-            // Clear URL parameters
-            window.history.replaceState({}, document.title, '/auth');
-            navigate('/');
-          }
-        } catch (error) {
-          console.error('Auth page: Error refreshing session:', error);
         }
+      } catch (error) {
+        console.error('Auth page: Error handling callback:', error);
       }
+
+      // After handling, if user is set, redirect handled by the other effect
     };
 
     handleAuthCallback();
