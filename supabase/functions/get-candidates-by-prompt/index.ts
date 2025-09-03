@@ -66,9 +66,9 @@ serve(async (req: Request) => {
     // Normalize defaults
     const safeCount = (typeof count === "number" && !Number.isNaN(count)) ? count : 200;
     const similarRolesBool = (typeof similarRoles === "string"
-      ? similarRoles.toUpperCase() === "TRUE"
+      ? similarRoles.toLowerCase() === "true"
       : !!similarRoles);
-    const similarRolesFlag = similarRolesBool ? "TRUE" : "FALSE";
+    console.log("Normalized request:", { prompt, projectId, safeCount, similarRolesBool });
     // Create search record
     const { data: searchData, error: searchError } = await supabase
       .from('searches')
@@ -96,8 +96,7 @@ serve(async (req: Request) => {
       const payload: Record<string, unknown> = {
         prompt,
         count: safeCount,
-        similarRoles: similarRolesFlag,
-        city: "", // Required parameter for external API
+        similarRoles: similarRolesBool,
       };
 
       console.log("Forwarding to external API /get-candidates-by-prompt with payload:", payload);
