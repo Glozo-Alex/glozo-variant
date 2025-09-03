@@ -37,78 +37,41 @@ const NewSearch = () => {
     setSelectedSkills(selectedSkills.filter(s => s !== skill));
   };
   const handleCreateProject = async () => {
-    if (!projectName.trim() || !searchQuery.trim()) {
+    if (!projectName.trim()) {
       toast({
-        title: "Заполните все поля",
-        description: "Название проекта и поисковый запрос обязательны.",
-        variant: "destructive",
+        title: "Project name required",
+        description: "Please enter a name for your project",
+        variant: "destructive"
+      });
+      return;
+    }
+    if (!searchQuery.trim()) {
+      toast({
+        title: "Search query required",
+        description: "Please enter a search query",
+        variant: "destructive"
       });
       return;
     }
 
+    const fullQuery = selectedSkills.length > 0 ? `${searchQuery} Skills: ${selectedSkills.join(", ")}` : searchQuery;
+
     setIsLoading(true);
     try {
-      // Import the projects service functions
-      const { createProject, createSearch, updateSearchStatus, saveSearchResults } = await import('@/services/projects');
-      
-      // Create project in database
-      const newProject = await createProject({
-        name: projectName,
-        query: searchQuery,
-        similarRoles: similarRoles,
-      });
-      
-      // Create search record
-      const search = await createSearch({
-        projectId: newProject.id,
-        prompt: searchQuery,
-        similarRoles: similarRoles,
-      });
-      
-      try {
-        // Execute API call
-        const result = await getCandidatesByPrompt({
-          prompt: searchQuery,
-          count: 20,
-          similarRoles: similarRoles,
-        });
-        
-        if (result?.candidates && Array.isArray(result.candidates)) {
-          // Save search results to database
-          await saveSearchResults({
-            searchId: search.id,
-            candidates: result.candidates,
-          });
-          
-          // Update search status to completed
-          await updateSearchStatus(search.id, 'completed', undefined, result.candidates.length);
-          
-          toast({
-            title: "Проект создан!",
-            description: `Найдено ${result.candidates.length} кандидатов`,
-          });
-          
-          navigate(`/project/${newProject.id}/results`);
-        } else {
-          throw new Error('Invalid API response format');
-        }
-      } catch (apiError) {
-        console.error('API Error:', apiError);
-        
-        // Update search status to failed
-        await updateSearchStatus(search.id, 'failed', apiError instanceof Error ? apiError.message : 'API call failed');
-        
-        toast({
-          title: "Ошибка поиска",
-          description: "Не удалось выполнить поиск кандидатов. Попробуйте еще раз.",
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
-      console.error('Error:', error);
+      const apiRes = await getCandidatesByPrompt({ prompt: fullQuery, similarRoles });
+      const count = Array.isArray(apiRes) ? apiRes.length : Array.isArray(apiRes?.data) ? apiRes.data.length : undefined;
+
+      const project = createProject(projectName, fullQuery);
       toast({
-        title: "Ошибка",
-        description: "Не удалось создать проект.",
+        title: "Search started",
+        description: count !== undefined ? `Found ${count} candidates for "${project.name}"` : `"${project.name}" is ready for candidate search`
+      });
+      navigate(`/project/${project.id}/results`);
+    } catch (error: any) {
+      console.error("getCandidatesByPrompt error:", error);
+      toast({
+        title: "Search failed",
+        description: error?.message ?? "Unable to fetch candidates",
         variant: "destructive",
       });
     } finally {

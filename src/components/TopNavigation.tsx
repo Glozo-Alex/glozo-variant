@@ -1,7 +1,6 @@
 import React from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 import { useProject } from '@/contexts/ProjectContext';
-import { useAuth } from '@/contexts/AuthContext';
 import { 
   Breadcrumb, 
   BreadcrumbItem, 
@@ -11,7 +10,6 @@ import {
   BreadcrumbSeparator 
 } from '@/components/ui/breadcrumb';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { 
   LayoutDashboard, 
   Plus, 
@@ -22,19 +20,13 @@ import {
   Users, 
   Plug, 
   Settings,
-  FolderOpen,
-  LogOut
+  FolderOpen
 } from 'lucide-react';
 
-interface TopNavigationProps {
-  onSignOut?: () => Promise<void>;
-}
-
-const TopNavigation: React.FC<TopNavigationProps> = ({ onSignOut }) => {
+const TopNavigation = () => {
   const location = useLocation();
   const { projectId } = useParams();
   const { projects, activeProject } = useProject();
-  const { user } = useAuth();
   
   const currentProject = projectId ? projects.find(p => p.id === projectId) : activeProject;
 
@@ -197,13 +189,6 @@ const TopNavigation: React.FC<TopNavigationProps> = ({ onSignOut }) => {
 
         {/* Right side - Status indicators */}
         <div className="flex items-center gap-3">
-          {/* User info */}
-          {user && (
-            <div className="hidden sm:flex items-center gap-2 text-sm text-muted-foreground">
-              <span>{user.email}</span>
-            </div>
-          )}
-          
           {/* Active project indicator */}
           {activeProject && !location.pathname.includes('/project/') && (
             <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-lg bg-primary/5 border border-primary/20">
@@ -222,18 +207,10 @@ const TopNavigation: React.FC<TopNavigationProps> = ({ onSignOut }) => {
             </div>
           )}
           
-          {/* Sign out button */}
-          {onSignOut && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onSignOut}
-              className="text-muted-foreground hover:text-foreground"
-            >
-              <LogOut className="h-4 w-4 mr-2" />
-              Выйти
-            </Button>
-          )}
+          {/* Current time */}
+          <div className="hidden xl:block text-sm text-muted-foreground">
+            {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          </div>
         </div>
       </div>
     </header>
