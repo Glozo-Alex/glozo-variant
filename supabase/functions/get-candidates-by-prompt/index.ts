@@ -15,7 +15,7 @@ serve(async (req: Request) => {
 
   if (req.method !== "POST") {
     return new Response(JSON.stringify({ error: "Method not allowed" }), {
-      status: 405,
+      status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
@@ -29,7 +29,7 @@ serve(async (req: Request) => {
   const authHeader = req.headers.get('authorization');
   if (!authHeader) {
     return new Response(JSON.stringify({ error: "Missing authorization" }), {
-      status: 401,
+      status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
@@ -41,7 +41,7 @@ serve(async (req: Request) => {
   
   if (authError || !user) {
     return new Response(JSON.stringify({ error: "Invalid authorization" }), {
-      status: 401,
+      status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
@@ -55,7 +55,7 @@ serve(async (req: Request) => {
     } catch (e) {
       console.error("Invalid JSON body received:", rawBody);
       return new Response(JSON.stringify({ error: "Invalid JSON body" }), {
-        status: 400,
+        status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -64,14 +64,14 @@ serve(async (req: Request) => {
 
     if (!prompt || typeof prompt !== "string") {
       return new Response(JSON.stringify({ error: "'prompt' is required and must be a string" }), {
-        status: 400,
+        status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
     if (!projectId || typeof projectId !== "string") {
       return new Response(JSON.stringify({ error: "'projectId' is required and must be a string" }), {
-        status: 400,
+        status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -98,7 +98,7 @@ serve(async (req: Request) => {
     if (searchError) {
       console.error("Failed to create search record:", searchError);
       return new Response(JSON.stringify({ error: "Failed to create search record" }), {
-        status: 500,
+        status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -201,12 +201,15 @@ serve(async (req: Request) => {
         })
         .eq('id', searchId);
 
-      throw apiError;
+      return new Response(JSON.stringify({ error: apiError.message || "API call failed" }), {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
   } catch (err) {
     console.error("get-candidates-by-prompt edge function error:", err);
     return new Response(JSON.stringify({ error: "Internal error" }), {
-      status: 500,
+      status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }

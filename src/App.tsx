@@ -34,28 +34,46 @@ const App = () => (
             <Routes>
               <Route path="/auth" element={<Auth />} />
               <Route
-                path="/*"
+                path="/"
                 element={
                   <ProtectedRoute>
                     <Layout>
-                      <Routes>
-                        <Route path="/" element={<Dashboard />} />
-                        <Route path="/projects" element={<Projects />} />
-                        <Route path="/new-search" element={<NewSearch />} />
-                        <Route path="/project/:projectId/results" element={<SearchResults />} />
-                        <Route path="/project/:projectId/shortlist" element={<Shortlist />} />
-                        <Route path="/analytics" element={<Analytics />} />
-                        <Route path="/search" element={<Search />} />
-                        <Route path="/pipeline" element={<Pipeline />} />
-                        <Route path="/team" element={<Team />} />
-                        <Route path="/integrations" element={<Integrations />} />
-                        <Route path="/settings" element={<Settings />} />
-                        <Route path="*" element={<NotFound />} />
-                      </Routes>
+                      <Dashboard />
                     </Layout>
                   </ProtectedRoute>
                 }
               />
+              <Route
+                path="/new-search"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <NewSearch />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/project/:projectId/results"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <SearchResults />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/project/:projectId/shortlist"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <Shortlist />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
         </TooltipProvider>
