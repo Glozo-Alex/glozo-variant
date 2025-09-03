@@ -36,6 +36,10 @@
     --card-shadow: 200 15% 15% / 0.04; /* Elegant slate shadow */
     --card-hover: 168 76% 42% / 0.02; /* Subtle emerald tint */
     
+    /* Popover system with opaque backgrounds */
+    --popover: 45 23% 98%; /* Slightly darker than background for opacity */
+    --popover-foreground: 200 20% 12%; /* Deep slate text */
+    
     /* Accent system */
     --accent: 168 50% 96%; /* Very light sage */
     --accent-foreground: 168 76% 25%; /* Deep emerald text */
@@ -138,6 +142,10 @@
     --card-border: 220 13% 18%;
     --card-shadow: 0 0% 0% / 0.2;
     --card-hover: 262 83% 65% / 0.05;
+    
+    /* Dark popover system with opaque backgrounds */
+    --popover: 224 71% 5%; /* Slightly darker than card for opacity */
+    --popover-foreground: 210 20% 98%; /* Light text */
     
     /* Dark accents */
     --accent: 224 71% 8%;

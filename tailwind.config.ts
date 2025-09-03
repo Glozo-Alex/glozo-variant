@@ -68,6 +68,10 @@ export default {
 					shadow: 'hsl(var(--card-shadow))',
 					hover: 'hsl(var(--card-hover))'
 				},
+				popover: {
+					DEFAULT: 'hsl(var(--popover))',
+					foreground: 'hsl(var(--popover-foreground))'
+				},
 				sidebar: {
 					bg: 'hsl(var(--sidebar-bg))',
 					border: 'hsl(var(--sidebar-border))',
