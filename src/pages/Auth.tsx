@@ -14,7 +14,7 @@ const Auth = () => {
   // Handle Google OAuth callback
   useEffect(() => {
     const handleAuthCallback = async () => {
-      console.log('Auth page: Checking for OAuth callback...');
+      console.log('Auth page: === CALLBACK HANDLER START ===');
       console.log('Auth page: Current URL:', window.location.href);
       console.log('Auth page: URL hash:', window.location.hash);
       console.log('Auth page: URL search:', window.location.search);
@@ -22,17 +22,34 @@ const Auth = () => {
       const hashParams = new URLSearchParams(window.location.hash.substring(1));
       const searchParams = new URLSearchParams(window.location.search);
 
-      const hasCode = !!(searchParams.get('code') || hashParams.get('code'));
+      const code = searchParams.get('code') || hashParams.get('code');
       const accessToken = hashParams.get('access_token') || searchParams.get('access_token');
       const refreshToken = hashParams.get('refresh_token') || searchParams.get('refresh_token');
+      const error = searchParams.get('error') || hashParams.get('error');
       
-      console.log('Auth page: Parsed params:', { hasCode, accessToken: !!accessToken, refreshToken: !!refreshToken });
+      console.log('Auth page: Parsed params:', { 
+        code: !!code, 
+        accessToken: !!accessToken, 
+        refreshToken: !!refreshToken,
+        error 
+      });
+
+      if (error) {
+        console.error('Auth page: OAuth error:', error);
+        toast({
+          title: 'Ошибка авторизации',
+          description: error,
+          variant: 'destructive',
+        });
+        return;
+      }
 
       try {
-        if (hasCode) {
-          console.log('Auth page: Exchanging code for session...');
+        if (code) {
+          console.log('Auth page: Found code, exchanging for session...');
           const { data, error } = await supabase.auth.exchangeCodeForSession(window.location.href);
           console.log('Auth page: exchangeCodeForSession result:', { data, error });
+          
           if (error) {
             console.error('Auth page: exchangeCodeForSession error:', error);
             toast({
@@ -40,19 +57,26 @@ const Auth = () => {
               description: error.message || 'Не удалось завершить вход через Google.',
               variant: 'destructive',
             });
+          } else if (data?.session) {
+            console.log('Auth page: Session obtained from code exchange:', data.session);
+            // Clear URL parameters
+            window.history.replaceState({}, document.title, '/auth');
           }
-          // Clear URL parameters regardless to avoid repeated exchanges
-          window.history.replaceState({}, document.title, '/auth');
         } else if (accessToken || refreshToken) {
-          console.log('Auth page: OAuth tokens detected, refreshing session...');
+          console.log('Auth page: Found tokens in URL, checking session...');
           const { data: { session }, error } = await supabase.auth.getSession();
-          console.log('Auth page: Session refresh result:', { session, error });
+          console.log('Auth page: getSession result:', { session, error });
+        } else {
+          // No special params, just check current session
+          console.log('Auth page: No OAuth params, checking current session...');
+          const { data: { session }, error } = await supabase.auth.getSession();
+          console.log('Auth page: Current session check:', { session, error });
         }
       } catch (error) {
-        console.error('Auth page: Error handling callback:', error);
+        console.error('Auth page: Error in callback handler:', error);
       }
 
-      // After handling, if user is set, redirect handled by the other effect
+      console.log('Auth page: === CALLBACK HANDLER END ===');
     };
 
     handleAuthCallback();
@@ -60,8 +84,9 @@ const Auth = () => {
 
   // Redirect if already authenticated
   useEffect(() => {
+    console.log('Auth page: User redirect effect triggered, user:', user);
     if (user) {
-      console.log('Auth page: User already authenticated, redirecting...');
+      console.log('Auth page: User authenticated, redirecting to home...');
       navigate('/');
     }
   }, [user, navigate]);
