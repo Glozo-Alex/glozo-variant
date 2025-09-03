@@ -32,9 +32,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const { toast } = useToast();
 
   useEffect(() => {
+    console.log('Auth Debug - Setting up auth listener, current origin:', window.location.origin);
+    
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        console.log('Auth Debug - Auth state change:', event, session?.user?.email);
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
@@ -53,10 +56,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const signInWithGoogle = async () => {
     try {
+      // Determine the correct redirect URL based on the current environment
+      const currentOrigin = window.location.origin;
+      const redirectUrl = currentOrigin.includes('lovable.app') 
+        ? currentOrigin 
+        : 'https://preview--glozo-variant.lovable.app';
+      
+      console.log('Auth Debug - Current origin:', currentOrigin);
+      console.log('Auth Debug - Redirect URL:', redirectUrl);
+      
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/`
+          redirectTo: `${redirectUrl}/`
         }
       });
 
