@@ -47,7 +47,20 @@ serve(async (req: Request) => {
   }
 
   try {
-    const { prompt, count, similarRoles, projectId } = await req.json();
+    // Safely parse JSON body (handle empty or invalid JSON)
+    const rawBody = await req.text();
+    let parsed: any = {};
+    try {
+      parsed = rawBody ? JSON.parse(rawBody) : {};
+    } catch (e) {
+      console.error("Invalid JSON body received:", rawBody);
+      return new Response(JSON.stringify({ error: "Invalid JSON body" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const { prompt, count, similarRoles, projectId } = parsed;
 
     if (!prompt || typeof prompt !== "string") {
       return new Response(JSON.stringify({ error: "'prompt' is required and must be a string" }), {
@@ -104,11 +117,19 @@ serve(async (req: Request) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Accept": "application/json",
         },
         body: JSON.stringify(payload),
       });
 
-      const data = await extRes.json().catch(() => ({ error: "Invalid JSON from external API" }));
+      const responseText = await extRes.text();
+      let data: any = null;
+      try {
+        data = responseText ? JSON.parse(responseText) : null;
+      } catch (parseErr) {
+        console.error("Failed to parse external API JSON:", parseErr, { responseText });
+        data = { error: "Invalid JSON from external API", raw: responseText };
+      }
 
       if (extRes.ok && data && Array.isArray(data)) {
         // Save successful results
