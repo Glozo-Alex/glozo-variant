@@ -47,25 +47,7 @@ serve(async (req: Request) => {
   }
 
   try {
-    // Safely parse JSON body (handle empty or invalid JSON)
-    const rawBody = await req.text();
-    console.log("Incoming request headers:", Object.fromEntries(req.headers.entries()));
-    console.log("Incoming raw body length:", rawBody?.length ?? 0);
-    if (rawBody && rawBody.length < 2048) {
-      console.log("Incoming raw body snippet:", rawBody);
-    }
-    let parsed: any = {};
-    try {
-      parsed = rawBody ? JSON.parse(rawBody) : {};
-    } catch (e) {
-      console.error("Invalid JSON body received:", rawBody);
-      return new Response(JSON.stringify({ error: "Invalid JSON body" }), {
-        status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    const { prompt, count, similarRoles, projectId } = parsed;
+    const { prompt, projectId, count = 200, similarRoles = false } = await req.json();
 
     if (!prompt || typeof prompt !== "string") {
       return new Response(JSON.stringify({ error: "'prompt' is required and must be a string" }), {
@@ -80,13 +62,6 @@ serve(async (req: Request) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-
-    // Normalize defaults
-    const safeCount = (typeof count === "number" && !Number.isNaN(count)) ? count : 200;
-    const similarRolesBool = (typeof similarRoles === "string"
-      ? similarRoles.toLowerCase() === "true"
-      : !!similarRoles);
-    console.log("Normalized request:", { prompt, projectId, safeCount, similarRolesBool });
     // Create search record
     const { data: searchData, error: searchError } = await supabase
       .from('searches')
@@ -94,7 +69,7 @@ serve(async (req: Request) => {
         project_id: projectId,
         user_id: user.id,
         prompt,
-        similar_roles: similarRolesBool,
+        similar_roles: Boolean(similarRoles),
         status: 'pending'
       })
       .select()
@@ -111,34 +86,26 @@ serve(async (req: Request) => {
     const searchId = searchData.id;
 
     try {
-      const payload: Record<string, unknown> = {
+      const payload = {
         prompt,
-        count: safeCount,
-        similarRoles: similarRolesBool,
+        count: typeof count === "number" ? count : 200,
+        similarRoles: Boolean(similarRoles),
       };
 
-      console.log("Forwarding to external API /get-candidates-by-prompt with payload:", payload);
       const extRes = await fetch("http://34.75.197.68:8888/api/get-candidates-by-prompt", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Accept": "application/json",
         },
         body: JSON.stringify(payload),
       });
 
-      console.log("External API response status:", extRes.status);
-      console.log("External API response headers:", Object.fromEntries(extRes.headers.entries()));
-
       const responseText = await extRes.text();
-      console.log("External API raw response:", responseText);
-      
       let data: any = null;
       try {
         data = responseText ? JSON.parse(responseText) : null;
       } catch (parseErr) {
-        console.error("Failed to parse external API JSON:", parseErr, { responseText });
-        data = { error: "Invalid JSON from external API", raw: responseText };
+        data = { error: "Invalid JSON from external API" };
       }
 
       if (extRes.ok && data && Array.isArray(data)) {
@@ -168,7 +135,6 @@ serve(async (req: Request) => {
           })
           .eq('id', searchId);
 
-        console.log(`Successfully saved ${data.length} candidates for search ${searchId}`);
       } else {
         // Update search status to failed
         const errorMessage = data?.error || "External API request failed";
@@ -180,8 +146,6 @@ serve(async (req: Request) => {
             error_message: errorMessage
           })
           .eq('id', searchId);
-
-        console.error("External API error:", errorMessage);
       }
 
       const responsePayload = extRes.ok && Array.isArray(data)
