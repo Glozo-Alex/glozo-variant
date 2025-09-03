@@ -97,6 +97,7 @@ serve(async (req: Request) => {
         prompt,
         count: safeCount,
         similarRoles: similarRolesFlag,
+        city: "", // Required parameter for external API
       };
 
       console.log("Forwarding to external API /get-candidates-by-prompt with payload:", payload);
