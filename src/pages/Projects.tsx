@@ -99,8 +99,8 @@ const Projects = () => {
     if (projectToDelete) {
       deleteProject(projectToDelete);
       toast({
-        title: "Проект удален",
-        description: "Проект был успешно удален",
+        title: "Project Deleted",
+        description: "Project has been successfully deleted",
       });
     }
     setDeleteDialogOpen(false);
@@ -117,8 +117,8 @@ const Projects = () => {
     if (projectToEdit && newProjectName.trim()) {
       updateProject(projectToEdit.id, { name: newProjectName.trim() });
       toast({
-        title: "Проект переименован",
-        description: "Название проекта было изменено",
+        title: "Project Renamed",
+        description: "Project name has been updated",
       });
     }
     setEditDialogOpen(false);
@@ -129,8 +129,8 @@ const Projects = () => {
   const handleDuplicateProject = (project: any) => {
     const duplicatedProject = duplicateProject(project.id);
     toast({
-      title: "Проект дублирован",
-      description: `Создан проект "${duplicatedProject.name}"`,
+      title: "Project Duplicated",
+      description: `Created project "${duplicatedProject.name}"`,
     });
   };
 
@@ -162,12 +162,12 @@ const Projects = () => {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Projects</h1>
           <p className="text-muted-foreground">
-            Управляйте всеми вашими проектами в одном месте
+            Manage all your projects in one place
           </p>
         </div>
         <Button onClick={() => navigate("/new-search")} className="gap-2">
           <Plus className="h-4 w-4" />
-          Новый проект
+          New Project
         </Button>
       </div>
 
@@ -176,7 +176,7 @@ const Projects = () => {
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
           <Input
-            placeholder="Поиск по проектам..."
+            placeholder="Search projects..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10"
@@ -186,18 +186,18 @@ const Projects = () => {
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="sm" className="gap-2">
               <Filter className="h-4 w-4" />
-              Сортировка
+              Sort
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={() => handleSort("name")} className="gap-2">
-              Название {getSortIcon("name")}
+              Name {getSortIcon("name")}
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => handleSort("createdAt")} className="gap-2">
-              Дата создания {getSortIcon("createdAt")}
+              Date Created {getSortIcon("createdAt")}
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => handleSort("shortlistCount")} className="gap-2">
-              Количество в шортлисте {getSortIcon("shortlistCount")}
+              Shortlist Count {getSortIcon("shortlistCount")}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -210,17 +210,17 @@ const Projects = () => {
             <div className="text-muted-foreground space-y-2">
               {projects.length === 0 ? (
                 <>
-                  <p className="text-lg font-medium">Нет проектов</p>
-                  <p>Создайте свой первый проект, чтобы начать поиск кандидатов</p>
+                  <p className="text-lg font-medium">No Projects</p>
+                  <p>Create your first project to start searching for candidates</p>
                   <Button onClick={() => navigate("/new-search")} className="mt-4 gap-2">
                     <Plus className="h-4 w-4" />
-                    Создать проект
+                    Create Project
                   </Button>
                 </>
               ) : (
                 <>
-                  <p className="text-lg font-medium">Проекты не найдены</p>
-                  <p>Попробуйте изменить условия поиска</p>
+                  <p className="text-lg font-medium">No Projects Found</p>
+                  <p>Try adjusting your search criteria</p>
                 </>
               )}
             </div>
@@ -260,7 +260,7 @@ const Projects = () => {
                       className="gap-2"
                     >
                       <Edit3 className="h-4 w-4" />
-                      Переименовать
+                      Rename
                     </DropdownMenuItem>
                     <DropdownMenuItem 
                       onClick={(e) => {
@@ -270,7 +270,7 @@ const Projects = () => {
                       className="gap-2"
                     >
                       <Copy className="h-4 w-4" />
-                      Дублировать
+                      Duplicate
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem 
@@ -281,7 +281,7 @@ const Projects = () => {
                       className="gap-2 text-destructive focus:text-destructive"
                     >
                       <Trash2 className="h-4 w-4" />
-                      Удалить
+                      Delete
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -307,15 +307,15 @@ const Projects = () => {
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Удалить проект?</AlertDialogTitle>
+            <AlertDialogTitle>Delete Project?</AlertDialogTitle>
             <AlertDialogDescription>
-              Это действие нельзя отменить. Проект и все связанные с ним данные будут удалены навсегда.
+              This action cannot be undone. The project and all associated data will be permanently deleted.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Отмена</AlertDialogCancel>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-              Удалить
+              Delete
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -325,28 +325,28 @@ const Projects = () => {
       <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Переименовать проект</DialogTitle>
+            <DialogTitle>Rename Project</DialogTitle>
             <DialogDescription>
-              Введите новое название для проекта
+              Enter a new name for the project
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label htmlFor="project-name">Название проекта</Label>
+              <Label htmlFor="project-name">Project Name</Label>
               <Input
                 id="project-name"
                 value={newProjectName}
                 onChange={(e) => setNewProjectName(e.target.value)}
-                placeholder="Введите название проекта"
+                placeholder="Enter project name"
               />
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditDialogOpen(false)}>
-              Отмена
+              Cancel
             </Button>
             <Button onClick={confirmEdit} disabled={!newProjectName.trim()}>
-              Сохранить
+              Save
             </Button>
           </DialogFooter>
         </DialogContent>
