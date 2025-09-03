@@ -4,15 +4,56 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 const Auth = () => {
   const [loading, setLoading] = useState(false);
   const { signInWithGoogle, user } = useAuth();
   const navigate = useNavigate();
 
+  // Handle Google OAuth callback
+  useEffect(() => {
+    const handleAuthCallback = async () => {
+      console.log('Auth page: Checking for OAuth callback...');
+      console.log('Auth page: Current URL:', window.location.href);
+      console.log('Auth page: URL hash:', window.location.hash);
+      console.log('Auth page: URL search:', window.location.search);
+      
+      // Check if this is a callback from Google OAuth
+      const hashParams = new URLSearchParams(window.location.hash.substring(1));
+      const searchParams = new URLSearchParams(window.location.search);
+      
+      const accessToken = hashParams.get('access_token') || searchParams.get('access_token');
+      const refreshToken = hashParams.get('refresh_token') || searchParams.get('refresh_token');
+      
+      console.log('Auth page: Found tokens:', { accessToken: !!accessToken, refreshToken: !!refreshToken });
+      
+      if (accessToken || refreshToken) {
+        console.log('Auth page: OAuth callback detected, refreshing session...');
+        try {
+          // Force refresh the session to get the latest auth state
+          const { data: { session }, error } = await supabase.auth.getSession();
+          console.log('Auth page: Session refresh result:', { session, error });
+          
+          if (session && !error) {
+            console.log('Auth page: Session found, redirecting to home...');
+            // Clear URL parameters
+            window.history.replaceState({}, document.title, '/auth');
+            navigate('/');
+          }
+        } catch (error) {
+          console.error('Auth page: Error refreshing session:', error);
+        }
+      }
+    };
+
+    handleAuthCallback();
+  }, [navigate]);
+
   // Redirect if already authenticated
   useEffect(() => {
     if (user) {
+      console.log('Auth page: User already authenticated, redirecting...');
       navigate('/');
     }
   }, [user, navigate]);
