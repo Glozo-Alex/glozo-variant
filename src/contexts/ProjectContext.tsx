@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Project, ProjectContextType } from '@/types/project';
+import { supabase } from '@/integrations/supabase/client';
 
 const ProjectContext = createContext<ProjectContextType | undefined>(undefined);
 
@@ -42,14 +43,38 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   }, [activeProject]);
 
-  const createProject = (name: string, query: string): Project => {
+  const createProject = async (name: string, query: string, similarRoles?: boolean): Promise<Project> => {
+    // Get current user
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      throw new Error('User not authenticated');
+    }
+
+    // Create project in Supabase
+    const { data: supabaseProject, error } = await supabase
+      .from('projects')
+      .insert({
+        name,
+        query,
+        similar_roles: similarRoles || false,
+        user_id: user.id
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Failed to create project in Supabase:', error);
+      throw new Error('Failed to create project');
+    }
+
+    // Convert to local Project format
     const newProject: Project = {
-      id: `project-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      name,
-      query,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      shortlistCount: 0,
+      id: supabaseProject.id,
+      name: supabaseProject.name,
+      query: supabaseProject.query,
+      createdAt: new Date(supabaseProject.created_at),
+      updatedAt: new Date(supabaseProject.updated_at),
+      shortlistCount: supabaseProject.shortlist_count || 0,
     };
     
     setProjects(prev => [...prev, newProject]);

@@ -58,20 +58,27 @@ const NewSearch = () => {
 
     setIsLoading(true);
     try {
-      const apiRes = await getCandidatesByPrompt({ prompt: fullQuery, similarRoles });
+      // First create the project in Supabase
+      const project = await createProject(projectName, fullQuery, similarRoles);
+      
+      // Then perform the search
+      const apiRes = await getCandidatesByPrompt({ 
+        prompt: fullQuery, 
+        similarRoles, 
+        projectId: project.id 
+      });
       const count = Array.isArray(apiRes) ? apiRes.length : Array.isArray(apiRes?.data) ? apiRes.data.length : undefined;
 
-      const project = createProject(projectName, fullQuery);
       toast({
         title: "Search started",
         description: count !== undefined ? `Found ${count} candidates for "${project.name}"` : `"${project.name}" is ready for candidate search`
       });
       navigate(`/project/${project.id}/results`);
     } catch (error: any) {
-      console.error("getCandidatesByPrompt error:", error);
+      console.error("Project creation or search error:", error);
       toast({
         title: "Search failed",
-        description: error?.message ?? "Unable to fetch candidates",
+        description: error?.message ?? "Unable to create project and fetch candidates",
         variant: "destructive",
       });
     } finally {

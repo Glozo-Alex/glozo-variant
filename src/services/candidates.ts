@@ -4,10 +4,11 @@ export interface GetCandidatesParams {
   prompt: string;
   count?: number;
   similarRoles?: boolean;
+  projectId: string;
 }
 
-export async function getCandidatesByPrompt({ prompt, count, similarRoles }: GetCandidatesParams) {
-  const body: Record<string, any> = { prompt };
+export async function getCandidatesByPrompt({ prompt, count, similarRoles, projectId }: GetCandidatesParams) {
+  const body: Record<string, any> = { prompt, projectId };
   if (typeof count === 'number') body.count = count;
   if (similarRoles) body.similarRoles = "Yes"; // API expects "Yes" when enabled
 
