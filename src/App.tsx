@@ -4,7 +4,9 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ProjectProvider } from "@/contexts/ProjectContext";
+import { AuthProvider } from "@/contexts/AuthContext";
 import Layout from "./components/Layout";
+import ProtectedRoute from "./components/ProtectedRoute";
 import Dashboard from "./pages/Dashboard";
 import NewSearch from "./pages/NewSearch";
 import SearchResults from "./pages/SearchResults";
@@ -16,34 +18,47 @@ import Pipeline from "./pages/Pipeline";
 import Team from "./pages/Team";
 import Integrations from "./pages/Integrations";
 import Settings from "./pages/Settings";
+import Auth from "./pages/Auth";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <ProjectProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Layout>
+    <AuthProvider>
+      <ProjectProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
             <Routes>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/new-search" element={<NewSearch />} />
-              <Route path="/project/:projectId/results" element={<SearchResults />} />
-              <Route path="/project/:projectId/shortlist" element={<Shortlist />} />
-              <Route path="/analytics" element={<Analytics />} />
-              <Route path="/search" element={<Search />} />
-              <Route path="/pipeline" element={<Pipeline />} />
-              <Route path="/team" element={<Team />} />
-              <Route path="/integrations" element={<Integrations />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="*" element={<NotFound />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route
+                path="/*"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <Routes>
+                        <Route path="/" element={<Dashboard />} />
+                        <Route path="/new-search" element={<NewSearch />} />
+                        <Route path="/project/:projectId/results" element={<SearchResults />} />
+                        <Route path="/project/:projectId/shortlist" element={<Shortlist />} />
+                        <Route path="/analytics" element={<Analytics />} />
+                        <Route path="/search" element={<Search />} />
+                        <Route path="/pipeline" element={<Pipeline />} />
+                        <Route path="/team" element={<Team />} />
+                        <Route path="/integrations" element={<Integrations />} />
+                        <Route path="/settings" element={<Settings />} />
+                        <Route path="*" element={<NotFound />} />
+                      </Routes>
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
             </Routes>
-          </Layout>
-        </BrowserRouter>
-      </TooltipProvider>
-    </ProjectProvider>
+          </BrowserRouter>
+        </TooltipProvider>
+      </ProjectProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 
