@@ -17,12 +17,11 @@ export const useChatMessages = (projectId: string | undefined) => {
     
     setLoading(true);
     try {
-      // Get the latest search for this project to extract chat messages
+      // Get ALL searches for this project to build complete chat history
       const { data: searches, error } = await supabase
         .from('searches')
-        .select('prompt, raw_response, created_at')
+        .select('prompt, raw_response, created_at, status')
         .eq('project_id', projectId)
-        .eq('status', 'completed')
         .order('created_at', { ascending: true });
 
       if (error) {
@@ -36,7 +35,7 @@ export const useChatMessages = (projectId: string | undefined) => {
         const rawResponse = search.raw_response as any;
         
         // Add the user's search query from the search prompt
-        const userPrompt = (search as any).prompt || rawResponse?.prompt;
+        const userPrompt = (search as any).prompt;
         if (userPrompt) {
           chatMessages.push({
             id: `user-${index}`,
@@ -46,8 +45,8 @@ export const useChatMessages = (projectId: string | undefined) => {
           });
         }
 
-        // Add the bot's response
-        if (rawResponse?.session?.message) {
+        // Add the bot's response only if search is completed and has a response
+        if ((search as any).status === 'completed' && rawResponse?.session?.message) {
           chatMessages.push({
             id: `bot-${index}`,
             content: rawResponse.session.message,

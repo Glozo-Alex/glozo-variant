@@ -63,7 +63,8 @@ const CandidateList = () => {
 
         const st = (data.status as any) ?? "pending";
         const raw = data.raw_response as any;
-        const fromArray = Array.isArray(raw) ? raw : Array.isArray(raw?.candidates) ? raw.candidates : [];
+        // For candidates display, only show results from completed searches
+        const fromArray = (st === 'completed' && Array.isArray(raw?.candidates)) ? raw.candidates : [];
         const count = Array.isArray(fromArray) ? fromArray.length : (data.candidate_count ?? 0);
 
         if (!cancelled) {

@@ -102,7 +102,7 @@ serve(async (req) => {
       sessionId: project.session_id
     });
 
-    // Create search record with pending status
+    // Create search record with pending status (keep all previous searches for chat history)
     const { data: searchRecord, error: searchError } = await supabase
       .from('searches')
       .insert({
