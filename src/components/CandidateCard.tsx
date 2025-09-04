@@ -113,7 +113,7 @@ const CandidateCard = ({
           <div className="flex items-center gap-3 flex-wrap">
             <h3 className="text-base font-semibold text-card-foreground">{name}</h3>
             <div className="flex items-center gap-2 text-muted-foreground">
-              <CandidateProfile candidateData={fullCandidateData} socialLinks={socialLinks}>
+              <CandidateProfile candidateData={fullCandidateData} socialLinks={socialLinks} projectId={projectId}>
                 <ArrowUpRight className="h-4 w-4 cursor-pointer hover:text-primary transition-colors" />
               </CandidateProfile>
               {socialLinks.map((link, index) => {

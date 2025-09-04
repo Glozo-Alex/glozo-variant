@@ -2,3 +2,6 @@ project_id = "uisjaqfkfdckvgwcdsyf"
 
 [functions.get-candidates-by-chat]
 verify_jwt = true
+
+[functions.get-candidate-details]
+verify_jwt = true
