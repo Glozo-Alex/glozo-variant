@@ -1,7 +1,7 @@
 import { RotateCcw, Filter, Paperclip, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useChatMessages } from "@/hooks/useChatMessages";
 import { getCandidatesByChat } from "@/services/candidates";
@@ -29,6 +29,15 @@ const RightSidebar = () => {
   const [inputMessage, setInputMessage] = useState("");
   const [sendingMessage, setSendingMessage] = useState(false);
   const { toast } = useToast();
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const handleSendMessage = async () => {
     if (!inputMessage.trim() || !projectId || sendingMessage) return;
@@ -101,6 +110,7 @@ const RightSidebar = () => {
           {sendingMessage && (
             <div className="text-center text-muted-foreground text-sm py-2">Sending...</div>
           )}
+          <div ref={messagesEndRef} />
         </div>
       </div>
 
