@@ -3,64 +3,92 @@ import { useProject } from "@/contexts/ProjectContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Users, Star, Mail, Phone, MapPin, Calendar, ArrowLeft } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Users, Star, Mail, Phone, MapPin, Calendar, ArrowLeft, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { getShortlistForProject, removeFromShortlist } from "@/services/shortlist";
+import { useToast } from "@/hooks/use-toast";
 
 const Shortlist = () => {
   const { projectId } = useParams();
-  const { projects } = useProject();
+  const { projects, updateShortlistCount } = useProject();
   const navigate = useNavigate();
+  const { toast } = useToast();
+  
+  const [shortlistedCandidates, setShortlistedCandidates] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   
   const project = projects.find(p => p.id === projectId);
 
-  // Mock shortlisted candidates data
-  const shortlistedCandidates = [
-    {
-      id: 1,
-      name: "Sarah Chen",
-      title: "Senior Frontend Developer",
-      company: "TechFlow Inc.",
-      location: "San Francisco, CA",
-      match: 95,
-      rating: 4.8,
-      skills: ["React", "TypeScript", "Node.js", "GraphQL"],
-      experience: "5 years",
-      email: "sarah.chen@example.com",
-      phone: "+1 (555) 123-4567",
-      addedAt: "2024-01-15",
-      avatar: "SC"
-    },
-    {
-      id: 2,
-      name: "Marcus Rodriguez",
-      title: "Full Stack Engineer",
-      company: "DataViz Solutions",
-      location: "Austin, TX",
-      match: 88,
-      rating: 4.6,
-      skills: ["React", "Python", "AWS", "Docker"],
-      experience: "4 years",
-      email: "marcus.r@example.com",
-      phone: "+1 (555) 987-6543",
-      addedAt: "2024-01-14",
-      avatar: "MR"
-    },
-    {
-      id: 3,
-      name: "Emily Zhang",
-      title: "Software Engineer",
-      company: "CloudFirst",
-      location: "Remote",
-      match: 92,
-      rating: 4.9,
-      skills: ["Vue.js", "TypeScript", "Kubernetes", "MongoDB"],
-      experience: "3 years",
-      email: "emily.zhang@example.com",
-      phone: "+1 (555) 456-7890",
-      addedAt: "2024-01-13",
-      avatar: "EZ"
+  useEffect(() => {
+    const fetchShortlistedCandidates = async () => {
+      if (!projectId) return;
+      
+      try {
+        setLoading(true);
+        setError(null);
+        const shortlist = await getShortlistForProject(projectId);
+        
+        // Transform the data to match the component's expected format
+        const transformedCandidates = shortlist.map((item) => {
+          const candidateData = item.candidate_snapshot as any;
+          return {
+            id: item.candidate_id,
+            name: candidateData.name || 'Unknown',
+            title: candidateData.title || 'No title',
+            company: candidateData.company || 'Unknown company',
+            location: candidateData.location || 'Unknown location',
+            match: candidateData.matchPercentage || candidateData.match || 0,
+            rating: candidateData.rating || 0,
+            skills: candidateData.skills || [],
+            experience: candidateData.experience || 'No experience',
+            email: candidateData.email || 'No email',
+            phone: candidateData.phone || 'No phone',
+            addedAt: item.added_at,
+            avatar: candidateData.name ? candidateData.name.split(' ').map((n: string) => n[0]).join('').toUpperCase() : 'UN'
+          };
+        });
+        
+        setShortlistedCandidates(transformedCandidates);
+      } catch (error) {
+        console.error('Failed to fetch shortlisted candidates:', error);
+        setError('Failed to load shortlisted candidates');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchShortlistedCandidates();
+  }, [projectId]);
+
+  const handleRemoveFromShortlist = async (candidateId: string, candidateName: string) => {
+    if (!projectId) return;
+    
+    try {
+      await removeFromShortlist(projectId, candidateId);
+      
+      // Update local state
+      setShortlistedCandidates(prev => prev.filter(c => c.id !== candidateId));
+      
+      // Update project shortlist count
+      const newCount = shortlistedCandidates.length - 1;
+      updateShortlistCount(projectId, newCount);
+      
+      toast({
+        title: "Removed from shortlist",
+        description: `${candidateName} removed from shortlist`,
+      });
+    } catch (error) {
+      console.error('Failed to remove from shortlist:', error);
+      toast({
+        title: "Error",
+        description: "Failed to remove candidate from shortlist",
+        variant: "destructive",
+      });
     }
-  ];
+  };
 
   if (!project) {
     return (
@@ -109,8 +137,48 @@ const Shortlist = () => {
         </div>
       </div>
 
-      {/* Shortlisted Candidates */}
-      {shortlistedCandidates.length > 0 ? (
+      {/* Loading State */}
+      {loading ? (
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Card key={i} className="glass-card">
+              <CardHeader className="pb-4">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-3">
+                    <Skeleton className="w-12 h-12 rounded-full" />
+                    <div>
+                      <Skeleton className="h-5 w-32 mb-2" />
+                      <Skeleton className="h-4 w-24" />
+                    </div>
+                  </div>
+                  <Skeleton className="w-12 h-6 rounded-full" />
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-3/4" />
+                <div className="flex gap-2">
+                  <Skeleton className="h-6 w-16" />
+                  <Skeleton className="h-6 w-20" />
+                  <Skeleton className="h-6 w-14" />
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : error ? (
+        /* Error State */
+        <Card className="glass-card">
+          <CardContent className="pt-12 pb-12 text-center">
+            <Users className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+            <h3 className="text-xl font-medium mb-2">Error loading shortlist</h3>
+            <p className="text-muted-foreground mb-6">{error}</p>
+            <Button onClick={() => window.location.reload()}>
+              Try Again
+            </Button>
+          </CardContent>
+        </Card>
+      ) : shortlistedCandidates.length > 0 ? (
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
           {shortlistedCandidates.map((candidate) => (
             <Card key={candidate.id} className="glass-card hover-lift">
@@ -192,6 +260,14 @@ const Shortlist = () => {
                   </Button>
                   <Button variant="outline" size="sm" className="flex-1">
                     View Profile
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => handleRemoveFromShortlist(candidate.id, candidate.name)}
+                    className="text-destructive hover:text-destructive"
+                  >
+                    <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
               </CardContent>
