@@ -9,32 +9,47 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [projects, setProjects] = useState<Project[]>([]);
   const [activeProject, setActiveProjectState] = useState<Project | null>(null);
 
-  // Load from localStorage on mount
+  // Load from Supabase on mount
   useEffect(() => {
-    const savedProjects = localStorage.getItem('projects');
-    const savedActiveProjectId = localStorage.getItem('activeProjectId');
-    
-    if (savedProjects) {
-      const parsedProjects = JSON.parse(savedProjects).map((p: any) => ({
-        ...p,
-        createdAt: new Date(p.createdAt),
-        updatedAt: new Date(p.updatedAt),
+    const loadProjectsFromSupabase = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: supabaseProjects, error } = await supabase
+        .from('projects')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Failed to load projects:', error);
+        return;
+      }
+
+      const projects = supabaseProjects.map(p => ({
+        id: p.id,
+        name: p.name,
+        query: p.query,
+        createdAt: new Date(p.created_at),
+        updatedAt: new Date(p.updated_at),
+        shortlistCount: p.shortlist_count || 0,
       }));
-      setProjects(parsedProjects);
-      
+
+      setProjects(projects);
+
+      // Load active project from localStorage if it exists in database
+      const savedActiveProjectId = localStorage.getItem('activeProjectId');
       if (savedActiveProjectId) {
-        const activeProj = parsedProjects.find((p: Project) => p.id === savedActiveProjectId);
+        const activeProj = projects.find(p => p.id === savedActiveProjectId);
         if (activeProj) {
           setActiveProjectState(activeProj);
         }
       }
-    }
+    };
+
+    loadProjectsFromSupabase();
   }, []);
 
-  // Save to localStorage when projects or active project changes
-  useEffect(() => {
-    localStorage.setItem('projects', JSON.stringify(projects));
-  }, [projects]);
 
   useEffect(() => {
     if (activeProject) {
