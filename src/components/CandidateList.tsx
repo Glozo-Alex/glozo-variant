@@ -4,6 +4,8 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import CandidateCard from "./CandidateCard";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { getShortlistStatus } from "@/services/shortlist";
+import { useProject } from "@/contexts/ProjectContext";
 
 interface APICandidate {
   id?: number | string;
@@ -24,11 +26,13 @@ interface APICandidate {
 
 const CandidateList = () => {
   const { projectId } = useParams();
+  const { updateShortlistCount } = useProject();
   const [status, setStatus] = useState<"pending" | "completed" | "failed" | "idle">("idle");
   const [candidates, setCandidates] = useState<APICandidate[]>([]);
   const [candidateCount, setCandidateCount] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [shortlistStatus, setShortlistStatus] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     if (!projectId) return;
@@ -66,6 +70,17 @@ const CandidateList = () => {
           setStatus(st);
           setCandidates(fromArray);
           setCandidateCount(count);
+          
+          // Load shortlist status for candidates
+          if (fromArray.length > 0 && projectId) {
+            try {
+              const candidateIds = fromArray.map((c: APICandidate) => String(c.id || ''));
+              const shortlistMap = await getShortlistStatus(projectId, candidateIds);
+              setShortlistStatus(shortlistMap);
+            } catch (error) {
+              console.error('Failed to load shortlist status:', error);
+            }
+          }
         }
       } catch (e: any) {
         if (!cancelled) {
@@ -85,6 +100,31 @@ const CandidateList = () => {
       if (timer) clearInterval(timer);
     };
   }, [projectId]);
+
+  const handleShortlistToggle = async (candidateId: string, isShortlisted: boolean) => {
+    // Update local state immediately for optimistic UI
+    setShortlistStatus(prev => ({
+      ...prev,
+      [candidateId]: isShortlisted
+    }));
+
+    // Update project shortlist count
+    if (projectId) {
+      try {
+        const { data, error } = await supabase
+          .from('projects')
+          .select('shortlist_count')
+          .eq('id', projectId)
+          .single();
+        
+        if (!error && data) {
+          updateShortlistCount(projectId, data.shortlist_count);
+        }
+      } catch (error) {
+        console.error('Failed to update shortlist count:', error);
+      }
+    }
+  };
 
   const headerText = useMemo(() => {
     if (loading) return "Loading candidates...";
@@ -120,6 +160,8 @@ const CandidateList = () => {
           return (
             <CandidateCard
               key={`${c.id ?? idx}`}
+              candidateId={String(c.id || idx)}
+              projectId={projectId || ''}
               name={c.name || "Unnamed"}
               title={c.title || c.role || "Unknown role"}
               location={c.location || "Unknown location"}
@@ -128,6 +170,8 @@ const CandidateList = () => {
               description={c.ai_summary || c.standout || ""}
               skills={flatSkills.map((s) => ({ name: s, type: "primary" as const }))}
               openToOffers={Boolean(c.open_to_offers)}
+              isShortlisted={shortlistStatus[String(c.id || idx)] || false}
+              onShortlistToggle={handleShortlistToggle}
             />
           );
         })}

@@ -29,10 +29,19 @@ export const addToShortlist = async (projectId: string, candidateId: string, can
     throw new Error(`Failed to add to shortlist: ${insertError.message}`);
   }
 
-  // Update shortlist count in projects table
-  const { error: updateError } = await supabase.rpc('increment_shortlist_count', {
-    project_id_param: projectId
-  });
+  // Get current count and increment it
+  const { data: currentProject } = await supabase
+    .from('projects')
+    .select('shortlist_count')
+    .eq('id', projectId)
+    .single();
+
+  const newCount = (currentProject?.shortlist_count || 0) + 1;
+  
+  const { error: updateError } = await supabase
+    .from('projects')
+    .update({ shortlist_count: newCount })
+    .eq('id', projectId);
 
   if (updateError) {
     console.error('Failed to update shortlist count:', updateError);
@@ -60,10 +69,19 @@ export const removeFromShortlist = async (projectId: string, candidateId: string
     throw new Error(`Failed to remove from shortlist: ${deleteError.message}`);
   }
 
-  // Update shortlist count in projects table
-  const { error: updateError } = await supabase.rpc('decrement_shortlist_count', {
-    project_id_param: projectId
-  });
+  // Get current count and decrement it
+  const { data: currentProject } = await supabase
+    .from('projects')
+    .select('shortlist_count')
+    .eq('id', projectId)
+    .single();
+
+  const newCount = Math.max((currentProject?.shortlist_count || 0) - 1, 0);
+  
+  const { error: updateError } = await supabase
+    .from('projects')
+    .update({ shortlist_count: newCount })
+    .eq('id', projectId);
 
   if (updateError) {
     console.error('Failed to update shortlist count:', updateError);
