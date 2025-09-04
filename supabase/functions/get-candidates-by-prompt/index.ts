@@ -92,7 +92,7 @@ serve(async (req: Request) => {
         similarRoles: Boolean(similarRoles),
       };
 
-      const extRes = await fetch("http://34.75.197.68:8888/api/get-candidates-by-prompt", {
+      const extRes = await fetch("http://104.196.13.228:8888/api/get-candidates-by-prompt", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
