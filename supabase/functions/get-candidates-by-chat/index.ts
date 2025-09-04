@@ -102,25 +102,32 @@ serve(async (req) => {
       sessionId: project.session_id
     });
 
-    // Delete previous search results for this project (keep only latest)
-    await supabase
-      .from('search_results')
-      .delete()
-      .eq('user_id', user.id)
-      .in('search_id', 
-        supabase
-          .from('searches')
-          .select('id')
-          .eq('project_id', projectId)
-          .eq('user_id', user.id)
-      );
-
-    // Delete previous searches for this project (keep only latest)
-    await supabase
+    // Clean up previous results for this project: delete search_results then searches
+    const { data: prevSearches, error: prevSearchesError } = await supabase
       .from('searches')
-      .delete()
-      .eq('user_id', user.id)
-      .eq('project_id', projectId);
+      .select('id')
+      .eq('project_id', projectId)
+      .eq('user_id', user.id);
+
+    if (prevSearchesError) {
+      console.error('Failed to load previous searches:', prevSearchesError);
+    }
+
+    const prevIds = (prevSearches || []).map((s: any) => s.id);
+
+    if (prevIds.length > 0) {
+      const { error: delResultsErr } = await supabase
+        .from('search_results')
+        .delete()
+        .in('search_id', prevIds);
+      if (delResultsErr) console.error('Failed to delete previous search_results:', delResultsErr);
+
+      const { error: delSearchesErr } = await supabase
+        .from('searches')
+        .delete()
+        .in('id', prevIds);
+      if (delSearchesErr) console.error('Failed to delete previous searches:', delSearchesErr);
+    }
 
     // Create search record with pending status
     const { data: searchRecord, error: searchError } = await supabase
