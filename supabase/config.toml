@@ -1,4 +1,4 @@
 project_id = "uisjaqfkfdckvgwcdsyf"
 
-[functions.get-candidates-by-prompt]
+[functions.get-candidates-by-chat]
 verify_jwt = true
