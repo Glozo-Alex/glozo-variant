@@ -68,7 +68,7 @@ const RightSidebar = () => {
   };
 
   return (
-    <aside className="w-96 glass-sidebar h-screen flex flex-col animate-slide-in-right">
+    <aside className="w-96 glass-sidebar h-full flex flex-col animate-slide-in-right">
       {/* Top tag */}
       <div className="h-14 px-4 flex items-center">
         <span className="inline-block bg-tag-blue text-tag-blue-text px-3 py-1 rounded-full text-sm font-medium">AI Chat</span>
