@@ -20,6 +20,7 @@ import Integrations from "./pages/Integrations";
 import Settings from "./pages/Settings";
 import Auth from "./pages/Auth";
 import Projects from "./pages/Projects";
+import TestCandidateDetails from "./pages/TestCandidateDetails";
 
 const queryClient = new QueryClient();
 
@@ -81,9 +82,19 @@ const App = () => (
                       <Projects />
                     </Layout>
                   </ProtectedRoute>
-                }
-              />
-              <Route path="*" element={<NotFound />} />
+                 }
+               />
+               <Route
+                 path="/test-candidate-details"
+                 element={
+                   <ProtectedRoute>
+                     <Layout>
+                       <TestCandidateDetails />
+                     </Layout>
+                   </ProtectedRoute>
+                 }
+               />
+               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
         </TooltipProvider>

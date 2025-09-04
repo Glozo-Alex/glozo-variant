@@ -98,7 +98,7 @@ export async function getCandidateDetails({
   projectId 
 }: GetCandidateDetailsParams): Promise<GetCandidateDetailsResponse> {
   try {
-    console.log('Getting candidate details for:', { candidateIds, projectId });
+    console.log('getCandidateDetails - Starting request:', { candidateIds, projectId });
 
     const { data, error } = await supabase.functions.invoke('get-candidate-details', {
       body: {
@@ -107,28 +107,33 @@ export async function getCandidateDetails({
       },
     });
 
+    console.log('getCandidateDetails - Raw response:', { data, error });
+
     if (error) {
-      console.error('Error calling get-candidate-details function:', error);
+      console.error('getCandidateDetails - Supabase function error:', error);
       throw new Error(`Failed to get candidate details: ${error.message}`);
     }
 
     if (!data) {
+      console.error('getCandidateDetails - No data returned');
       throw new Error('No data returned from get-candidate-details function');
     }
 
     if (!data.success) {
+      console.error('getCandidateDetails - Function returned error:', data.error);
       throw new Error(data.error || 'Unknown error occurred');
     }
 
-    console.log('Successfully fetched candidate details:', {
+    console.log('getCandidateDetails - Success:', {
       candidatesCount: Object.keys(data.details).length,
       cachedCount: data.cached_count,
-      apiFetchedCount: data.api_fetched_count
+      apiFetchedCount: data.api_fetched_count,
+      detailKeys: Object.keys(data.details)
     });
 
     return data;
   } catch (error) {
-    console.error('Error in getCandidateDetails:', error);
+    console.error('getCandidateDetails - Catch block:', error);
     return {
       success: false,
       details: {},

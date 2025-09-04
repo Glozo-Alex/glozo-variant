@@ -25,39 +25,52 @@ export function useCandidateDetails({
 
   const fetchCandidateDetails = async () => {
     if (!candidateId || !projectId || !enabled) {
+      console.log('useCandidateDetails - Skipping fetch:', { candidateId, projectId, enabled });
       return;
     }
 
+    console.log('useCandidateDetails - Starting fetch for:', { candidateId, projectId });
     setLoading(true);
     setError(null);
 
     try {
-      console.log('Fetching candidate details for:', candidateId);
+      console.log('useCandidateDetails - Calling getCandidateDetails...');
       
       const response = await getCandidateDetails({
         candidateIds: [candidateId],
         projectId,
       });
 
+      console.log('useCandidateDetails - API response:', response);
+
       if (!response.success) {
-        throw new Error(response.error || 'Failed to fetch candidate details');
+        const errorMsg = response.error || 'Failed to fetch candidate details';
+        console.error('useCandidateDetails - API error:', errorMsg);
+        throw new Error(errorMsg);
       }
 
       const detail = response.details[candidateId];
       if (detail) {
+        console.log('useCandidateDetails - Detail found:', {
+          candidateId,
+          name: detail.name,
+          hasEmployments: !!detail.employments?.length,
+          hasEducations: !!detail.educations?.length,
+          hasBio: !!detail.bio
+        });
         setCandidateDetail(detail);
-        console.log('Candidate details loaded successfully:', detail.name);
       } else {
-        console.warn('No details found for candidate ID:', candidateId);
+        console.warn('useCandidateDetails - No details found for candidate ID:', candidateId);
         setCandidateDetail(null);
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-      console.error('Error fetching candidate details:', errorMessage);
+      console.error('useCandidateDetails - Error:', errorMessage, err);
       setError(errorMessage);
       setCandidateDetail(null);
     } finally {
       setLoading(false);
+      console.log('useCandidateDetails - Fetch completed');
     }
   };
 

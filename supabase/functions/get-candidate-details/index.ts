@@ -20,10 +20,25 @@ serve(async (req) => {
 
   try {
     console.log('get-candidate-details function called');
+    console.log('Headers:', {
+      authorization: req.headers.get('Authorization') ? 'Present' : 'Missing',
+      contentType: req.headers.get('Content-Type'),
+      userAgent: req.headers.get('User-Agent')
+    });
     
     // Initialize Supabase client
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    
+    console.log('Environment check:', {
+      hasSupabaseUrl: !!supabaseUrl,
+      hasServiceKey: !!supabaseServiceKey
+    });
+    
+    if (!supabaseUrl || !supabaseServiceKey) {
+      throw new Error('Missing Supabase environment variables');
+    }
+    
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     // Get user from JWT token
