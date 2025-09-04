@@ -25,7 +25,7 @@ const UserBubble = ({ children }: { children: React.ReactNode }) => (
 
 const RightSidebar = () => {
   const { projectId } = useParams();
-  const { messages, loading, addMessage } = useChatMessages(projectId);
+  const { messages, loading, addMessage, reloadMessages } = useChatMessages(projectId);
   const [inputMessage, setInputMessage] = useState("");
   const [sendingMessage, setSendingMessage] = useState(false);
   const { toast } = useToast();
@@ -38,7 +38,7 @@ const RightSidebar = () => {
     setSendingMessage(true);
 
     try {
-      // Add user message to chat
+      // Add user message to chat immediately
       addMessage(userMessage, false);
 
       // Send to API
@@ -48,10 +48,8 @@ const RightSidebar = () => {
         similarRoles: false,
       });
 
-      // Add bot response to chat
-      if (response?.session?.message) {
-        addMessage(response.session.message, true);
-      }
+      // Reload chat messages from database to get the bot response
+      await reloadMessages();
 
       // Show success toast if new candidates found
       if (response?.candidates?.length > 0) {

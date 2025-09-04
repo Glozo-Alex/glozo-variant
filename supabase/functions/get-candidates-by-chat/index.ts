@@ -102,34 +102,6 @@ serve(async (req) => {
       sessionId: project.session_id
     });
 
-    // Clean up previous results for this project: delete search_results then searches
-    const { data: prevSearches, error: prevSearchesError } = await supabase
-      .from('searches')
-      .select('id')
-      .eq('project_id', projectId)
-      .eq('user_id', user.id);
-
-    if (prevSearchesError) {
-      console.error('Failed to load previous searches:', prevSearchesError);
-    }
-
-    const prevIds = Array.isArray(prevSearches) ? prevSearches.map((s: any) => s.id) : [];
-    console.log('Previous search IDs to delete:', prevIds);
-
-    if (Array.isArray(prevIds) && prevIds.length > 0) {
-      const { error: delResultsErr } = await supabase
-        .from('search_results')
-        .delete()
-        .in('search_id', prevIds);
-      if (delResultsErr) console.error('Failed to delete previous search_results:', delResultsErr);
-
-      const { error: delSearchesErr } = await supabase
-        .from('searches')
-        .delete()
-        .in('id', prevIds);
-      if (delSearchesErr) console.error('Failed to delete previous searches:', delSearchesErr);
-    }
-
     // Create search record with pending status
     const { data: searchRecord, error: searchError } = await supabase
       .from('searches')
@@ -213,24 +185,6 @@ serve(async (req) => {
         completed_at: new Date().toISOString()
       })
       .eq('id', searchRecord.id);
-
-    // Store search results
-    if (responseData.candidates && responseData.candidates.length > 0) {
-      const searchResults = responseData.candidates.map((candidate: any) => ({
-        search_id: searchRecord.id,
-        user_id: user.id,
-        candidate_data: candidate,
-        match_percentage: candidate.match_score || 0
-      }));
-
-      const { error: resultsError } = await supabase
-        .from('search_results')
-        .insert(searchResults);
-
-      if (resultsError) {
-        console.error('Failed to store search results:', resultsError);
-      }
-    }
 
     console.log('Search completed successfully');
 
