@@ -7,8 +7,20 @@ import { useChatMessages } from "@/hooks/useChatMessages";
 import { getCandidatesByChat } from "@/services/candidates";
 import { useToast } from "@/hooks/use-toast";
 
-const Bubble = ({ children }: { children: React.ReactNode }) => (
-  <div className="glass-surface text-card-foreground rounded-xl p-3 text-sm leading-relaxed animate-fade-in">{children}</div>
+const BotBubble = ({ children }: { children: React.ReactNode }) => (
+  <div className="flex items-start gap-2 mb-3">
+    <div className="glass-surface text-card-foreground rounded-2xl rounded-tl-sm p-3 text-sm leading-relaxed animate-fade-in max-w-[85%]">
+      {children}
+    </div>
+  </div>
+);
+
+const UserBubble = ({ children }: { children: React.ReactNode }) => (
+  <div className="flex items-start gap-2 mb-3 justify-end">
+    <div className="bg-gradient-to-r from-primary/90 to-primary text-primary-foreground rounded-2xl rounded-tr-sm p-3 text-sm leading-relaxed max-w-[85%]">
+      {children}
+    </div>
+  </div>
 );
 
 const RightSidebar = () => {
@@ -69,33 +81,29 @@ const RightSidebar = () => {
 
   return (
     <aside className="w-96 glass-sidebar h-full flex flex-col animate-slide-in-right">
-      {/* Top tag */}
-      <div className="h-14 px-4 flex items-center">
-        <span className="inline-block bg-tag-blue text-tag-blue-text px-3 py-1 rounded-full text-sm font-medium">AI Chat</span>
-      </div>
 
       {/* Conversation */}
-      <div className="flex-1 p-4 space-y-3 overflow-auto">
-        {loading ? (
-          <div className="text-center text-muted-foreground">Loading chat...</div>
-        ) : messages.length === 0 ? (
-          <Bubble>
-            Hi! I'm here to help you refine your candidate search. Ask me questions or provide additional criteria to find better matches.
-          </Bubble>
-        ) : (
-          messages.map((message) => (
-            message.isBot ? (
-              <Bubble key={message.id}>{message.content}</Bubble>
-            ) : (
-              <div key={message.id} className="bg-gradient-to-r from-primary/20 to-primary/10 text-card-foreground rounded-xl p-3 text-sm border border-primary/20">
-                {message.content}
-              </div>
-            )
-          ))
-        )}
-        {sendingMessage && (
-          <div className="text-center text-muted-foreground text-sm">Sending...</div>
-        )}
+      <div className="flex-1 p-4 overflow-auto">
+        <div className="space-y-1">
+          {loading ? (
+            <div className="text-center text-muted-foreground py-8">Loading chat...</div>
+          ) : messages.length === 0 ? (
+            <BotBubble>
+              Hi! I'm here to help you refine your candidate search. Ask me questions or provide additional criteria to find better matches.
+            </BotBubble>
+          ) : (
+            messages.map((message) => (
+              message.isBot ? (
+                <BotBubble key={message.id}>{message.content}</BotBubble>
+              ) : (
+                <UserBubble key={message.id}>{message.content}</UserBubble>
+              )
+            ))
+          )}
+          {sendingMessage && (
+            <div className="text-center text-muted-foreground text-sm py-2">Sending...</div>
+          )}
+        </div>
       </div>
 
       {/* Controls */}

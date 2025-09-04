@@ -102,6 +102,26 @@ serve(async (req) => {
       sessionId: project.session_id
     });
 
+    // Delete previous search results for this project (keep only latest)
+    await supabase
+      .from('search_results')
+      .delete()
+      .eq('user_id', user.id)
+      .in('search_id', 
+        supabase
+          .from('searches')
+          .select('id')
+          .eq('project_id', projectId)
+          .eq('user_id', user.id)
+      );
+
+    // Delete previous searches for this project (keep only latest)
+    await supabase
+      .from('searches')
+      .delete()
+      .eq('user_id', user.id)
+      .eq('project_id', projectId);
+
     // Create search record with pending status
     const { data: searchRecord, error: searchError } = await supabase
       .from('searches')

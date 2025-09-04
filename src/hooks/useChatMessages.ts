@@ -22,7 +22,7 @@ export const useChatMessages = (projectId: string | undefined) => {
         // Get the latest search for this project to extract chat messages
         const { data: searches, error } = await supabase
           .from('searches')
-          .select('raw_response, created_at')
+          .select('prompt, raw_response, created_at')
           .eq('project_id', projectId)
           .eq('status', 'completed')
           .order('created_at', { ascending: true });
@@ -37,11 +37,12 @@ export const useChatMessages = (projectId: string | undefined) => {
         searches?.forEach((search, index) => {
           const rawResponse = search.raw_response as any;
           
-          // Add the user's search query
-          if (rawResponse?.prompt) {
+          // Add the user's search query from the search prompt
+          const userPrompt = (search as any).prompt || rawResponse?.prompt;
+          if (userPrompt) {
             chatMessages.push({
               id: `user-${index}`,
-              content: rawResponse.prompt,
+              content: userPrompt,
               isBot: false,
               timestamp: new Date(search.created_at)
             });
