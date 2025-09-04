@@ -65,7 +65,7 @@ export function CandidateProfile({ children, candidateData, socialLinks = [] }: 
       <SheetTrigger asChild>
         {children}
       </SheetTrigger>
-      <SheetContent side="right" className="w-[600px] sm:w-[600px] overflow-y-auto">
+      <SheetContent side="right" className="w-full sm:w-1/2 overflow-y-auto">
         <SheetHeader className="space-y-4">
           <div className="flex items-start gap-4">
             <Avatar className="h-16 w-16">
