@@ -124,7 +124,7 @@ serve(async (req) => {
     }
 
     // Make request to external API
-    const apiResponse = await fetch('http://104.196.13.228:8888/api/get-candidates-by-chat', {
+    const apiResponse = await fetch('http://104.196.13.228:8888/api/get-candidates-by-prompt', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
