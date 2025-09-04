@@ -29,18 +29,17 @@ export const addToShortlist = async (projectId: string, candidateId: string, can
     throw new Error(`Failed to add to shortlist: ${insertError.message}`);
   }
 
-  // Get current count and increment it
-  const { data: currentProject } = await supabase
+  // First get current count, then update
+  const { data: projectData } = await supabase
     .from('projects')
     .select('shortlist_count')
     .eq('id', projectId)
     .single();
 
-  const newCount = (currentProject?.shortlist_count || 0) + 1;
-  
+  const currentCount = projectData?.shortlist_count || 0;
   const { error: updateError } = await supabase
     .from('projects')
-    .update({ shortlist_count: newCount })
+    .update({ shortlist_count: currentCount + 1 })
     .eq('id', projectId);
 
   if (updateError) {
@@ -69,18 +68,17 @@ export const removeFromShortlist = async (projectId: string, candidateId: string
     throw new Error(`Failed to remove from shortlist: ${deleteError.message}`);
   }
 
-  // Get current count and decrement it
-  const { data: currentProject } = await supabase
+  // First get current count, then update
+  const { data: projectData } = await supabase
     .from('projects')
     .select('shortlist_count')
     .eq('id', projectId)
     .single();
 
-  const newCount = Math.max((currentProject?.shortlist_count || 0) - 1, 0);
-  
+  const currentCount = projectData?.shortlist_count || 0;
   const { error: updateError } = await supabase
     .from('projects')
-    .update({ shortlist_count: newCount })
+    .update({ shortlist_count: Math.max(currentCount - 1, 0) })
     .eq('id', projectId);
 
   if (updateError) {
