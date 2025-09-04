@@ -143,20 +143,31 @@ serve(async (req) => {
     if (!apiResponse.ok) {
       const errorText = await apiResponse.text();
       console.error('External API error:', apiResponse.status, errorText);
-      
-      // Update search record with failed status
+
+      // Build fallback response so the app can show a bot message and persist chat history
+      const fallbackResponse = {
+        session: {
+          message: `Sorry, the search service is temporarily unavailable (HTTP ${apiResponse.status}). Please try again in a moment.`,
+          session_id: project.session_id || ''
+        },
+        candidates: [] as any[]
+      };
+
+      // Store as completed with empty candidates so chat history and UI stay consistent
       await supabase
         .from('searches')
         .update({
-          status: 'failed',
-          error_message: `API error: ${apiResponse.status} - ${errorText}`,
+          status: 'completed',
+          candidate_count: 0,
+          raw_response: fallbackResponse,
+          error_message: `API error: ${apiResponse.status}`,
           completed_at: new Date().toISOString()
         })
         .eq('id', searchRecord.id);
 
-      return new Response(`External API error: ${apiResponse.status}`, { 
-        status: 500, 
-        headers: corsHeaders 
+      return new Response(JSON.stringify(fallbackResponse), {
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
