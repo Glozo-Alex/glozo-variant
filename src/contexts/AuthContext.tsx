@@ -56,13 +56,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const signInWithGoogle = async () => {
     try {
-      // Determine the correct redirect URL based on the current environment
-      const currentOrigin = window.location.origin;
-      const redirectUrl = currentOrigin.includes('lovable.app') 
-        ? currentOrigin 
-        : 'https://preview--glozo-variant.lovable.app';
-      
-      console.log('Auth Debug - Current origin:', currentOrigin);
+      // Determine redirect URL to current origin (must be allowlisted in Supabase Auth settings)
+      const redirectUrl = window.location.origin;
       console.log('Auth Debug - Redirect URL:', redirectUrl);
       
       const { error } = await supabase.auth.signInWithOAuth({
