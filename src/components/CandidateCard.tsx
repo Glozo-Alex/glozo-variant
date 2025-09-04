@@ -48,8 +48,8 @@ const CandidateCard = ({
       if (isShortlisted) {
         await removeFromShortlist(projectId, candidateId);
         toast({
-          title: "Удален из избранного",
-          description: `${name} удален из избранного`,
+          title: "Removed from shortlist",
+          description: `${name} removed from shortlist`,
         });
       } else {
         const candidateData = {
@@ -65,16 +65,16 @@ const CandidateCard = ({
         };
         await addToShortlist(projectId, candidateId, candidateData);
         toast({
-          title: "Добавлен в избранное",
-          description: `${name} добавлен в избранное`,
+          title: "Added to shortlist",
+          description: `${name} added to shortlist`,
         });
       }
       onShortlistToggle?.(candidateId, !isShortlisted);
     } catch (error) {
       console.error('Shortlist operation failed:', error);
       toast({
-        title: "Ошибка",
-        description: "Не удалось обновить избранное",
+        title: "Error",
+        description: "Failed to update shortlist",
         variant: "destructive",
       });
     } finally {
@@ -119,7 +119,7 @@ const CandidateCard = ({
             ) : (
               <Star className={`h-4 w-4 mr-1 ${isShortlisted ? 'fill-current' : ''}`} />
             )}
-            {isShortlisted ? 'В избранном' : 'В избранное'}
+            {isShortlisted ? 'Shortlisted' : 'Shortlist'}
           </Button>
         </div>
       </header>
