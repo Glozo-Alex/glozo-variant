@@ -127,23 +127,41 @@ serve(async (req) => {
     const requestBody = {
       message,
       count,
-      similarRoles,
+      // send both casing variants just in case
+      similarRoles: !!similarRoles,
+      similar_roles: !!similarRoles,
       session_id: project.session_id || '',
       user_name: userName,
       user_id: user.id,
       project_id: projectId
     };
 
-    console.log('Making API request to:', 'http://104.196.13.228:8888/api/get-candidates-by-chat');
-    console.log('Request body:', JSON.stringify(requestBody, null, 2));
+    const primaryUrl = 'http://104.196.13.228:8888/api/get-candidates-by-chat';
+    const altUrl = 'http://104.196.13.228:8888/api/get_candidates_by_chat';
 
-    const apiResponse = await fetch('http://104.196.13.228:8888/api/get-candidates-by-chat', {
+    console.log('API primary URL:', primaryUrl);
+    console.log('API request body:', JSON.stringify(requestBody));
+
+    let apiResponse = await fetch(primaryUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Accept': 'application/json'
       },
       body: JSON.stringify(requestBody),
     });
+
+    if (apiResponse.status === 404) {
+      console.warn('Primary URL returned 404, trying alternate URL:', altUrl);
+      apiResponse = await fetch(altUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(requestBody),
+      });
+    }
 
     if (!apiResponse.ok) {
       const errorText = await apiResponse.text();
