@@ -34,6 +34,13 @@ const Shortlist = () => {
         // Transform the data to match the component's expected format
         const transformedCandidates = shortlist.map((item) => {
           const candidateData = item.candidate_snapshot as any;
+          
+          // Handle skills - they might be objects with {name, type} or just strings
+          const skillsArray = candidateData.skills || [];
+          const processedSkills = skillsArray.map((skill: any) => 
+            typeof skill === 'string' ? skill : skill.name || skill
+          );
+          
           return {
             id: item.candidate_id,
             name: candidateData.name || 'Unknown',
@@ -42,7 +49,7 @@ const Shortlist = () => {
             location: candidateData.location || 'Unknown location',
             match: candidateData.matchPercentage || candidateData.match || 0,
             rating: candidateData.rating || 0,
-            skills: candidateData.skills || [],
+            skills: processedSkills,
             experience: candidateData.experience || 'No experience',
             email: candidateData.email || 'No email',
             phone: candidateData.phone || 'No phone',
