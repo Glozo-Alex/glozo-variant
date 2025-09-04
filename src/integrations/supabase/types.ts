@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      candidate_details: {
+        Row: {
+          candidate_id: number
+          created_at: string
+          detailed_data: Json
+          id: string
+          project_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          candidate_id: number
+          created_at?: string
+          detailed_data: Json
+          id?: string
+          project_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          candidate_id?: number
+          created_at?: string
+          detailed_data?: Json
+          id?: string
+          project_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       project_shortlist: {
         Row: {
           added_at: string
