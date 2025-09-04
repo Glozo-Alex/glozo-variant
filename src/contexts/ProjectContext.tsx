@@ -81,17 +81,6 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setProjects(prev => [...prev, newProject]);
     setActiveProjectState(newProject);
 
-    // Kick off initial search call to populate candidates and first chat message
-    try {
-      await getCandidatesByChat({
-        message: supabaseProject.query,
-        projectId: supabaseProject.id,
-        count: 200,
-        similarRoles: Boolean(supabaseProject.similar_roles)
-      });
-    } catch (e) {
-      console.warn('Initial search failed:', e);
-    }
 
     return newProject;
   };

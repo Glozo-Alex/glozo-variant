@@ -136,13 +136,12 @@ serve(async (req) => {
       project_id: projectId
     };
 
-    const primaryUrl = 'http://104.196.13.228:8888/api/get-candidates-by-chat';
-    const altUrl = 'http://104.196.13.228:8888/api/get_candidates_by_chat';
+    const apiUrl = 'http://104.196.13.228:8888/api/get-candidates-by-chat';
 
-    console.log('API primary URL:', primaryUrl);
+    console.log('API URL:', apiUrl);
     console.log('API request body:', JSON.stringify(requestBody));
 
-    let apiResponse = await fetch(primaryUrl, {
+    const apiResponse = await fetch(apiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -150,18 +149,6 @@ serve(async (req) => {
       },
       body: JSON.stringify(requestBody),
     });
-
-    if (apiResponse.status === 404) {
-      console.warn('Primary URL returned 404, trying alternate URL:', altUrl);
-      apiResponse = await fetch(altUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify(requestBody),
-      });
-    }
 
     if (!apiResponse.ok) {
       const errorText = await apiResponse.text();
