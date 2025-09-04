@@ -113,9 +113,10 @@ serve(async (req) => {
       console.error('Failed to load previous searches:', prevSearchesError);
     }
 
-    const prevIds = (prevSearches || []).map((s: any) => s.id);
+    const prevIds = Array.isArray(prevSearches) ? prevSearches.map((s: any) => s.id) : [];
+    console.log('Previous search IDs to delete:', prevIds);
 
-    if (prevIds.length > 0) {
+    if (Array.isArray(prevIds) && prevIds.length > 0) {
       const { error: delResultsErr } = await supabase
         .from('search_results')
         .delete()
