@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { X, Plus, Search } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Switch } from "@/components/ui/switch";
-import { getCandidatesByPrompt } from "@/services/candidates";
+import { getCandidatesByChat } from "@/services/candidates";
 const NewSearch = () => {
   const {
     createProject
@@ -62,8 +62,8 @@ const NewSearch = () => {
       const project = await createProject(projectName, fullQuery, similarRoles);
       
       // Then perform the search
-      const apiRes = await getCandidatesByPrompt({ 
-        prompt: fullQuery, 
+      const apiRes = await getCandidatesByChat({ 
+        message: fullQuery, 
         similarRoles, 
         projectId: project.id 
       });
