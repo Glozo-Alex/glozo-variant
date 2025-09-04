@@ -127,6 +127,7 @@ serve(async (req: Request) => {
         // Update search as completed and store the full raw response
         const candidateCount = candidatesArray.length;
 
+        // 1) Update the searches table (backward compatibility for UI)
         const { error: updateError } = await supabase
           .from('searches')
           .update({ 
@@ -139,6 +140,20 @@ serve(async (req: Request) => {
 
         if (updateError) {
           console.error('Failed to update search with raw_response:', updateError);
+        }
+
+        // 2) Insert the full API payload into search_results as a single row (no per-candidate rows)
+        const { error: insertError } = await supabase
+          .from('search_results')
+          .insert({
+            search_id: searchId,
+            user_id: user.id,
+            candidate_data: data, // store full JSON payload here
+            match_percentage: null
+          });
+
+        if (insertError) {
+          console.error('Failed to insert raw payload into search_results:', insertError);
         }
 
       } else {
