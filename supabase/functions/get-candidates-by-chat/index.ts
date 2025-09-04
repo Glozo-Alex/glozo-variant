@@ -124,20 +124,25 @@ serve(async (req) => {
     }
 
     // Make request to external API
+    const requestBody = {
+      message,
+      count,
+      similarRoles,
+      session_id: project.session_id || '',
+      user_name: userName,
+      user_id: user.id,
+      project_id: projectId
+    };
+
+    console.log('Making API request to:', 'http://104.196.13.228:8888/api/get-candidates-by-chat');
+    console.log('Request body:', JSON.stringify(requestBody, null, 2));
+
     const apiResponse = await fetch('http://104.196.13.228:8888/api/get-candidates-by-chat', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        message,
-        count,
-        similarRoles,
-        session_id: project.session_id || '',
-        user_name: userName,
-        user_id: user.id,
-        project_id: projectId
-      }),
+      body: JSON.stringify(requestBody),
     });
 
     if (!apiResponse.ok) {
