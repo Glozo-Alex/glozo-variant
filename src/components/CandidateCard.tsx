@@ -1,7 +1,12 @@
-import { ArrowUpRight, Linkedin, Github, Globe, CheckCircle, ChevronDown, MessageSquare, Star, BrainCircuit } from "lucide-react";
+import { ArrowUpRight, Linkedin, Github, Globe, CheckCircle, ChevronDown, MessageSquare, Star, BrainCircuit, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { addToShortlist, removeFromShortlist } from "@/services/shortlist";
+import { useToast } from "@/hooks/use-toast";
 
 interface CandidateCardProps {
+  candidateId: string;
+  projectId: string;
   name: string;
   title: string;
   location: string;
@@ -10,6 +15,8 @@ interface CandidateCardProps {
   description: string;
   skills: Array<{ name: string; type: 'primary' | 'secondary' }>;
   openToOffers: boolean;
+  isShortlisted?: boolean;
+  onShortlistToggle?: (candidateId: string, isShortlisted: boolean) => void;
 }
 
 const LinkChunk = ({ children }: { children: React.ReactNode }) => (
@@ -17,6 +24,8 @@ const LinkChunk = ({ children }: { children: React.ReactNode }) => (
 );
 
 const CandidateCard = ({
+  candidateId,
+  projectId,
   name,
   title,
   location,
@@ -25,7 +34,53 @@ const CandidateCard = ({
   description,
   skills,
   openToOffers,
+  isShortlisted = false,
+  onShortlistToggle,
 }: CandidateCardProps) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
+
+  const handleShortlistClick = async () => {
+    if (isLoading) return;
+    
+    setIsLoading(true);
+    try {
+      if (isShortlisted) {
+        await removeFromShortlist(projectId, candidateId);
+        toast({
+          title: "Удален из избранного",
+          description: `${name} удален из избранного`,
+        });
+      } else {
+        const candidateData = {
+          id: candidateId,
+          name,
+          title,
+          location,
+          experience,
+          match_percentage: matchPercentage,
+          description,
+          skills,
+          open_to_offers: openToOffers,
+        };
+        await addToShortlist(projectId, candidateId, candidateData);
+        toast({
+          title: "Добавлен в избранное",
+          description: `${name} добавлен в избранное`,
+        });
+      }
+      onShortlistToggle?.(candidateId, !isShortlisted);
+    } catch (error) {
+      console.error('Shortlist operation failed:', error);
+      toast({
+        title: "Ошибка",
+        description: "Не удалось обновить избранное",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
   return (
     <article className="glass-card rounded-xl p-5 space-y-3 animate-fade-in hover:shadow-elegant hover:border-primary/30 transition-all duration-300 hover-lift">
       {/* Header */}
@@ -52,9 +107,19 @@ const CandidateCard = ({
             <MessageSquare className="h-4 w-4 mr-1" />
             Message <ChevronDown className="h-4 w-4 ml-1" />
           </Button>
-          <Button variant="outline" size="sm" className="text-card-foreground border-card-border bg-card-hover hover:bg-card-hover/70 transition-all duration-300 hover-scale">
-            <Star className="h-4 w-4 mr-1" />
-            Shortlist
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="text-card-foreground border-card-border bg-card-hover hover:bg-card-hover/70 transition-all duration-300 hover-scale"
+            onClick={handleShortlistClick}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+            ) : (
+              <Star className={`h-4 w-4 mr-1 ${isShortlisted ? 'fill-current' : ''}`} />
+            )}
+            {isShortlisted ? 'В избранном' : 'В избранное'}
           </Button>
         </div>
       </header>

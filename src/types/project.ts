@@ -15,4 +15,5 @@ export interface ProjectContextType {
   deleteProject: (projectId: string) => void;
   updateProject: (projectId: string, updates: Partial<Pick<Project, 'name' | 'query'>>) => void;
   duplicateProject: (projectId: string) => Project;
+  updateShortlistCount: (projectId: string, newCount: number) => void;
 }

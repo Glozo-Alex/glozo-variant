@@ -125,6 +125,19 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
     return duplicatedProject;
   };
 
+  const updateShortlistCount = (projectId: string, newCount: number) => {
+    setProjects(prev => prev.map(p => 
+      p.id === projectId 
+        ? { ...p, shortlistCount: newCount }
+        : p
+    ));
+    
+    // Update active project if it's the one being updated
+    if (activeProject?.id === projectId) {
+      setActiveProjectState(prev => prev ? { ...prev, shortlistCount: newCount } : null);
+    }
+  };
+
   return (
     <ProjectContext.Provider value={{
       projects,
@@ -134,6 +147,7 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
       deleteProject,
       updateProject,
       duplicateProject,
+      updateShortlistCount,
     }}>
       {children}
     </ProjectContext.Provider>
