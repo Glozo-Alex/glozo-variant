@@ -1,8 +1,14 @@
-import { ArrowUpRight, Linkedin, Github, Globe, CheckCircle, ChevronDown, MessageSquare, Star, BrainCircuit, Loader2 } from "lucide-react";
+import { ArrowUpRight, Linkedin, Github, Globe, CheckCircle, ChevronDown, MessageSquare, Star, BrainCircuit, Loader2, Monitor, FileText, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { addToShortlist, removeFromShortlist } from "@/services/shortlist";
 import { useToast } from "@/hooks/use-toast";
+import { CandidateProfile } from "./CandidateProfile";
+
+interface SocialLink {
+  platform: string;
+  url: string;
+}
 
 interface CandidateCardProps {
   candidateId: string;
@@ -17,11 +23,28 @@ interface CandidateCardProps {
   openToOffers: boolean;
   isShortlisted?: boolean;
   onShortlistToggle?: (candidateId: string, isShortlisted: boolean) => void;
+  socialLinks?: SocialLink[];
+  fullCandidateData?: any;
 }
 
 const LinkChunk = ({ children }: { children: React.ReactNode }) => (
   <span className="bg-tag-purple text-tag-purple-text px-1 rounded">{children}</span>
 );
+
+const getSocialIcon = (platform: string) => {
+  const iconMap: Record<string, React.ElementType> = {
+    linkedin: Linkedin,
+    github: Github,
+    x: MessageSquare, // Twitter/X
+    instagram: Monitor,
+    medium: FileText,
+    stackoverflow: Monitor,
+    gitlab: Github,
+    globe: Globe,
+  };
+  
+  return iconMap[platform.toLowerCase()] || Globe;
+};
 
 const CandidateCard = ({
   candidateId,
@@ -36,6 +59,8 @@ const CandidateCard = ({
   openToOffers,
   isShortlisted = false,
   onShortlistToggle,
+  socialLinks = [],
+  fullCandidateData,
 }: CandidateCardProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
@@ -85,14 +110,26 @@ const CandidateCard = ({
     <article className="glass-card rounded-xl p-5 space-y-3 animate-fade-in hover:shadow-elegant hover:border-primary/30 transition-all duration-300 hover-lift">
       {/* Header */}
       <header className="flex items-start justify-between">
-        <div className="flex items-center gap-3 flex-wrap">
-          <h3 className="text-base font-semibold text-card-foreground">{name}</h3>
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <ArrowUpRight className="h-4 w-4" />
-            <Linkedin className="h-4 w-4" />
-            <Globe className="h-4 w-4" />
-            <Github className="h-4 w-4" />
-          </div>
+          <div className="flex items-center gap-3 flex-wrap">
+            <h3 className="text-base font-semibold text-card-foreground">{name}</h3>
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <CandidateProfile candidateData={fullCandidateData} socialLinks={socialLinks}>
+                <ArrowUpRight className="h-4 w-4 cursor-pointer hover:text-primary transition-colors" />
+              </CandidateProfile>
+              {socialLinks.map((link, index) => {
+                const IconComponent = getSocialIcon(link.platform);
+                return (
+                  <IconComponent
+                    key={index}
+                    className="h-4 w-4 cursor-pointer hover:text-primary transition-colors"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      window.open(link.url, '_blank');
+                    }}
+                  />
+                );
+              })}
+            </div>
           <span className="inline-flex items-center gap-1 text-sm font-semibold text-success">
             <CheckCircle className="h-4 w-4" /> {matchPercentage}% match
           </span>

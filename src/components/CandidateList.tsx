@@ -22,6 +22,12 @@ interface APICandidate {
   standout?: string;
   skills?: Array<{ cluster?: string; skills?: string[] }>;
   open_to_offers?: boolean;
+  social?: Array<{ platform: string; url: string }>;
+  salary?: string;
+  seniority_level?: string;
+  degree?: string;
+  domain?: string;
+  time_overlap?: number;
 }
 
 const CandidateList = () => {
@@ -158,6 +164,12 @@ const CandidateList = () => {
             .filter(Boolean)
             .slice(0, 8);
 
+          // Extract social links from candidate data
+          const socialLinks = (c.social ?? []).map((social: any) => ({
+            platform: social.platform || 'globe',
+            url: social.url || '#'
+          }));
+
           return (
             <CandidateCard
               key={`${c.id ?? idx}`}
@@ -173,6 +185,8 @@ const CandidateList = () => {
               openToOffers={Boolean(c.open_to_offers)}
               isShortlisted={shortlistStatus[String(c.id || idx)] || false}
               onShortlistToggle={handleShortlistToggle}
+              socialLinks={socialLinks}
+              fullCandidateData={c}
             />
           );
         })}
