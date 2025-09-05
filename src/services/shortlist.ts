@@ -16,13 +16,23 @@ export const addToShortlist = async (projectId: string, candidateId: string, can
     throw new Error('User not authenticated');
   }
 
+  // Normalize candidate snapshot to ensure match score is present
+  const normalizedSnapshot = {
+    ...candidateData,
+    match_percentage: Math.round(
+      Number(
+        candidateData.match_percentage ?? candidateData.match_score ?? candidateData.matchPercentage ?? candidateData.match ?? 0
+      )
+    ),
+  };
+
   // Insert into project_shortlist
   const { error: insertError } = await supabase
     .from('project_shortlist')
     .insert({
       project_id: projectId,
       candidate_id: candidateId,
-      candidate_snapshot: candidateData,
+      candidate_snapshot: normalizedSnapshot,
       user_id: user.id
     });
 

@@ -115,7 +115,12 @@ const Shortlist = () => {
             title,
             company,
             location,
-            match: candidateData.matchPercentage || candidateData.match || 0,
+            match: Math.round(
+              Number(
+                (details as any)?.match_percentage ?? (details as any)?.match_score ?? (details as any)?.match ??
+                candidateData.match_percentage ?? candidateData.match_score ?? candidateData.matchPercentage ?? candidateData.match ?? 0
+              )
+            ),
             rating: candidateData.rating || 0,
             skills: processedSkills,
             experience: candidateData.experience || 'No experience',
