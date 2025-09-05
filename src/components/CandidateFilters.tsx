@@ -1,6 +1,5 @@
-import { Filter, X } from "lucide-react";
+import { Filter, X, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
@@ -55,24 +54,47 @@ const CandidateFilters = ({ availableFilters, selectedFilters, onFiltersChange }
   console.log('CandidateFilters Debug:', { availableFilters: safeAvailableFilters, selectedFilters, hasActiveFilters, activeFilterCount });
 
   return (
-    <div className="flex items-center gap-2 flex-wrap">
-      <Popover open={isOpen} onOpenChange={setIsOpen}>
-        <PopoverTrigger asChild>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="flex items-center gap-2"
-          >
-            <Filter className="h-4 w-4" />
-            Filters
-            {activeFilterCount > 0 && (
-              <Badge variant="secondary" className="ml-1 text-xs px-1.5 py-0">
-                {activeFilterCount}
-              </Badge>
-            )}
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-80 p-4 bg-background border shadow-lg" align="end">
+    <div className="relative">
+      <div className="flex items-center gap-2 flex-wrap">
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="flex items-center gap-2"
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          <Filter className="h-4 w-4" />
+          Filters
+          {activeFilterCount > 0 && (
+            <Badge variant="secondary" className="ml-1 text-xs px-1.5 py-0">
+              {activeFilterCount}
+            </Badge>
+          )}
+          <ChevronDown className={`h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        </Button>
+
+        {/* Active filter tags */}
+        {Object.entries(selectedFilters).map(([category, values]) =>
+          values.map(value => (
+            <Badge 
+              key={`${category}-${value}`} 
+              variant="secondary" 
+              className="flex items-center gap-1 text-xs"
+            >
+              {value}
+              <button
+                onClick={() => removeFilter(category, value)}
+                className="ml-1 hover:bg-secondary-foreground/20 rounded-full p-0.5"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </Badge>
+          ))
+        )}
+      </div>
+
+      {/* Dropdown panel */}
+      {isOpen && (
+        <div className="absolute top-full left-0 mt-2 w-80 bg-background border rounded-lg shadow-lg p-4 z-50">
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="font-semibold text-foreground">Filters</h3>
@@ -122,26 +144,7 @@ const CandidateFilters = ({ availableFilters, selectedFilters, onFiltersChange }
               </div>
             )}
           </div>
-        </PopoverContent>
-      </Popover>
-      
-      {/* Active filter tags */}
-      {Object.entries(selectedFilters).map(([category, values]) =>
-        values.map(value => (
-          <Badge 
-            key={`${category}-${value}`} 
-            variant="secondary" 
-            className="flex items-center gap-1 text-xs"
-          >
-            {value}
-            <button
-              onClick={() => removeFilter(category, value)}
-              className="ml-1 hover:bg-secondary-foreground/20 rounded-full p-0.5"
-            >
-              <X className="h-3 w-3" />
-            </button>
-          </Badge>
-        ))
+        </div>
       )}
     </div>
   );
