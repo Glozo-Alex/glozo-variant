@@ -6,12 +6,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useProject } from "@/contexts/ProjectContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { useProfile } from "@/hooks/useProfile";
 import ProjectSelector from "./ProjectSelector";
 
 const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
   const { activeProject } = useProject();
   const { user, signOut } = useAuth();
+  const { profile, displayName } = useProfile();
 
   const getInitials = (name: string) => {
     return name
@@ -22,8 +24,7 @@ const Sidebar = () => {
       .slice(0, 2);
   };
 
-  const displayName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User';
-  const avatarUrl = user?.user_metadata?.avatar_url;
+  const avatarUrl = profile?.avatar_url || user?.user_metadata?.avatar_url;
 
   const navCls = "flex items-center gap-3 px-3 py-2 rounded-md text-sm text-sidebar-text hover:bg-sidebar-hover hover:text-sidebar-text-active transition-all duration-300 hover-scale";
 
