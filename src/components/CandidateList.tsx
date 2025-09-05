@@ -145,81 +145,58 @@ const CandidateList = () => {
     };
   }, [projectId]);
 
-  // Extract filters from API response and candidates
+  // Extract filters from API response
   const extractFiltersFromResponse = (filters: any, candidates: APICandidate[]) => {
     const processedFilters: Record<string, any> = {};
 
-    // Process domain filters
-    if (filters.domain && Array.isArray(filters.domain)) {
-      processedFilters.domain = {
-        name: 'Domain',
-        values: filters.domain.map((item: any) => {
-          const value = String(item?.value || item || '').trim();
-          const count = Number(item?.count || 0);
-          return {
-            value,
-            count: count || candidates.filter(c => 
-              c.domain && typeof c.domain === 'string' && 
-              c.domain === value
-            ).length
-          };
-        }).filter(item => item.value) // Remove empty values
-      };
-    }
+    // Process each filter category directly from API structure
+    Object.entries(filters).forEach(([category, items]) => {
+      if (Array.isArray(items)) {
+        let categoryName = category.replace(/_/g, ' ');
+        
+        // Customize category names
+        switch (category) {
+          case 'domain':
+            categoryName = 'Domain';
+            break;
+          case 'education':
+            categoryName = 'Education';
+            break;
+          case 'time_overlap':
+            categoryName = 'Time Overlap';
+            break;
+          case 'open_to_offers':
+            categoryName = 'Open to Offers';
+            break;
+        }
 
-    // Process education filters  
-    if (filters.education && Array.isArray(filters.education)) {
-      processedFilters.education = {
-        name: 'Education',
-        values: filters.education.map((item: any) => {
-          const value = String(item?.value || item || '').trim();
-          const count = Number(item?.count || 0);
-          return {
-            value,
-            count: count || candidates.filter(c => 
-              c.degree && typeof c.degree === 'string' && 
-              c.degree === value
-            ).length
-          };
-        }).filter(item => item.value) // Remove empty values
-      };
-    }
+        processedFilters[category] = {
+          name: categoryName,
+          values: items
+            .map((item: any) => {
+              let name = '';
+              let count = Number(item?.count || 0);
 
-    // Process time overlap filters
-    if (filters.time_overlap && Array.isArray(filters.time_overlap)) {
-      processedFilters.time_overlap = {
-        name: 'Time Overlap',
-        values: filters.time_overlap.map((item: any) => {
-          const rawValue = item?.value ?? item ?? '';
-          const value = `${String(rawValue).trim()} hours`;
-          const count = Number(item?.count || 0);
-          return {
-            value,
-            count: count || candidates.filter(c => 
-              c.time_overlap === rawValue
-            ).length
-          };
-        }).filter(item => item.value !== ' hours') // Remove empty values
-      };
-    }
+              // Extract name from API structure
+              if (typeof item === 'object' && item !== null) {
+                name = String(item.name || '').trim();
+              }
 
-    // Process open to offers filters
-    if (filters.open_to_offers && Array.isArray(filters.open_to_offers)) {
-      processedFilters.open_to_offers = {
-        name: 'Open to Offers',
-        values: filters.open_to_offers.map((item: any) => {
-          const boolValue = Boolean(item?.value ?? item);
-          const value = boolValue ? 'Yes' : 'No';
-          const count = Number(item?.count || 0);
-          return {
-            value,
-            count: count || candidates.filter(c => 
-              Boolean(c.open_to_offers) === boolValue
-            ).length
-          };
-        })
-      };
-    }
+              // Special handling for specific categories
+              if (category === 'time_overlap' && name) {
+                name = `${name} hours`;
+              }
+              
+              if (category === 'open_to_offers' && name === 'True') {
+                name = 'Yes';
+              }
+
+              return { name, count };
+            })
+            .filter(item => item.name) // Remove empty names
+        };
+      }
+    });
 
     return processedFilters;
   };
@@ -235,19 +212,11 @@ const CandidateList = () => {
         switch (category) {
           case 'domain':
             return values.includes(candidate.domain || '');
-          case 'skills':
-            return (values as string[]).some((filterValue: string) => 
-              candidate.skills?.some(skillGroup => 
-                skillGroup.skills?.some(skill => 
-                  skill && typeof skill === 'string' && 
-                  skill.toLowerCase().includes(filterValue.toLowerCase())
-                )
-              )
-            );
           case 'education':
             return values.includes(candidate.degree || '');
           case 'time_overlap':
-            return values.some(v => v.startsWith(String(candidate.time_overlap || 0)));
+            const timeOverlapValue = `${candidate.time_overlap || 0} hours`;
+            return values.includes(timeOverlapValue);
           case 'open_to_offers':
             const candidateOpenToOffers = candidate.open_to_offers ? 'Yes' : 'No';
             return values.includes(candidateOpenToOffers);

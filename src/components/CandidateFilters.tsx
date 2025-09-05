@@ -7,7 +7,7 @@ import { useState } from "react";
 
 interface FilterGroup {
   name: string;
-  values: Array<{ value: string; count: number } | string | any>;
+  values: Array<{ name: string; count: number }>;
 }
 
 interface CandidateFiltersProps {
@@ -69,7 +69,7 @@ const CandidateFilters = ({ availableFilters, selectedFilters, onFiltersChange }
               variant="secondary" 
               className="flex items-center gap-1 text-xs"
             >
-              {availableFilters[category]?.name || category.replace(/_/g, ' ')}
+              {value}
               <button
                 onClick={() => removeFilter(category, value)}
                 className="ml-1 hover:bg-secondary-foreground/20 rounded-full p-0.5"
@@ -129,78 +129,21 @@ const CandidateFilters = ({ availableFilters, selectedFilters, onFiltersChange }
             </div>
             
             {Object.entries(safeAvailableFilters).map(([category, filterGroup]) => {
-              console.log('🔍 Rendering filter group:', category);
-              console.log('📊 Filter group data:', filterGroup);
-              console.log('📋 Filter group values:', filterGroup?.values);
-              
               if (!filterGroup || !filterGroup.values || !Array.isArray(filterGroup.values)) {
-                console.warn('❌ Invalid filter group structure for category:', category, filterGroup);
                 return null;
               }
               
               return (
                 <div key={category} className="space-y-2">
                   <h4 className="text-sm font-medium text-foreground capitalize">
-                    {filterGroup?.name || category.replace(/_/g, ' ')}
+                    {filterGroup.name || category.replace(/_/g, ' ')}
                   </h4>
                   <div className="space-y-2 max-h-32 overflow-y-auto">
                     {filterGroup.values.map((item, index) => {
-                      console.log(`🔍 Processing filter item [${index}]:`, typeof item, item);
+                      if (!item || !item.name) return null;
                       
-                      // Ensure we have a valid structure
-                      if (item === null || item === undefined) {
-                        console.warn('❌ Null/undefined filter item at index:', index);
-                        return null;
-                      }
-                      
-                      // Safely extract and convert values
-                      let value = '';
-                      let count = 0;
-                      
-                      // Handle different data structures
-                      if (typeof item === 'string') {
-                        value = item;
-                        count = 0;
-                      } else if (typeof item === 'object' && item !== null) {
-                        // Handle various object structures with safe property access
-                        const obj = item as any;
-                        
-                        // First try standard properties
-                        if (obj.value) {
-                          value = String(obj.value);
-                        } else if (obj.name) {
-                          value = String(obj.name);
-                        } else if (obj.label) {
-                          value = String(obj.label);
-                        } else if (obj.title) {
-                          value = String(obj.title);
-                        } else {
-                          // If it's a plain object, use the first non-count property as value
-                          const keys = Object.keys(obj).filter(k => k !== 'count' && k !== 'frequency' && k !== 'total');
-                          if (keys.length > 0) {
-                            value = String(obj[keys[0]]);
-                          } else {
-                            value = JSON.stringify(obj);
-                          }
-                        }
-                        
-                        count = Number(obj.count || obj.frequency || obj.total || 0);
-                      } else {
-                        value = String(item || '');
-                        count = 0;
-                      }
-                      
-                      // Ensure value is a string and clean it
-                      value = String(value).trim();
-                      
-                      console.log(`📝 Extracted filter value: "${value}", count: ${count} from:`, item);
-                      
-                      // Skip empty values
-                      if (!value.trim()) {
-                        console.warn('❌ Skipping empty filter value:', item);
-                        return null;
-                      }
-                      
+                      const value = String(item.name).trim();
+                      const count = Number(item.count || 0);
                       const key = `${category}-${value}-${index}`;
                       
                       return (
@@ -209,7 +152,6 @@ const CandidateFilters = ({ availableFilters, selectedFilters, onFiltersChange }
                             id={key}
                             checked={selectedFilters[category]?.includes(value) || false}
                             onCheckedChange={(checked) => {
-                              console.log(`🔄 Filter toggle: ${category} -> ${value} -> ${checked}`);
                               handleFilterToggle(category, value, checked as boolean);
                             }}
                           />
