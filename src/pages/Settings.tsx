@@ -168,7 +168,7 @@ const Settings = () => {
                       <Input 
                         id="name" 
                         value={profile.name}
-                        onChange={(e) => { setProfile({...profile, name: e.target.value}); setDirty(true); }}}
+                        onChange={(e) => { setProfile({...profile, name: e.target.value}); setDirty(true); }}
                       />
                     </div>
                     <div className="space-y-2">
@@ -185,7 +185,7 @@ const Settings = () => {
                       <Input 
                         id="title" 
                         value={profile.title}
-                        onChange={(e) => { setProfile({...profile, title: e.target.value}); setDirty(true); }}}
+                        onChange={(e) => { setProfile({...profile, title: e.target.value}); setDirty(true); }}
                       />
                     </div>
                     <div className="space-y-2">
@@ -193,7 +193,7 @@ const Settings = () => {
                       <Input 
                         id="company" 
                         value={profile.company}
-                        onChange={(e) => { setProfile({...profile, company: e.target.value}); setDirty(true); }}}
+                        onChange={(e) => { setProfile({...profile, company: e.target.value}); setDirty(true); }}
                       />
                     </div>
                     <div className="space-y-2">
@@ -201,7 +201,7 @@ const Settings = () => {
                       <Input 
                         id="phone" 
                         value={profile.phone}
-                        onChange={(e) => { setProfile({...profile, phone: e.target.value}); setDirty(true); }}}
+                        onChange={(e) => { setProfile({...profile, phone: e.target.value}); setDirty(true); }}
                       />
                     </div>
                     <div className="space-y-2">
@@ -210,7 +210,10 @@ const Settings = () => {
                         id="timezone"
                         className="w-full h-10 px-3 rounded-md border border-input bg-background"
                         value={profile.timezone}
-                        onChange={(e) => { setProfile({ ...profile, timezone: e.target.value }); setDirty(true); }}
+                        onChange={(e) => {
+                          setProfile({ ...profile, timezone: e.target.value });
+                          setDirty(true);
+                        }}
                       >
                         <option value="PST">Pacific Standard Time (PST)</option>
                         <option value="EST">Eastern Standard Time (EST)</option>
