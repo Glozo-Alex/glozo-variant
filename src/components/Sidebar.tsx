@@ -8,6 +8,7 @@ import { useProject } from "@/contexts/ProjectContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
 import ProjectSelector from "./ProjectSelector";
+import ColorSchemeSelector from "./ColorSchemeSelector";
 
 const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
@@ -212,6 +213,9 @@ const Sidebar = () => {
               </>
             )}
           </NavLink>
+
+          {/* Color Scheme Selector */}
+          <ColorSchemeSelector collapsed={collapsed} />
         </nav>
 
         {/* Collapse button at bottom */}

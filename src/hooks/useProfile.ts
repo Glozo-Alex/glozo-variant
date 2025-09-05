@@ -12,6 +12,7 @@ export type ProfileRow = {
   phone: string | null;
   timezone: string | null;
   avatar_url: string | null;
+  theme_preference: string | null;
   created_at: string;
   updated_at: string;
 };

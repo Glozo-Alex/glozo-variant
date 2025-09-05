@@ -53,6 +53,7 @@ export type Database = {
           id: string
           job_title: string | null
           phone: string | null
+          theme_preference: string | null
           timezone: string | null
           updated_at: string
         }
@@ -64,6 +65,7 @@ export type Database = {
           id: string
           job_title?: string | null
           phone?: string | null
+          theme_preference?: string | null
           timezone?: string | null
           updated_at?: string
         }
@@ -75,6 +77,7 @@ export type Database = {
           id?: string
           job_title?: string | null
           phone?: string | null
+          theme_preference?: string | null
           timezone?: string | null
           updated_at?: string
         }
