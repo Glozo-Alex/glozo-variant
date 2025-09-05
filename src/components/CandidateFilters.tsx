@@ -101,22 +101,12 @@ const CandidateFilters = ({ availableFilters, selectedFilters, onFiltersChange }
         )}
       </div>
 
-      {/* Dropdown panel with max z-index */}
+      {/* Dropdown panel with proper positioning */}
       {isOpen && (
         <div 
-          className="fixed top-0 left-0 w-full h-full z-[9999]" 
-          onClick={() => setIsOpen(false)}
+          className="absolute top-full left-0 mt-2 w-80 bg-background border rounded-lg shadow-lg z-50 p-4" 
+          onClick={(e) => e.stopPropagation()}
         >
-          <div 
-            className="absolute top-full left-0 mt-2 w-80 bg-background/98 backdrop-blur-md border rounded-lg shadow-lg p-4" 
-            style={{ 
-              position: 'absolute',
-              top: '100%',
-              left: '0',
-              zIndex: 10000
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="font-semibold text-foreground">Filters</h3>
@@ -205,7 +195,6 @@ const CandidateFilters = ({ availableFilters, selectedFilters, onFiltersChange }
                 No filters available
               </div>
             )}
-          </div>
           </div>
         </div>
       )}

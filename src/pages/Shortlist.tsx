@@ -14,7 +14,7 @@ import { getCachedCandidateDetails, getCandidateDetails } from "@/services/candi
 import { useToast } from "@/hooks/use-toast";
 import { ContactInfo } from "@/components/ContactInfo";
 import { CandidateProfile } from "@/components/CandidateProfile";
-import CandidateFilters from "@/components/CandidateFilters";
+import ShortlistProjectSelector from "@/components/ShortlistProjectSelector";
 
 type ViewMode = 'cards' | 'table';
 
@@ -32,9 +32,7 @@ const Shortlist = () => {
     return (saved as ViewMode) || 'cards';
   });
   
-  // Filter states
-  const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
-  const [availableFilters, setAvailableFilters] = useState<Record<string, any>>({});
+  // No need for filter states on Shortlist page
   
   const project = projects.find(p => p.id === projectId);
 
@@ -138,10 +136,6 @@ const Shortlist = () => {
         console.log('Shortlist - Final transformed candidates:', transformedCandidates);
         setShortlistedCandidates(transformedCandidates);
         
-        // Extract filters from candidates
-        const filters = extractFiltersFromCandidates(transformedCandidates);
-        setAvailableFilters(filters);
-        
         // Check for candidates without cached details and fetch them in background
         const missingIds = numericIds.filter(id => !detailsMap[id]);
         if (missingIds.length > 0) {
@@ -200,81 +194,6 @@ const Shortlist = () => {
     setViewMode(mode);
     localStorage.setItem('shortlist-view-mode', mode);
   }, []);
-  
-  // Filter helper functions
-  const extractFiltersFromCandidates = (candidates: any[]) => {
-    const filters: Record<string, any> = {};
-    
-    // Extract skills
-    const skillsMap = new Map<string, number>();
-    const companiesMap = new Map<string, number>();
-    const locationsMap = new Map<string, number>();
-    
-    candidates.forEach(candidate => {
-      // Skills
-      candidate.skills?.forEach((skill: string) => {
-        if (skill?.trim()) {
-          skillsMap.set(skill, (skillsMap.get(skill) || 0) + 1);
-        }
-      });
-      
-      // Companies
-      if (candidate.company?.trim()) {
-        companiesMap.set(candidate.company, (companiesMap.get(candidate.company) || 0) + 1);
-      }
-      
-      // Locations
-      if (candidate.location?.trim()) {
-        locationsMap.set(candidate.location, (locationsMap.get(candidate.location) || 0) + 1);
-      }
-    });
-    
-    filters.skills = {
-      name: 'Skills',
-      values: Array.from(skillsMap.entries())
-        .map(([value, count]) => ({ value, count }))
-        .sort((a, b) => b.count - a.count)
-        .slice(0, 20) // Limit to top 20 skills
-    };
-    
-    filters.companies = {
-      name: 'Companies',
-      values: Array.from(companiesMap.entries())
-        .map(([value, count]) => ({ value, count }))
-        .sort((a, b) => b.count - a.count)
-    };
-    
-    filters.locations = {
-      name: 'Locations',
-      values: Array.from(locationsMap.entries())
-        .map(([value, count]) => ({ value, count }))
-        .sort((a, b) => b.count - a.count)
-    };
-    
-    return filters;
-  };
-  
-  const handleFiltersChange = useCallback((filters: Record<string, string[]>) => {
-    setSelectedFilters(filters);
-  }, []);
-  
-  // Filter candidates based on selected filters
-  const filteredCandidates = shortlistedCandidates.filter(candidate => {
-    return Object.entries(selectedFilters).every(([category, values]) => {
-      if (values.length === 0) return true;
-      
-      switch (category) {
-        case 'skills':
-          return values.some(value => candidate.skills?.includes(value));
-        case 'companies':
-          return values.includes(candidate.company);
-        case 'locations':
-          return values.includes(candidate.location);
-        default:
-          return true;
-      }
-    });
-  });
 
   if (!project) {
     return (
@@ -313,10 +232,13 @@ const Shortlist = () => {
               Shortlist
             </h1>
             <p className="text-muted-foreground">
-              Selected candidates for <strong>{project.name}</strong>
+              Selected candidates for your projects
             </p>
           </div>
           <div className="flex items-center gap-4">
+            {/* Project Selector */}
+            <ShortlistProjectSelector />
+            
             {/* View Mode Switcher - Hidden on mobile */}
             <div className="hidden md:flex items-center gap-1 p-1 rounded-lg bg-muted">
               <Button
@@ -338,27 +260,13 @@ const Shortlist = () => {
             </div>
             
             <div className="text-right">
-              <p className="text-2xl font-bold text-primary">{filteredCandidates.length}</p>
-              <p className="text-sm text-muted-foreground">
-                {filteredCandidates.length !== shortlistedCandidates.length 
-                  ? `of ${shortlistedCandidates.length} total` 
-                  : 'candidates shortlisted'
-                }
-              </p>
+              <p className="text-2xl font-bold text-primary">{shortlistedCandidates.length}</p>
+              <p className="text-sm text-muted-foreground">candidates shortlisted</p>
             </div>
           </div>
         </div>
         
-        {/* Filters */}
-        {!loading && shortlistedCandidates.length > 0 && (
-          <div className="mb-6">
-            <CandidateFilters
-              availableFilters={availableFilters}
-              selectedFilters={selectedFilters}
-              onFiltersChange={handleFiltersChange}
-            />
-          </div>
-        )}
+        {/* No filters on Shortlist page */}
       </div>
 
       {/* Loading State */}
@@ -402,11 +310,11 @@ const Shortlist = () => {
             </Button>
           </CardContent>
         </Card>
-      ) : filteredCandidates.length > 0 ? (
+      ) : shortlistedCandidates.length > 0 ? (
         viewMode === 'cards' ? (
           /* Cards View */
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-            {filteredCandidates.map((candidate) => (
+            {shortlistedCandidates.map((candidate) => (
               <Card key={candidate.id} className="glass-card hover-lift h-[440px] flex flex-col">
                 <CardHeader className="pb-4 flex-shrink-0">
                   <div className="flex items-start justify-between">
@@ -542,7 +450,7 @@ const Shortlist = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredCandidates.map((candidate) => (
+                {shortlistedCandidates.map((candidate) => (
                   <TableRow key={candidate.id} className="h-12 group hover:bg-muted/50">
                     <TableCell className="p-2">
                       <div className="flex items-center gap-2 min-w-0">
@@ -660,28 +568,14 @@ const Shortlist = () => {
         <Card className="glass-card">
           <CardContent className="pt-12 pb-12 text-center">
             <Users className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-xl font-medium mb-2">
-              {shortlistedCandidates.length === 0 
-                ? "No candidates shortlisted" 
-                : "No candidates match the current filters"
-              }
-            </h3>
+            <h3 className="text-xl font-medium mb-2">No candidates shortlisted</h3>
             <p className="text-muted-foreground mb-6">
-              {shortlistedCandidates.length === 0 
-                ? "Start adding candidates to your shortlist from the search results."
-                : "Try adjusting your filters or clear them to see all shortlisted candidates."
-              }
+              Start adding candidates to your shortlist from the search results.
             </p>
-            {shortlistedCandidates.length === 0 ? (
-              <Button onClick={() => navigate(`/project/${projectId}/results`)}>
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Search Results
-              </Button>
-            ) : (
-              <Button onClick={() => setSelectedFilters({})}>
-                Clear Filters
-              </Button>
-            )}
+            <Button onClick={() => navigate(`/project/${projectId}/results`)}>
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Search Results
+            </Button>
           </CardContent>
         </Card>
       )}
