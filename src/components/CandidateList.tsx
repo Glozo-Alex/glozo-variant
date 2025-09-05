@@ -153,10 +153,17 @@ const CandidateList = () => {
     if (filters.domain && Array.isArray(filters.domain)) {
       processedFilters.domain = {
         name: 'Domain',
-        values: filters.domain.map((item: any) => ({
-          value: item.value || item,
-          count: item.count || candidates.filter(c => c.domain === (item.value || item)).length
-        }))
+        values: filters.domain.map((item: any) => {
+          const value = String(item?.value || item || '').trim();
+          const count = Number(item?.count || 0);
+          return {
+            value,
+            count: count || candidates.filter(c => 
+              c.domain && typeof c.domain === 'string' && 
+              c.domain === value
+            ).length
+          };
+        }).filter(item => item.value) // Remove empty values
       };
     }
 
@@ -164,10 +171,17 @@ const CandidateList = () => {
     if (filters.education && Array.isArray(filters.education)) {
       processedFilters.education = {
         name: 'Education',
-        values: filters.education.map((item: any) => ({
-          value: item.value || item,
-          count: item.count || candidates.filter(c => c.degree === (item.value || item)).length
-        }))
+        values: filters.education.map((item: any) => {
+          const value = String(item?.value || item || '').trim();
+          const count = Number(item?.count || 0);
+          return {
+            value,
+            count: count || candidates.filter(c => 
+              c.degree && typeof c.degree === 'string' && 
+              c.degree === value
+            ).length
+          };
+        }).filter(item => item.value) // Remove empty values
       };
     }
 
@@ -175,10 +189,17 @@ const CandidateList = () => {
     if (filters.time_overlap && Array.isArray(filters.time_overlap)) {
       processedFilters.time_overlap = {
         name: 'Time Overlap',
-        values: filters.time_overlap.map((item: any) => ({
-          value: `${item.value || item} hours`,
-          count: item.count || candidates.filter(c => c.time_overlap === (item.value || item)).length
-        }))
+        values: filters.time_overlap.map((item: any) => {
+          const rawValue = item?.value ?? item ?? '';
+          const value = `${String(rawValue).trim()} hours`;
+          const count = Number(item?.count || 0);
+          return {
+            value,
+            count: count || candidates.filter(c => 
+              c.time_overlap === rawValue
+            ).length
+          };
+        }).filter(item => item.value !== ' hours') // Remove empty values
       };
     }
 
@@ -186,10 +207,17 @@ const CandidateList = () => {
     if (filters.open_to_offers && Array.isArray(filters.open_to_offers)) {
       processedFilters.open_to_offers = {
         name: 'Open to Offers',
-        values: filters.open_to_offers.map((item: any) => ({
-          value: item.value ? 'Yes' : 'No',
-          count: item.count || candidates.filter(c => !!c.open_to_offers === !!item.value).length
-        }))
+        values: filters.open_to_offers.map((item: any) => {
+          const boolValue = Boolean(item?.value ?? item);
+          const value = boolValue ? 'Yes' : 'No';
+          const count = Number(item?.count || 0);
+          return {
+            value,
+            count: count || candidates.filter(c => 
+              Boolean(c.open_to_offers) === boolValue
+            ).length
+          };
+        })
       };
     }
 
@@ -207,6 +235,15 @@ const CandidateList = () => {
         switch (category) {
           case 'domain':
             return values.includes(candidate.domain || '');
+          case 'skills':
+            return (values as string[]).some((filterValue: string) => 
+              candidate.skills?.some(skillGroup => 
+                skillGroup.skills?.some(skill => 
+                  skill && typeof skill === 'string' && 
+                  skill.toLowerCase().includes(filterValue.toLowerCase())
+                )
+              )
+            );
           case 'education':
             return values.includes(candidate.degree || '');
           case 'time_overlap':

@@ -103,7 +103,7 @@ const CandidateFilters = ({ availableFilters, selectedFilters, onFiltersChange }
 
       {/* Dropdown panel */}
       {isOpen && (
-        <div className="absolute top-full left-0 mt-2 w-80 bg-background border rounded-lg shadow-lg p-4 z-50">
+        <div className="absolute top-full left-0 mt-2 w-80 bg-background/95 backdrop-blur-md border rounded-lg shadow-lg p-4 z-[9999]">
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="font-semibold text-foreground">Filters</h3>
@@ -142,8 +142,25 @@ const CandidateFilters = ({ availableFilters, selectedFilters, onFiltersChange }
                         return null;
                       }
                       
-                      const value = item.value || '';
-                      const count = item.count || 0;
+                      // Safely extract and convert values
+                      let value = '';
+                      let count = 0;
+                      
+                       // Handle different data structures
+                       if (typeof item === 'object' && item !== null) {
+                         value = String(item.value || (item as any).name || (item as any).label || '');
+                         count = Number(item.count || 0);
+                       } else {
+                         value = String(item || '');
+                         count = 0;
+                       }
+                      
+                      // Skip empty values
+                      if (!value.trim()) {
+                        console.warn('❌ Skipping empty filter value:', item);
+                        return null;
+                      }
+                      
                       const key = `${category}-${value}-${index}`;
                       
                       return (
@@ -159,7 +176,7 @@ const CandidateFilters = ({ availableFilters, selectedFilters, onFiltersChange }
                             htmlFor={key} 
                             className="text-sm text-foreground flex-1 cursor-pointer"
                           >
-                            {String(value)}
+                            {value}
                           </label>
                           <span className="text-xs text-muted-foreground">({count})</span>
                         </div>
