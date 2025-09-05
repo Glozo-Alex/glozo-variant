@@ -74,26 +74,76 @@ const App = () => (
                   </ProtectedRoute>
                 }
               />
-              <Route
-                path="/projects"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <Projects />
-                    </Layout>
-                  </ProtectedRoute>
-                 }
-               />
-               <Route
-                 path="/test-candidate-details"
+                <Route
+                 path="/projects"
                  element={
                    <ProtectedRoute>
                      <Layout>
-                       <TestCandidateDetails />
+                       <Projects />
                      </Layout>
                    </ProtectedRoute>
-                 }
-               />
+                  }
+                />
+                <Route
+                  path="/analytics"
+                  element={
+                    <ProtectedRoute>
+                      <Layout>
+                        <Analytics />
+                      </Layout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/pipeline"
+                  element={
+                    <ProtectedRoute>
+                      <Layout>
+                        <Pipeline />
+                      </Layout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/team"
+                  element={
+                    <ProtectedRoute>
+                      <Layout>
+                        <Team />
+                      </Layout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/integrations"
+                  element={
+                    <ProtectedRoute>
+                      <Layout>
+                        <Integrations />
+                      </Layout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/settings"
+                  element={
+                    <ProtectedRoute>
+                      <Layout>
+                        <Settings />
+                      </Layout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/test-candidate-details"
+                  element={
+                    <ProtectedRoute>
+                      <Layout>
+                        <TestCandidateDetails />
+                      </Layout>
+                    </ProtectedRoute>
+                  }
+                />
                <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

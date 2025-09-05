@@ -22,7 +22,7 @@ import {
   Settings,
   FolderOpen
 } from 'lucide-react';
-import UserMenu from './UserMenu';
+
 
 const TopNavigation = () => {
   const location = useLocation();
@@ -212,9 +212,6 @@ const TopNavigation = () => {
           <div className="hidden xl:block text-sm text-muted-foreground">
             {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
           </div>
-          
-          {/* User menu */}
-          <UserMenu />
         </div>
       </div>
     </header>

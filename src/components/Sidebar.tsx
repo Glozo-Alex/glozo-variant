@@ -1,13 +1,29 @@
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
-import { LayoutDashboard, Search, Kanban, Users, BarChart3, Plug, Settings, ChevronLeft, ChevronRight, List, Plus, FolderOpen } from "lucide-react";
+import { LayoutDashboard, Search, Kanban, Users, BarChart3, Plug, Settings, ChevronLeft, ChevronRight, List, Plus, FolderOpen, LogOut, User } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import { useProject } from "@/contexts/ProjectContext";
+import { useAuth } from "@/contexts/AuthContext";
 import ProjectSelector from "./ProjectSelector";
 
 const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
   const { activeProject } = useProject();
+  const { user, signOut } = useAuth();
+
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(part => part.charAt(0))
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  const displayName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User';
+  const avatarUrl = user?.user_metadata?.avatar_url;
 
   const navCls = "flex items-center gap-3 px-3 py-2 rounded-md text-sm text-sidebar-text hover:bg-sidebar-hover hover:text-sidebar-text-active transition-all duration-300 hover-scale";
 
@@ -207,11 +223,64 @@ const Sidebar = () => {
             {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
           </button>
           
-          {/* User */}
-          <div className={`flex items-center gap-3 px-3 py-2 rounded-lg border border-sidebar-border glass-card ${collapsed ? "justify-center" : ""}`}>
-            <div className="w-8 h-8 rounded-full bg-sidebar-hover flex items-center justify-center text-sm font-medium text-sidebar-text-active">A</div>
-            {!collapsed && <div className="text-sm font-medium text-sidebar-text-active">Ana Ivanova</div>}
-          </div>
+          {/* User Profile Section */}
+          {user && (
+            <div className={`rounded-lg border border-sidebar-border glass-card ${collapsed ? "p-2" : "p-3"}`}>
+              {collapsed ? (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <NavLink 
+                      to="/settings" 
+                      className="flex items-center justify-center w-full group"
+                    >
+                      <Avatar className="h-8 w-8 ring-2 ring-sidebar-accent/50 group-hover:ring-sidebar-accent transition-all">
+                        <AvatarImage src={avatarUrl} alt={displayName} />
+                        <AvatarFallback className="bg-primary text-primary-foreground text-xs">
+                          {getInitials(displayName)}
+                        </AvatarFallback>
+                      </Avatar>
+                    </NavLink>
+                  </TooltipTrigger>
+                  <TooltipContent side="right">
+                    <div className="text-center">
+                      <div className="font-medium">{displayName}</div>
+                      <div className="text-xs text-muted-foreground">{user.email}</div>
+                      <div className="text-xs text-muted-foreground mt-1">Click for settings</div>
+                    </div>
+                  </TooltipContent>
+                </Tooltip>
+              ) : (
+                <div className="space-y-3">
+                  <NavLink 
+                    to="/settings" 
+                    className="flex items-center gap-3 p-2 rounded-md hover:bg-sidebar-hover transition-colors group"
+                  >
+                    <Avatar className="h-8 w-8 ring-2 ring-sidebar-accent/50 group-hover:ring-sidebar-accent transition-all">
+                      <AvatarImage src={avatarUrl} alt={displayName} />
+                      <AvatarFallback className="bg-primary text-primary-foreground text-xs">
+                        {getInitials(displayName)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-medium text-sidebar-text-active truncate">{displayName}</div>
+                      <div className="text-xs text-sidebar-text truncate">{user.email}</div>
+                    </div>
+                    <User className="h-4 w-4 text-sidebar-text opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </NavLink>
+                  
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={signOut}
+                    className="w-full text-destructive hover:text-destructive hover:bg-destructive/10 justify-start gap-2"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    Sign out
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </aside>
     </TooltipProvider>
