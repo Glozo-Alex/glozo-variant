@@ -119,33 +119,56 @@ const CandidateFilters = ({ availableFilters, selectedFilters, onFiltersChange }
               )}
             </div>
             
-            {Object.entries(safeAvailableFilters).map(([category, filterGroup]) => (
-              <div key={category} className="space-y-2">
-                <h4 className="text-sm font-medium text-foreground capitalize">
-                  {filterGroup?.name || category.replace(/_/g, ' ')}
-                </h4>
-                <div className="space-y-2 max-h-32 overflow-y-auto">
-                  {(filterGroup?.values || []).map(({ value, count }) => (
-                    <div key={value} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={`${category}-${value}`}
-                        checked={selectedFilters[category]?.includes(value) || false}
-                        onCheckedChange={(checked) => 
-                          handleFilterToggle(category, value, checked as boolean)
-                        }
-                      />
-                      <label 
-                        htmlFor={`${category}-${value}`} 
-                        className="text-sm text-foreground flex-1 cursor-pointer"
-                      >
-                        {value}
-                      </label>
-                      <span className="text-xs text-muted-foreground">({count})</span>
-                    </div>
-                  ))}
+            {Object.entries(safeAvailableFilters).map(([category, filterGroup]) => {
+              console.log('🔍 Rendering filter group:', category, filterGroup);
+              
+              if (!filterGroup || !Array.isArray(filterGroup.values)) {
+                console.warn('❌ Invalid filter group structure:', filterGroup);
+                return null;
+              }
+              
+              return (
+                <div key={category} className="space-y-2">
+                  <h4 className="text-sm font-medium text-foreground capitalize">
+                    {filterGroup?.name || category.replace(/_/g, ' ')}
+                  </h4>
+                  <div className="space-y-2 max-h-32 overflow-y-auto">
+                    {filterGroup.values.map((item, index) => {
+                      console.log('🔍 Rendering filter item:', item);
+                      
+                      // Ensure we have a valid structure
+                      if (!item || typeof item !== 'object') {
+                        console.warn('❌ Invalid filter item:', item);
+                        return null;
+                      }
+                      
+                      const value = item.value || '';
+                      const count = item.count || 0;
+                      const key = `${category}-${value}-${index}`;
+                      
+                      return (
+                        <div key={key} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={key}
+                            checked={selectedFilters[category]?.includes(value) || false}
+                            onCheckedChange={(checked) => 
+                              handleFilterToggle(category, value, checked as boolean)
+                            }
+                          />
+                          <label 
+                            htmlFor={key} 
+                            className="text-sm text-foreground flex-1 cursor-pointer"
+                          >
+                            {String(value)}
+                          </label>
+                          <span className="text-xs text-muted-foreground">({count})</span>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
             
             {Object.keys(safeAvailableFilters).length === 0 && (
               <div className="text-sm text-muted-foreground text-center py-4">
