@@ -1,9 +1,10 @@
-import { ArrowUpRight, Linkedin, Github, Globe, CheckCircle, ChevronDown, MessageSquare, Star, BrainCircuit, Loader2, Monitor, FileText, Mail } from "lucide-react";
+import { ArrowUpRight, CheckCircle, ChevronDown, MessageSquare, Star, BrainCircuit, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { addToShortlist, removeFromShortlist } from "@/services/shortlist";
 import { useToast } from "@/hooks/use-toast";
 import { CandidateProfile } from "./CandidateProfile";
+import { getSocialIcon } from '@/utils/socialIcons';
 
 interface SocialLink {
   platform: string;
@@ -30,21 +31,6 @@ interface CandidateCardProps {
 const LinkChunk = ({ children }: { children: React.ReactNode }) => (
   <span className="bg-tag-purple text-tag-purple-text px-1 rounded">{children}</span>
 );
-
-const getSocialIcon = (platform: string) => {
-  const iconMap: Record<string, React.ElementType> = {
-    linkedin: Linkedin,
-    github: Github,
-    x: MessageSquare, // Twitter/X
-    instagram: Monitor,
-    medium: FileText,
-    stackoverflow: Monitor,
-    gitlab: Github,
-    globe: Globe,
-  };
-  
-  return iconMap[platform.toLowerCase()] || Globe;
-};
 
 const CandidateCard = ({
   candidateId,

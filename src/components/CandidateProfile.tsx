@@ -9,6 +9,7 @@ import { CandidateProfileContent } from '@/components/CandidateProfile/Candidate
 import { SummarySection } from '@/components/CandidateProfile/SummarySection';
 import { BasicInfoSection } from '@/components/CandidateProfile/BasicInfoSection';
 import { ContactSection } from '@/components/CandidateProfile/ContactSection';
+import { ContactHeaderSection } from '@/components/CandidateProfile/ContactHeaderSection';
 import { SocialLinksSection } from '@/components/CandidateProfile/SocialLinksSection';
 
 interface SocialLink {
@@ -59,16 +60,22 @@ export function CandidateProfile({ children, candidateData, socialLinks = [], pr
                   {getInitials(displayData?.name)}
                 </AvatarFallback>
               </Avatar>
-              <div className="flex-1 space-y-1">
-                <SheetTitle className="text-xl">{displayData?.name || 'Name not available'}</SheetTitle>
-                <p className="text-muted-foreground">
-                  {displayData?.title || displayData?.role || 'Position not specified'}
-                </p>
-                {displayData?.employer && (
-                  <p className="text-sm text-muted-foreground">
-                    at {displayData.employer}
+              <div className="flex-1 space-y-2">
+                <div className="space-y-1">
+                  <SheetTitle className="text-xl">{displayData?.name || 'Name not available'}</SheetTitle>
+                  <p className="text-muted-foreground">
+                    {displayData?.title || displayData?.role || 'Position not specified'}
                   </p>
-                )}
+                  {displayData?.employer && (
+                    <p className="text-sm text-muted-foreground">
+                      at {displayData.employer}
+                    </p>
+                  )}
+                </div>
+                {/* Contact Header Section */}
+                <ErrorBoundary>
+                  <ContactHeaderSection contacts={displayData.contacts} />
+                </ErrorBoundary>
               </div>
             </div>
 
@@ -117,11 +124,6 @@ export function CandidateProfile({ children, candidateData, socialLinks = [], pr
                 </ErrorBoundary>
 
                 <Separator />
-
-                {/* Contact Section */}
-                <ErrorBoundary>
-                  <ContactSection contacts={displayData.contacts} />
-                </ErrorBoundary>
 
                 {/* Social Links Section */}
                 <ErrorBoundary>

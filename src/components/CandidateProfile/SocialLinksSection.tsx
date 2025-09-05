@@ -1,6 +1,6 @@
-import { ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { getSocialIcon } from '@/utils/socialIcons';
 
 interface SocialLink {
   platform: string;
@@ -21,24 +21,21 @@ export function SocialLinksSection({ socialLinks }: SocialLinksSectionProps) {
       <div className="space-y-3">
         <h3 className="text-lg font-semibold">Social Links</h3>
         <div className="flex flex-wrap gap-2">
-          {socialLinks.slice(0, 5).map((link, index) => (
-            <Button
-              key={index}
-              variant="outline"
-              size="sm"
-              asChild
-            >
-              <a
-                href={link.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2"
+          {socialLinks.slice(0, 5).map((link, index) => {
+            const IconComponent = getSocialIcon(link.platform);
+            return (
+              <Button
+                key={index}
+                variant="outline"
+                size="sm"
+                className="h-9 w-9 p-0 rounded-full"
+                onClick={() => window.open(link.url, '_blank', 'noopener,noreferrer')}
               >
-                <span className="capitalize">{link.platform}</span>
-                <ExternalLink className="h-3 w-3" />
-              </a>
-            </Button>
-          ))}
+                <IconComponent className="h-4 w-4" />
+                <span className="sr-only">{link.platform}</span>
+              </Button>
+            );
+          })}
         </div>
       </div>
       <Separator />
