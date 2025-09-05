@@ -37,7 +37,16 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
       }
       
       setColorSchemeState(initialScheme);
-      applyColorScheme(initialScheme);
+      
+      // Ensure DOM is ready before applying colors
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+          applyColorScheme(initialScheme);
+        });
+      } else {
+        applyColorScheme(initialScheme);
+      }
+      
       setIsLoading(false);
     };
 
@@ -47,6 +56,8 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   const setColorScheme = async (scheme: ColorScheme) => {
     try {
       setColorSchemeState(scheme);
+      
+      // Apply color scheme immediately for instant feedback
       applyColorScheme(scheme);
       
       // Save to profile if user is logged in

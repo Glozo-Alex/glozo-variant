@@ -58,6 +58,9 @@ export const applyColorScheme = (scheme: ColorScheme) => {
   const root = document.documentElement;
   const theme = THEMES[scheme];
   
+  // Add transition class for smooth changes
+  root.classList.add('theme-transition');
+  
   // Remove existing theme classes
   Object.keys(THEMES).forEach(themeId => {
     root.classList.remove(`theme-${themeId}`);
@@ -66,6 +69,14 @@ export const applyColorScheme = (scheme: ColorScheme) => {
   // Add new theme class
   root.classList.add(`theme-${scheme}`);
   
+  // Force style recalculation
+  window.getComputedStyle(root).getPropertyValue('--primary');
+  
   // Store in localStorage
   localStorage.setItem('color-scheme', scheme);
+  
+  // Remove transition class after animation completes
+  setTimeout(() => {
+    root.classList.remove('theme-transition');
+  }, 300);
 };
