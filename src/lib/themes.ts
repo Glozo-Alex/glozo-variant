@@ -63,7 +63,11 @@ export const applyColorScheme = (scheme: ColorScheme) => {
   // Add transition class for smooth changes
   root.classList.add('theme-transition');
   
-  // Remove existing theme classes
+  // Get current dark/light mode from next-themes
+  const isDarkMode = root.classList.contains('dark');
+  console.log('🌓 Current mode:', isDarkMode ? 'dark' : 'light');
+  
+  // Remove ALL existing theme classes (including combined ones)
   Object.keys(THEMES).forEach(themeId => {
     root.classList.remove(`theme-${themeId}`);
     console.log('🗑️ Removed theme class:', `theme-${themeId}`);
@@ -73,9 +77,42 @@ export const applyColorScheme = (scheme: ColorScheme) => {
   root.classList.add(`theme-${scheme}`);
   console.log('✅ Applied theme class:', `theme-${scheme}`);
   
-  // Force style recalculation and check if CSS variables are applied
-  const primaryColor = window.getComputedStyle(root).getPropertyValue('--primary');
-  console.log('🔍 Current --primary color:', primaryColor);
+  // Force immediate DOM update and style recalculation
+  root.offsetHeight; // Force reflow
+  
+  // Wait for next frame to ensure styles are applied
+  requestAnimationFrame(() => {
+    // Force style recalculation
+    const computedStyle = window.getComputedStyle(root);
+    const primaryColor = computedStyle.getPropertyValue('--primary').trim();
+    const backgroundColor = computedStyle.getPropertyValue('--background').trim();
+    
+    console.log('🔍 Applied CSS variables:');
+    console.log('  --primary:', primaryColor);
+    console.log('  --background:', backgroundColor);
+    
+    // Validate that the theme was applied
+    if (!primaryColor || primaryColor === 'initial' || primaryColor === 'inherit') {
+      console.warn('⚠️ Theme may not have applied correctly. Retrying...');
+      
+      // Retry theme application
+      setTimeout(() => {
+        root.classList.remove(`theme-${scheme}`);
+        root.offsetHeight; // Force reflow
+        root.classList.add(`theme-${scheme}`);
+        
+        const retryPrimary = window.getComputedStyle(root).getPropertyValue('--primary').trim();
+        console.log('🔄 Retry result --primary:', retryPrimary);
+      }, 10);
+    }
+    
+    // Dispatch custom event to notify components about theme change
+    const event = new CustomEvent('themeChanged', { 
+      detail: { scheme, isDarkMode, colors: theme.colors } 
+    });
+    document.dispatchEvent(event);
+    console.log('📡 Dispatched themeChanged event');
+  });
   
   // Store in localStorage
   localStorage.setItem('color-scheme', scheme);
