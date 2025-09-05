@@ -21,20 +21,12 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   const { profile, updateProfile } = useProfile();
   const [colorScheme, setColorSchemeState] = useState<ColorScheme>('default');
   const [isLoading, setIsLoading] = useState(true);
+  const [isInitialized, setIsInitialized] = useState(false);
 
-  // Listen for theme changes from next-themes and reapply color scheme
+  // Initialize color scheme ONCE on mount
   useEffect(() => {
-    if (resolvedTheme && colorScheme) {
-      console.log('🌓 Theme mode changed:', resolvedTheme, 'Reapplying scheme:', colorScheme);
-      // Wait for next-themes to finish updating the DOM
-      setTimeout(() => {
-        applyColorScheme(colorScheme);
-      }, 50);
-    }
-  }, [resolvedTheme, colorScheme]);
-
-  // Initialize color scheme from localStorage first, then profile when available
-  useEffect(() => {
+    if (isInitialized) return;
+    
     const initializeColorScheme = () => {
       let initialScheme: ColorScheme = 'default';
       
@@ -49,13 +41,15 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
         initialScheme = profile.theme_preference as ColorScheme;
       }
       
-      console.log('🎯 Initializing color scheme:', initialScheme, 'from:', stored ? 'localStorage' : 'default', profile ? '+ profile' : '');
+      console.log('🎯 Initializing color scheme:', initialScheme);
       setColorSchemeState(initialScheme);
       
-      // Apply the theme immediately
+      // Apply the theme immediately, only once
       const applyInitialScheme = () => {
         console.log('⚡ Applying initial color scheme:', initialScheme);
-        setTimeout(() => applyColorScheme(initialScheme), 50);
+        applyColorScheme(initialScheme);
+        setIsInitialized(true);
+        setIsLoading(false);
       };
 
       if (document.readyState === 'loading') {
@@ -63,14 +57,25 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
       } else {
         applyInitialScheme();
       }
-      
-      setIsLoading(false);
     };
 
     initializeColorScheme();
-  }, [profile]);
+  }, [profile, isInitialized]);
 
-  // Listen for theme change events to show feedback
+  // Listen for theme mode changes (dark/light) and reapply ONLY if initialized
+  useEffect(() => {
+    if (!isInitialized || !resolvedTheme || !colorScheme) return;
+    
+    console.log('🌓 Theme mode changed:', resolvedTheme, 'Reapplying scheme:', colorScheme);
+    // Small delay to ensure next-themes has updated the DOM
+    const timer = setTimeout(() => {
+      applyColorScheme(colorScheme);
+    }, 100);
+    
+    return () => clearTimeout(timer);
+  }, [resolvedTheme, colorScheme, isInitialized]);
+
+  // Listen for theme change events to show feedback (only once)
   useEffect(() => {
     const handleThemeChanged = (event: CustomEvent) => {
       const { scheme } = event.detail;
@@ -86,6 +91,8 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   }, []);
 
   const setColorScheme = async (scheme: ColorScheme) => {
+    if (!isInitialized) return; // Prevent calls before initialization
+    
     try {
       console.log('🎨 Changing color scheme to:', scheme);
       setColorSchemeState(scheme);
