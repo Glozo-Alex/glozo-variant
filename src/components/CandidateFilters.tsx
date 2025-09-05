@@ -61,6 +61,25 @@ const CandidateFilters = ({ availableFilters, selectedFilters, onFiltersChange }
   return (
     <div className="relative">
       <div className="flex items-center gap-2 flex-wrap">
+        {/* Active filter tags - moved to left of button */}
+        {Object.entries(selectedFilters).map(([category, values]) =>
+          values.map(value => (
+            <Badge 
+              key={`${category}-${value}`} 
+              variant="secondary" 
+              className="flex items-center gap-1 text-xs"
+            >
+              {availableFilters[category]?.name || category.replace(/_/g, ' ')}
+              <button
+                onClick={() => removeFilter(category, value)}
+                className="ml-1 hover:bg-secondary-foreground/20 rounded-full p-0.5"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </Badge>
+          ))
+        )}
+
         <Button 
           variant="outline" 
           size="sm" 
@@ -80,25 +99,6 @@ const CandidateFilters = ({ availableFilters, selectedFilters, onFiltersChange }
           )}
           <ChevronDown className={`h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
         </Button>
-
-        {/* Active filter tags */}
-        {Object.entries(selectedFilters).map(([category, values]) =>
-          values.map(value => (
-            <Badge 
-              key={`${category}-${value}`} 
-              variant="secondary" 
-              className="flex items-center gap-1 text-xs"
-            >
-              {value}
-              <button
-                onClick={() => removeFilter(category, value)}
-                className="ml-1 hover:bg-secondary-foreground/20 rounded-full p-0.5"
-              >
-                <X className="h-3 w-3" />
-              </button>
-            </Badge>
-          ))
-        )}
       </div>
 
       {/* Dropdown panel with proper positioning */}
