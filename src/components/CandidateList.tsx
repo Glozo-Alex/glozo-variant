@@ -51,6 +51,8 @@ const CandidateList = () => {
 
     const fetchLatestSearch = async () => {
       try {
+        console.log('🔍 CandidateList: Fetching search results for projectId:', projectId);
+        
         const { data, error } = await supabase
           .from("searches")
           .select("id, status, raw_response, candidate_count, created_at")
@@ -59,26 +61,37 @@ const CandidateList = () => {
           .limit(1)
           .maybeSingle();
 
+        console.log('📊 CandidateList: Search data received:', data);
+        console.log('❗ CandidateList: Search error:', error);
+
         if (error) throw error;
 
         if (!data) {
+          console.log('🚫 CandidateList: No search data found');
           if (!cancelled) {
             setStatus("idle");
             setCandidates([]);
             setCandidateCount(0);
+            setAvailableFilters({});
           }
           return;
         }
 
         const st = (data.status as any) ?? "pending";
         const raw = data.raw_response as any;
+        console.log('📝 CandidateList: Raw response structure:', raw);
+        
         // For candidates display, only show results from completed searches
         const fromArray = (st === 'completed' && Array.isArray(raw?.candidates)) ? raw.candidates : [];
         const count = Array.isArray(fromArray) ? fromArray.length : (data.candidate_count ?? 0);
 
+        console.log('👥 CandidateList: Candidates array length:', fromArray.length, 'Status:', st);
+
         // Extract filters from raw response
         const filters = raw?.filters || {};
+        console.log('🔧 CandidateList: Raw filters data:', filters);
         const processedFilters = extractFiltersFromResponse(filters, fromArray);
+        console.log('✅ CandidateList: Processed filters:', processedFilters);
 
         if (!cancelled) {
           setStatus(st);

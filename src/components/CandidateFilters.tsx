@@ -1,3 +1,4 @@
+import React from "react";
 import { Filter, X, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -50,8 +51,12 @@ const CandidateFilters = ({ availableFilters, selectedFilters, onFiltersChange }
 
   // Defensive check to prevent crashes
   const safeAvailableFilters = availableFilters || {};
-
-  console.log('CandidateFilters Debug:', { availableFilters: safeAvailableFilters, selectedFilters, hasActiveFilters, activeFilterCount });
+  
+  
+  // Ensure dropdown renders and add debug logging  
+  React.useEffect(() => {
+    console.log('🎛️ CandidateFilters: Component updated, isOpen:', isOpen, 'filters count:', Object.keys(safeAvailableFilters).length);
+  }, [isOpen, safeAvailableFilters]);
 
   return (
     <div className="relative">
@@ -60,7 +65,11 @@ const CandidateFilters = ({ availableFilters, selectedFilters, onFiltersChange }
           variant="outline" 
           size="sm" 
           className="flex items-center gap-2"
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={() => {
+            console.log('🖱️ CandidateFilters: Button clicked, current isOpen:', isOpen);
+            console.log('🖱️ CandidateFilters: Available filters:', safeAvailableFilters);
+            setIsOpen(!isOpen);
+          }}
         >
           <Filter className="h-4 w-4" />
           Filters
