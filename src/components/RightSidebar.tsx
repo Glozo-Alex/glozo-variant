@@ -116,9 +116,8 @@ const RightSidebar = () => {
 
       {/* Controls */}
       <div className="p-4 space-y-3">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-center">
           <Button variant="outline" size="sm" className="flex items-center gap-2 hover-scale bg-card-hover border-card-border text-card-foreground hover:bg-card-hover/70"><RotateCcw className="h-4 w-4" /> Reset</Button>
-          <Button variant="outline" size="sm" className="flex items-center gap-2 hover-scale bg-card-hover border-card-border text-card-foreground hover:bg-card-hover/70"><Filter className="h-4 w-4" /> Filters</Button>
         </div>
         <div className="space-y-2">
           <div className="relative">
