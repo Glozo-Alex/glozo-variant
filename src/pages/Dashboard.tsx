@@ -1,14 +1,36 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useProject } from "@/contexts/ProjectContext";
 import { useNavigate } from "react-router-dom";
 import { Plus, Search, Users, BarChart3, FolderOpen } from "lucide-react";
+import { useState } from "react";
 
 const Dashboard = () => {
   const { projects, activeProject } = useProject();
   const navigate = useNavigate();
+  const [showProjectDialog, setShowProjectDialog] = useState(false);
 
   const recentProjects = projects.slice(-3);
+  const projectsWithShortlists = projects.filter(p => p.shortlistCount > 0);
+
+  const handleShortlistClick = () => {
+    if (projectsWithShortlists.length === 0) {
+      return; // No projects with shortlists
+    }
+    if (projectsWithShortlists.length === 1) {
+      // If only one project has shortlists, navigate directly
+      navigate(`/project/${projectsWithShortlists[0].id}/shortlist`);
+    } else {
+      // Show dialog to select project
+      setShowProjectDialog(true);
+    }
+  };
+
+  const handleProjectSelect = (projectId: string) => {
+    setShowProjectDialog(false);
+    navigate(`/project/${projectId}/shortlist`);
+  };
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
@@ -30,7 +52,7 @@ const Dashboard = () => {
           </CardHeader>
         </Card>
 
-        <Card className="glass-card">
+        <Card className="glass-card hover-lift cursor-pointer" onClick={() => navigate('/projects')}>
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-lg">
               <FolderOpen className="h-5 w-5 text-primary" />
@@ -42,7 +64,10 @@ const Dashboard = () => {
           </CardHeader>
         </Card>
 
-        <Card className="glass-card">
+        <Card 
+          className={`glass-card hover-lift ${projectsWithShortlists.length > 0 ? 'cursor-pointer' : 'cursor-default opacity-75'}`}
+          onClick={handleShortlistClick}
+        >
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-lg">
               <Users className="h-5 w-5 text-primary" />
@@ -149,6 +174,47 @@ const Dashboard = () => {
           </CardContent>
         </Card>
       )}
+
+      {/* Project Selection Dialog */}
+      <Dialog open={showProjectDialog} onOpenChange={setShowProjectDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Select Project</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            {projectsWithShortlists.length === 0 ? (
+              <p className="text-muted-foreground text-center py-4">
+                No projects with shortlists found
+              </p>
+            ) : (
+              projectsWithShortlists.map((project) => (
+                <Card 
+                  key={project.id} 
+                  className="cursor-pointer hover:bg-accent/50 transition-colors"
+                  onClick={() => handleProjectSelect(project.id)}
+                >
+                  <CardContent className="p-4">
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <h4 className="font-medium">{project.name}</h4>
+                        <p className="text-sm text-muted-foreground">
+                          {project.shortlistCount} candidate{project.shortlistCount !== 1 ? 's' : ''}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {project.createdAt.toLocaleDateString()}
+                        </p>
+                      </div>
+                      <Button variant="ghost" size="sm">
+                        View Shortlist
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
