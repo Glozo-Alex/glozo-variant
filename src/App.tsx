@@ -41,121 +41,121 @@ const App = () => (
               <Toaster />
               <Sonner />
               <BrowserRouter>
-            <Routes>
-              <Route path="/auth" element={<Auth />} />
-              <Route
-                path="/"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <Dashboard />
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/new-search"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <NewSearch />
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/project/:projectId/results"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <SearchResults />
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/project/:projectId/shortlist"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <Shortlist />
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              />
-                <Route
-                 path="/projects"
-                 element={
-                   <ProtectedRoute>
-                     <Layout>
-                       <Projects />
-                     </Layout>
-                   </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/analytics"
-                  element={
-                    <ProtectedRoute>
-                      <Layout>
-                        <Analytics />
-                      </Layout>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/pipeline"
-                  element={
-                    <ProtectedRoute>
-                      <Layout>
-                        <Pipeline />
-                      </Layout>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/team"
-                  element={
-                    <ProtectedRoute>
-                      <Layout>
-                        <Team />
-                      </Layout>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/integrations"
-                  element={
-                    <ProtectedRoute>
-                      <Layout>
-                        <Integrations />
-                      </Layout>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/settings"
-                  element={
-                    <ProtectedRoute>
-                      <Layout>
-                        <Settings />
-                      </Layout>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/test-candidate-details"
-                  element={
-                    <ProtectedRoute>
-                      <Layout>
-                        <TestCandidateDetails />
-                      </Layout>
-                    </ProtectedRoute>
-                  }
-                />
-               <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
+                <Routes>
+                  <Route path="/auth" element={<Auth />} />
+                  <Route
+                    path="/"
+                    element={
+                      <ProtectedRoute>
+                        <Layout>
+                          <Dashboard />
+                        </Layout>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/new-search"
+                    element={
+                      <ProtectedRoute>
+                        <Layout>
+                          <NewSearch />
+                        </Layout>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/project/:projectId/results"
+                    element={
+                      <ProtectedRoute>
+                        <Layout>
+                          <SearchResults />
+                        </Layout>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/project/:projectId/shortlist"
+                    element={
+                      <ProtectedRoute>
+                        <Layout>
+                          <Shortlist />
+                        </Layout>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/projects"
+                    element={
+                      <ProtectedRoute>
+                        <Layout>
+                          <Projects />
+                        </Layout>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/analytics"
+                    element={
+                      <ProtectedRoute>
+                        <Layout>
+                          <Analytics />
+                        </Layout>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/pipeline"
+                    element={
+                      <ProtectedRoute>
+                        <Layout>
+                          <Pipeline />
+                        </Layout>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/team"
+                    element={
+                      <ProtectedRoute>
+                        <Layout>
+                          <Team />
+                        </Layout>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/integrations"
+                    element={
+                      <ProtectedRoute>
+                        <Layout>
+                          <Integrations />
+                        </Layout>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/settings"
+                    element={
+                      <ProtectedRoute>
+                        <Layout>
+                          <Settings />
+                        </Layout>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/test-candidate-details"
+                    element={
+                      <ProtectedRoute>
+                        <Layout>
+                          <TestCandidateDetails />
+                        </Layout>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </BrowserRouter>
             </TooltipProvider>
           </ThemeProvider>
         </ProjectProvider>
