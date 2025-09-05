@@ -180,7 +180,7 @@ const CandidateList = () => {
               location={c.location || "Unknown location"}
               experience={c.years_of_experience || c.average_years_of_experience || "—"}
               matchPercentage={Math.round((c.match_score ?? c.match_percentage ?? 0) as number)}
-              description={c.ai_summary || c.standout || ""}
+              description={c.standout || c.ai_summary || ""}
               skills={flatSkills.map((s) => ({ name: s, type: "primary" as const }))}
               openToOffers={Boolean(c.open_to_offers)}
               isShortlisted={shortlistStatus[String(c.id || idx)] || false}
