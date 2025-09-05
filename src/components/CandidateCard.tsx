@@ -195,7 +195,11 @@ const CandidateCard = ({
           </span>
         ))}
         {skills.length > 6 && (
-          <span className="px-3 py-1 rounded-full text-xs font-medium bg-muted text-muted-foreground">+ 5 more skills</span>
+          <CandidateProfile candidateData={fullCandidateData} socialLinks={socialLinks} projectId={projectId}>
+            <span className="px-3 py-1 rounded-full text-xs font-medium bg-muted text-muted-foreground cursor-pointer hover:bg-muted/80 transition-colors">
+              + {skills.length - 6} more skills
+            </span>
+          </CandidateProfile>
         )}
       </div>
     </article>
