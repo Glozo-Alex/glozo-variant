@@ -37,24 +37,36 @@ const Shortlist = () => {
     const fetchShortlistedCandidates = async () => {
       if (!projectId) return;
       
+      console.log('Shortlist - Starting fetch for projectId:', projectId);
+      
       try {
         setLoading(true);
         setError(null);
         const shortlist = await getShortlistForProject(projectId);
+        console.log('Shortlist - Raw shortlist data:', shortlist);
         
         // Get numeric candidate IDs for fetching details
         const numericIds = shortlist
-          .map(item => parseInt(item.candidate_id, 10))
+          .map(item => {
+            const id = parseInt(item.candidate_id, 10);
+            console.log('Shortlist - Parsing candidate_id:', item.candidate_id, '-> numeric:', id);
+            return id;
+          })
           .filter(Number.isFinite);
+        
+        console.log('Shortlist - Numeric IDs:', numericIds);
         
         // Fetch cached candidate details
         const detailsMap = await getCachedCandidateDetails(numericIds, projectId);
+        console.log('Shortlist - Details map:', detailsMap);
         
         // Transform the data to match the component's expected format
-        const transformedCandidates = shortlist.map((item) => {
+        const transformedCandidates = shortlist.map((item, index) => {
+          console.log(`Shortlist - Processing candidate ${index}:`, item);
           const candidateData = item.candidate_snapshot as any;
           const numericId = parseInt(item.candidate_id, 10);
           const details = detailsMap[numericId];
+          console.log(`Shortlist - Candidate ${index} details:`, { candidateData, numericId, details });
           
           // Use details from cache if available, fallback to snapshot
           const name = details?.name || candidateData.name || 'Unknown';
@@ -86,7 +98,7 @@ const Shortlist = () => {
           // Prepare social links if available
           const socialLinks = details?.social || [];
           
-          return {
+          const result = {
             id: item.candidate_id,
             numericId,
             name,
@@ -104,8 +116,11 @@ const Shortlist = () => {
             addedAt: item.added_at,
             avatar: name ? name.split(' ').map((n: string) => n[0]).join('').toUpperCase() : 'UN'
           };
+          console.log(`Shortlist - Transformed candidate ${index}:`, result);
+          return result;
         });
         
+        console.log('Shortlist - Final transformed candidates:', transformedCandidates);
         setShortlistedCandidates(transformedCandidates);
         
         // Check for candidates without cached details and fetch them in background
@@ -124,7 +139,8 @@ const Shortlist = () => {
           });
         }
       } catch (error) {
-        console.error('Failed to fetch shortlisted candidates:', error);
+        console.error('Shortlist - Error in fetchShortlistedCandidates:', error);
+        console.error('Shortlist - Error stack:', error instanceof Error ? error.stack : 'No stack trace');
         setError('Failed to load shortlisted candidates');
       } finally {
         setLoading(false);
