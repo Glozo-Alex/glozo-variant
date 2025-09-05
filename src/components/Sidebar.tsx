@@ -245,16 +245,18 @@ const Sidebar = () => {
                   <TooltipContent side="right">
                     <div className="text-center">
                       <div className="font-medium">{displayName}</div>
-                      <div className="text-xs text-muted-foreground">{user.email}</div>
+                      {profile?.job_title && (
+                        <div className="text-xs text-muted-foreground">{profile.job_title}</div>
+                      )}
                       <div className="text-xs text-muted-foreground mt-1">Click for settings</div>
                     </div>
                   </TooltipContent>
                 </Tooltip>
               ) : (
-                <div className="space-y-3">
+                <div className="flex items-center gap-3 p-2 rounded-md hover:bg-sidebar-hover transition-colors group">
                   <NavLink 
                     to="/settings" 
-                    className="flex items-center gap-3 p-2 rounded-md hover:bg-sidebar-hover transition-colors group"
+                    className="flex items-center gap-3 flex-1 min-w-0"
                   >
                     <Avatar className="h-8 w-8 ring-2 ring-sidebar-accent/50 group-hover:ring-sidebar-accent transition-all">
                       <AvatarImage src={avatarUrl} alt={displayName} />
@@ -264,19 +266,19 @@ const Sidebar = () => {
                     </Avatar>
                     <div className="flex-1 min-w-0">
                       <div className="text-sm font-medium text-sidebar-text-active truncate">{displayName}</div>
-                      <div className="text-xs text-sidebar-text truncate">{user.email}</div>
+                      {profile?.job_title && (
+                        <div className="text-xs text-sidebar-text truncate">{profile.job_title}</div>
+                      )}
                     </div>
-                    <User className="h-4 w-4 text-sidebar-text opacity-0 group-hover:opacity-100 transition-opacity" />
                   </NavLink>
                   
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={signOut}
-                    className="w-full text-destructive hover:text-destructive hover:bg-destructive/10 justify-start gap-2"
+                    className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10 flex-shrink-0"
                   >
                     <LogOut className="h-4 w-4" />
-                    Sign out
                   </Button>
                 </div>
               )}
