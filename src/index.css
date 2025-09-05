@@ -218,6 +218,7 @@
     --primary: 217 91% 60%; /* #3b82f6 */
     --primary-foreground: 210 40% 98%;
     --primary-glow: 262 83% 58%; /* #8b5cf6 */
+    --primary-hover: 217 91% 55%;
     --secondary: 188 94% 43%; /* #06b6d4 */
     --secondary-foreground: 210 40% 98%;
     --muted: 210 40% 96%;
@@ -243,6 +244,7 @@
     --gradient-card: linear-gradient(145deg, hsl(210 40% 98%), hsl(214 32% 91% / 0.3));
     --gradient-glass: linear-gradient(145deg, hsl(210 40% 98% / 0.8), hsl(210 40% 96% / 0.6));
     --gradient-sidebar: linear-gradient(180deg, hsl(210 40% 98% / 0.95), hsl(210 40% 96% / 0.9));
+    --shadow-glow: 0 0 0 1px hsl(217 91% 60% / 0.05), 0 0 20px hsl(217 91% 60% / 0.1);
   }
 
   .theme-ocean.dark {
@@ -255,6 +257,7 @@
     --primary: 217 91% 60%;
     --primary-foreground: 210 40% 98%;
     --primary-glow: 262 83% 58%;
+    --primary-hover: 217 91% 65%;
     --secondary: 188 94% 43%;
     --secondary-foreground: 210 40% 98%;
     --muted: 240 5% 26%;
@@ -275,6 +278,7 @@
     --sidebar-text-active: 210 40% 98%;
     --sidebar-hover: 240 5% 26% / 0.7;
     --sidebar-accent: 217 91% 60% / 0.15;
+    --shadow-glow: 0 0 0 1px hsl(217 91% 60% / 0.05), 0 0 20px hsl(217 91% 60% / 0.1);
   }
 
   /* Sunset Theme - Orange-Pink */
@@ -288,6 +292,7 @@
     --primary: 347 77% 50%; /* #f43f5e */
     --primary-foreground: 0 0% 98%;
     --primary-glow: 330 81% 60%; /* #ec4899 */
+    --primary-hover: 347 77% 55%;
     --secondary: 43 96% 56%; /* #f59e0b */
     --secondary-foreground: 0 0% 98%;
     --muted: 0 0% 96.1%;
@@ -313,6 +318,7 @@
     --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(0 0% 96.1% / 0.3));
     --gradient-glass: linear-gradient(145deg, hsl(0 0% 100% / 0.8), hsl(0 0% 96.1% / 0.6));
     --gradient-sidebar: linear-gradient(180deg, hsl(0 0% 100% / 0.95), hsl(0 0% 96.1% / 0.9));
+    --shadow-glow: 0 0 0 1px hsl(347 77% 50% / 0.05), 0 0 20px hsl(347 77% 50% / 0.1);
   }
 
   .theme-sunset.dark {
@@ -325,6 +331,7 @@
     --primary: 347 77% 50%;
     --primary-foreground: 60 9% 98%;
     --primary-glow: 330 81% 60%;
+    --primary-hover: 347 77% 55%;
     --secondary: 43 96% 56%;
     --secondary-foreground: 60 9% 98%;
     --muted: 12 6% 15%;
@@ -345,6 +352,7 @@
     --sidebar-text-active: 60 9% 98%;
     --sidebar-hover: 12 6% 15% / 0.7;
     --sidebar-accent: 347 77% 50% / 0.15;
+    --shadow-glow: 0 0 0 1px hsl(347 77% 50% / 0.05), 0 0 20px hsl(347 77% 50% / 0.1);
   }
 
   /* Forest Theme - Green-Earth */
@@ -358,6 +366,7 @@
     --primary: 142 71% 45%; /* #22c55e */
     --primary-foreground: 0 0% 98%;
     --primary-glow: 160 84% 39%; /* #10b981 */
+    --primary-hover: 142 71% 50%;
     --secondary: 78 92% 50%; /* #84cc16 */
     --secondary-foreground: 0 0% 98%;
     --muted: 0 0% 96.1%;
@@ -383,6 +392,7 @@
     --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(0 0% 96.1% / 0.3));
     --gradient-glass: linear-gradient(145deg, hsl(0 0% 100% / 0.8), hsl(0 0% 96.1% / 0.6));
     --gradient-sidebar: linear-gradient(180deg, hsl(0 0% 100% / 0.95), hsl(0 0% 96.1% / 0.9));
+    --shadow-glow: 0 0 0 1px hsl(142 71% 45% / 0.05), 0 0 20px hsl(142 71% 45% / 0.1);
   }
 
   .theme-forest.dark {
@@ -395,6 +405,7 @@
     --primary: 142 71% 45%;
     --primary-foreground: 120 10% 98%;
     --primary-glow: 160 84% 39%;
+    --primary-hover: 142 71% 50%;
     --secondary: 78 92% 50%;
     --secondary-foreground: 120 10% 98%;
     --muted: 120 4% 15%;
@@ -415,6 +426,7 @@
     --sidebar-text-active: 120 10% 98%;
     --sidebar-hover: 120 4% 15% / 0.7;
     --sidebar-accent: 142 71% 45% / 0.15;
+    --shadow-glow: 0 0 0 1px hsl(142 71% 45% / 0.05), 0 0 20px hsl(142 71% 45% / 0.1);
   }
 }
 

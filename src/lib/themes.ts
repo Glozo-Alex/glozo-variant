@@ -80,8 +80,17 @@ export const applyColorScheme = (scheme: ColorScheme) => {
   // Force immediate DOM update and style recalculation
   root.offsetHeight; // Force reflow
   
+  // Force update CSS properties by triggering a repaint
+  const forceRepaint = () => {
+    root.style.display = 'none';
+    root.offsetHeight; // Trigger reflow
+    root.style.display = '';
+  };
+  
   // Wait for next frame to ensure styles are applied
   requestAnimationFrame(() => {
+    forceRepaint();
+    
     // Force style recalculation
     const computedStyle = window.getComputedStyle(root);
     const primaryColor = computedStyle.getPropertyValue('--primary').trim();
@@ -93,17 +102,21 @@ export const applyColorScheme = (scheme: ColorScheme) => {
     
     // Validate that the theme was applied
     if (!primaryColor || primaryColor === 'initial' || primaryColor === 'inherit') {
-      console.warn('⚠️ Theme may not have applied correctly. Retrying...');
+      console.warn('⚠️ Theme may not have applied correctly. Force updating all elements...');
       
-      // Retry theme application
-      setTimeout(() => {
-        root.classList.remove(`theme-${scheme}`);
-        root.offsetHeight; // Force reflow
-        root.classList.add(`theme-${scheme}`);
-        
-        const retryPrimary = window.getComputedStyle(root).getPropertyValue('--primary').trim();
-        console.log('🔄 Retry result --primary:', retryPrimary);
-      }, 10);
+      // Force all elements to recalculate their styles
+      const allElements = document.querySelectorAll('*');
+      allElements.forEach(el => {
+        if (el instanceof HTMLElement) {
+          el.style.transform = 'translateZ(0)';
+          el.offsetHeight; // Trigger reflow
+          el.style.transform = '';
+        }
+      });
+      
+      // Check again after force update
+      const retryPrimary = window.getComputedStyle(root).getPropertyValue('--primary').trim();
+      console.log('🔄 After force update --primary:', retryPrimary);
     }
     
     // Dispatch custom event to notify components about theme change
