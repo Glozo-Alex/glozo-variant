@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Users, Star, Mail, Phone, MapPin, Calendar, ArrowLeft, Trash2, Grid3X3, List } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, memo } from "react";
 import { getShortlistForProject, removeFromShortlist } from "@/services/shortlist";
 import { getCachedCandidateDetails, getCandidateDetails } from "@/services/candidateDetails";
 import { useToast } from "@/hooks/use-toast";
@@ -77,10 +77,15 @@ const Shortlist = () => {
           // Handle skills - prioritize details, fallback to snapshot
           let processedSkills: string[] = [];
           if (details?.skills) {
-            // Flatten skills from details (array of clusters)
-            processedSkills = details.skills.flatMap(skillCluster => 
-              Array.isArray(skillCluster) ? skillCluster : [skillCluster]
-            ).filter(Boolean);
+            // Flatten skills from details (array of SkillGroup objects)
+            processedSkills = details.skills.flatMap(skillGroup => {
+              // Handle both SkillGroup structure and direct string arrays
+              if (skillGroup && typeof skillGroup === 'object' && 'skills' in skillGroup) {
+                return skillGroup.skills || [];
+              }
+              // Fallback for direct string arrays or single strings
+              return Array.isArray(skillGroup) ? skillGroup : [skillGroup];
+            }).filter(skill => typeof skill === 'string' && skill.trim().length > 0);
           } else {
             // Fallback to snapshot skills
             const skillsArray = candidateData.skills || [];
@@ -150,7 +155,7 @@ const Shortlist = () => {
     fetchShortlistedCandidates();
   }, [projectId]);
 
-  const handleRemoveFromShortlist = async (candidateId: string, candidateName: string) => {
+  const handleRemoveFromShortlist = useCallback(async (candidateId: string, candidateName: string) => {
     if (!projectId) return;
     
     try {
@@ -175,12 +180,12 @@ const Shortlist = () => {
         variant: "destructive",
       });
     }
-  };
+  }, [projectId, shortlistedCandidates.length, updateShortlistCount, toast]);
 
-  const handleViewModeChange = (mode: ViewMode) => {
+  const handleViewModeChange = useCallback((mode: ViewMode) => {
     setViewMode(mode);
     localStorage.setItem('shortlist-view-mode', mode);
-  };
+  }, []);
 
   if (!project) {
     return (
@@ -552,4 +557,4 @@ const Shortlist = () => {
   );
 };
 
-export default Shortlist;
+export default memo(Shortlist);

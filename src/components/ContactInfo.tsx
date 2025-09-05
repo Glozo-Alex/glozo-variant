@@ -1,5 +1,6 @@
 import { Mail, Phone, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { memo } from 'react';
 
 interface ContactInfoProps {
   candidate: {
@@ -13,7 +14,7 @@ interface ContactInfoProps {
   size?: 'sm' | 'default';
 }
 
-export function ContactInfo({ candidate, size = 'default' }: ContactInfoProps) {
+export const ContactInfo = memo(function ContactInfo({ candidate, size = 'default' }: ContactInfoProps) {
   // Check for contacts in the new structure first, then fallback to old structure
   const emails = candidate.contacts?.emails?.filter(email => email && email !== 'No email') || 
                  (candidate.email && candidate.email !== 'No email' ? [candidate.email] : []);
@@ -86,4 +87,4 @@ export function ContactInfo({ candidate, size = 'default' }: ContactInfoProps) {
       ))}
     </div>
   );
-}
+});
