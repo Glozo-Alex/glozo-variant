@@ -253,10 +253,10 @@ const Sidebar = () => {
                   </TooltipContent>
                 </Tooltip>
               ) : (
-                <div className="flex items-center gap-3 p-2 rounded-md hover:bg-sidebar-hover transition-colors group">
+                <div className="space-y-3">
                   <NavLink 
                     to="/settings" 
-                    className="flex items-center gap-3 flex-1 min-w-0"
+                    className="flex items-center gap-3 p-2 rounded-md hover:bg-sidebar-hover transition-colors group"
                   >
                     <Avatar className="h-8 w-8 ring-2 ring-sidebar-accent/50 group-hover:ring-sidebar-accent transition-all">
                       <AvatarImage src={avatarUrl} alt={displayName} />
@@ -272,14 +272,16 @@ const Sidebar = () => {
                     </div>
                   </NavLink>
                   
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={signOut}
-                    className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10 flex-shrink-0"
-                  >
-                    <LogOut className="h-4 w-4" />
-                  </Button>
+                  <div className="flex justify-end">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={signOut}
+                      className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                    >
+                      <LogOut className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
               )}
             </div>
