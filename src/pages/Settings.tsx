@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { 
   Settings as SettingsIcon, 
   User, 
@@ -23,6 +23,9 @@ import {
   Smartphone
 } from "lucide-react";
 
+import { useAuth } from "@/contexts/AuthContext";
+import { useProfile } from "@/hooks/useProfile";
+
 const Settings = () => {
   const [darkMode, setDarkMode] = useState(false);
   const [notifications, setNotifications] = useState({
@@ -36,13 +39,69 @@ const Settings = () => {
   });
 
   const [profile, setProfile] = useState({
-    name: "Ana Ivanova",
-    email: "ana.ivanova@company.com",
-    title: "Senior Recruiter",
-    company: "TechCorp",
-    phone: "+1 (555) 123-4567",
-    timezone: "PST"
+    name: "",
+    email: "",
+    title: "",
+    company: "",
+    phone: "",
+    timezone: "UTC",
+    avatar_url: "",
   });
+  const [dirty, setDirty] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const { user } = useAuth();
+  const { profile: dbProfile, isLoading, uploadAvatar, updateProfile, displayName } = useProfile();
+
+  const getInitials = (name: string) =>
+    name
+      .split(" ")
+      .map((p) => p.charAt(0))
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+
+  const onUploadClick = () => fileInputRef.current?.click();
+  const onFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const url = await uploadAvatar(file);
+    setProfile((prev) => ({ ...prev, avatar_url: url }));
+    setDirty(true);
+  };
+
+  useEffect(() => {
+    if (user) {
+      setProfile((prev) => ({ ...prev, email: user.email || prev.email }));
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (dbProfile) {
+      setProfile({
+        name: dbProfile.full_name || displayName || "",
+        email: user?.email || "",
+        title: dbProfile.job_title || "",
+        company: dbProfile.company || "",
+        phone: dbProfile.phone || "",
+        timezone: dbProfile.timezone || "UTC",
+        avatar_url: dbProfile.avatar_url || "",
+      });
+      setDirty(false);
+    }
+  }, [dbProfile, displayName, user]);
+
+  const handleSave = async () => {
+    await updateProfile({
+      full_name: profile.name || null,
+      job_title: profile.title || null,
+      company: profile.company || null,
+      phone: profile.phone || null,
+      timezone: profile.timezone || null,
+      avatar_url: profile.avatar_url || null,
+    } as any);
+    setDirty(false);
+  };
 
   return (
     <div className="p-6 space-y-6 animate-fade-in">
@@ -52,7 +111,7 @@ const Settings = () => {
           <h1 className="text-2xl font-bold text-foreground">Settings</h1>
           <p className="text-muted-foreground">Manage your account preferences and system settings</p>
         </div>
-        <Button className="flex items-center gap-2">
+        <Button className="flex items-center gap-2" onClick={handleSave} disabled={!dirty}>
           <Save className="h-4 w-4" />
           Save Changes
         </Button>
@@ -80,16 +139,18 @@ const Settings = () => {
               <CardContent className="space-y-4">
                 <div className="flex flex-col items-center gap-4">
                   <Avatar className="w-24 h-24">
-                    <AvatarFallback className="text-2xl">AI</AvatarFallback>
+                    <AvatarImage src={profile.avatar_url || undefined} alt={profile.name || 'Avatar'} />
+                    <AvatarFallback className="text-2xl">{getInitials(profile.name || 'U')}</AvatarFallback>
                   </Avatar>
                   <div className="text-center">
                     <h3 className="font-semibold">{profile.name}</h3>
                     <p className="text-sm text-muted-foreground">{profile.title}</p>
                   </div>
-                  <Button variant="outline" className="flex items-center gap-2">
+                  <Button variant="outline" className="flex items-center gap-2" onClick={onUploadClick}>
                     <Upload className="h-4 w-4" />
                     Upload New Photo
                   </Button>
+                  <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={onFileChange} />
                 </div>
               </CardContent>
             </Card>
@@ -107,7 +168,7 @@ const Settings = () => {
                       <Input 
                         id="name" 
                         value={profile.name}
-                        onChange={(e) => setProfile({...profile, name: e.target.value})}
+                        onChange={(e) => { setProfile({...profile, name: e.target.value}); setDirty(true); }}}
                       />
                     </div>
                     <div className="space-y-2">
@@ -116,7 +177,7 @@ const Settings = () => {
                         id="email" 
                         type="email"
                         value={profile.email}
-                        onChange={(e) => setProfile({...profile, email: e.target.value})}
+                        disabled
                       />
                     </div>
                     <div className="space-y-2">
@@ -124,7 +185,7 @@ const Settings = () => {
                       <Input 
                         id="title" 
                         value={profile.title}
-                        onChange={(e) => setProfile({...profile, title: e.target.value})}
+                        onChange={(e) => { setProfile({...profile, title: e.target.value}); setDirty(true); }}}
                       />
                     </div>
                     <div className="space-y-2">
@@ -132,7 +193,7 @@ const Settings = () => {
                       <Input 
                         id="company" 
                         value={profile.company}
-                        onChange={(e) => setProfile({...profile, company: e.target.value})}
+                        onChange={(e) => { setProfile({...profile, company: e.target.value}); setDirty(true); }}}
                       />
                     </div>
                     <div className="space-y-2">
@@ -140,12 +201,17 @@ const Settings = () => {
                       <Input 
                         id="phone" 
                         value={profile.phone}
-                        onChange={(e) => setProfile({...profile, phone: e.target.value})}
+                        onChange={(e) => { setProfile({...profile, phone: e.target.value}); setDirty(true); }}}
                       />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="timezone">Timezone</Label>
-                      <select className="w-full h-10 px-3 rounded-md border border-input bg-background">
+                      <select 
+                        id="timezone"
+                        className="w-full h-10 px-3 rounded-md border border-input bg-background"
+                        value={profile.timezone}
+                        onChange={(e) => { setProfile({ ...profile, timezone: e.target.value }); setDirty(true); }}
+                      >
                         <option value="PST">Pacific Standard Time (PST)</option>
                         <option value="EST">Eastern Standard Time (EST)</option>
                         <option value="UTC">UTC</option>
