@@ -49,7 +49,10 @@ const CandidateFilters = ({ availableFilters, selectedFilters, onFiltersChange }
   const hasActiveFilters = Object.keys(selectedFilters).length > 0;
   const activeFilterCount = Object.values(selectedFilters).reduce((acc, values) => acc + values.length, 0);
 
-  console.log('CandidateFilters Debug:', { availableFilters, selectedFilters, hasActiveFilters, activeFilterCount });
+  // Defensive check to prevent crashes
+  const safeAvailableFilters = availableFilters || {};
+
+  console.log('CandidateFilters Debug:', { availableFilters: safeAvailableFilters, selectedFilters, hasActiveFilters, activeFilterCount });
 
   return (
     <div className="flex items-center gap-2 flex-wrap">
@@ -58,7 +61,7 @@ const CandidateFilters = ({ availableFilters, selectedFilters, onFiltersChange }
           <Button 
             variant="outline" 
             size="sm" 
-            className="flex items-center gap-2 hover-scale bg-card-hover border-card-border text-card-foreground hover:bg-card-hover/70"
+            className="flex items-center gap-2"
           >
             <Filter className="h-4 w-4" />
             Filters
@@ -69,29 +72,29 @@ const CandidateFilters = ({ availableFilters, selectedFilters, onFiltersChange }
             )}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-80 p-4" align="end">
+        <PopoverContent className="w-80 p-4 bg-background border shadow-lg" align="end">
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="font-semibold text-card-foreground">Filters</h3>
+              <h3 className="font-semibold text-foreground">Filters</h3>
               {hasActiveFilters && (
                 <Button 
                   variant="ghost" 
                   size="sm" 
                   onClick={clearAllFilters}
-                  className="text-xs text-muted-foreground hover:text-card-foreground"
+                  className="text-xs text-muted-foreground hover:text-foreground"
                 >
                   Clear all
                 </Button>
               )}
             </div>
             
-            {Object.entries(availableFilters).map(([category, filterGroup]) => (
+            {Object.entries(safeAvailableFilters).map(([category, filterGroup]) => (
               <div key={category} className="space-y-2">
-                <h4 className="text-sm font-medium text-card-foreground capitalize">
-                  {filterGroup.name || category.replace(/_/g, ' ')}
+                <h4 className="text-sm font-medium text-foreground capitalize">
+                  {filterGroup?.name || category.replace(/_/g, ' ')}
                 </h4>
                 <div className="space-y-2 max-h-32 overflow-y-auto">
-                  {filterGroup.values.map(({ value, count }) => (
+                  {(filterGroup?.values || []).map(({ value, count }) => (
                     <div key={value} className="flex items-center space-x-2">
                       <Checkbox
                         id={`${category}-${value}`}
@@ -102,7 +105,7 @@ const CandidateFilters = ({ availableFilters, selectedFilters, onFiltersChange }
                       />
                       <label 
                         htmlFor={`${category}-${value}`} 
-                        className="text-sm text-card-foreground flex-1 cursor-pointer"
+                        className="text-sm text-foreground flex-1 cursor-pointer"
                       >
                         {value}
                       </label>
@@ -113,7 +116,7 @@ const CandidateFilters = ({ availableFilters, selectedFilters, onFiltersChange }
               </div>
             ))}
             
-            {Object.keys(availableFilters).length === 0 && (
+            {Object.keys(safeAvailableFilters).length === 0 && (
               <div className="text-sm text-muted-foreground text-center py-4">
                 No filters available
               </div>
