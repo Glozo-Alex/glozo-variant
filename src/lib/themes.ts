@@ -65,30 +65,22 @@ export const applyColorScheme = (scheme: ColorScheme) => {
     return;
   }
   
-  // Remove ALL existing theme classes first
+  // Remove all existing theme classes
   Object.keys(THEMES).forEach(themeId => {
     root.classList.remove(`theme-${themeId}`);
   });
   
-  // Force immediate reflow
-  root.offsetHeight;
-  
   // Add new theme class
   root.classList.add(`theme-${scheme}`);
-  
-  // Force style recalculation immediately
-  document.body.style.display = 'none';
-  document.body.offsetHeight;
-  document.body.style.display = '';
   
   console.log('✅ Applied theme class:', `theme-${scheme}`);
   
   // Store in localStorage
   localStorage.setItem('color-scheme', scheme);
   
-  // Single event dispatch
+  // Dispatch single event
   const event = new CustomEvent('themeChanged', { 
-    detail: { scheme, colors: theme.colors, success: true } 
+    detail: { scheme, colors: theme.colors } 
   });
   document.dispatchEvent(event);
 };

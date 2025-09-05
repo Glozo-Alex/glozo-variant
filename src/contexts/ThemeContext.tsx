@@ -101,24 +101,21 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   }, []);
 
   const setColorScheme = async (scheme: ColorScheme) => {
-    if (!isInitialized) return; // Prevent calls before initialization
+    if (!isInitialized || scheme === colorScheme) return;
     
     try {
       console.log('🎨 Changing color scheme to:', scheme);
       setColorSchemeState(scheme);
       
-      // Apply color scheme immediately for instant feedback
+      // Apply color scheme immediately
       applyColorScheme(scheme);
       
-      // Save to localStorage immediately
+      // Save to localStorage
       localStorage.setItem('color-scheme', scheme);
       
-      // Save to profile if user is logged in (async, non-blocking)
+      // Save to profile only once if user is logged in
       if (profile) {
-        updateProfile({ theme_preference: scheme }).catch(profileError => {
-          console.warn('⚠️ Failed to save theme to profile:', profileError);
-          // Theme is still applied locally even if profile save fails
-        });
+        await updateProfile({ theme_preference: scheme });
       }
     } catch (error) {
       console.error('❌ Failed to apply color scheme:', error);
