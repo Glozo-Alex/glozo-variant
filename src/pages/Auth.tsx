@@ -1,12 +1,14 @@
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useColorScheme } from '@/contexts/ThemeContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Navigate } from 'react-router-dom';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Palette } from 'lucide-react';
 
 const Auth = () => {
   const { user, loading, signInWithGoogle } = useAuth();
+  const { colorScheme, setColorScheme } = useColorScheme();
 
   // Redirect authenticated users to dashboard
   if (user && !loading) {
@@ -56,6 +58,41 @@ const Auth = () => {
             </svg>
             Continue with Google
           </Button>
+          
+          {/* Test Color Schemes */}
+          <div className="space-y-2">
+            <p className="text-xs text-muted-foreground text-center">Test Color Schemes:</p>
+            <div className="flex gap-2 justify-center">
+              <Button
+                size="sm"
+                variant={colorScheme === 'default' ? 'default' : 'outline'}
+                onClick={() => setColorScheme('default')}
+              >
+                Default
+              </Button>
+              <Button
+                size="sm"
+                variant={colorScheme === 'ocean' ? 'default' : 'outline'}
+                onClick={() => setColorScheme('ocean')}
+              >
+                Ocean
+              </Button>
+              <Button
+                size="sm"
+                variant={colorScheme === 'sunset' ? 'default' : 'outline'}
+                onClick={() => setColorScheme('sunset')}
+              >
+                Sunset
+              </Button>
+              <Button
+                size="sm"
+                variant={colorScheme === 'forest' ? 'default' : 'outline'}
+                onClick={() => setColorScheme('forest')}
+              >
+                Forest
+              </Button>
+            </div>
+          </div>
           
           <div className="text-center">
             <p className="text-xs text-muted-foreground">

@@ -55,43 +55,34 @@ export const THEMES: Record<ColorScheme, ThemeConfig> = {
 };
 
 export const applyColorScheme = (scheme: ColorScheme) => {
+  console.log('🎨 Applying color scheme:', scheme);
+  
   const root = document.documentElement;
   const theme = THEMES[scheme];
   
-  console.log('🎨 Applying color scheme:', scheme, theme);
+  if (!theme) {
+    console.error('❌ Invalid theme scheme:', scheme);
+    return;
+  }
   
   // Add transition class for smooth changes
   root.classList.add('theme-transition');
   
-  // Get current dark/light mode from next-themes
-  const isDarkMode = root.classList.contains('dark');
-  console.log('🌓 Current mode:', isDarkMode ? 'dark' : 'light');
-  
-  // Remove ALL existing theme classes (including combined ones)
+  // Remove ALL existing theme classes
   Object.keys(THEMES).forEach(themeId => {
     root.classList.remove(`theme-${themeId}`);
-    console.log('🗑️ Removed theme class:', `theme-${themeId}`);
   });
   
   // Add new theme class
   root.classList.add(`theme-${scheme}`);
   console.log('✅ Applied theme class:', `theme-${scheme}`);
   
-  // Force immediate DOM update and style recalculation
-  root.offsetHeight; // Force reflow
-  
-  // Force update CSS properties by triggering a repaint
-  const forceRepaint = () => {
-    root.style.display = 'none';
-    root.offsetHeight; // Trigger reflow
-    root.style.display = '';
-  };
-  
-  // Wait for next frame to ensure styles are applied
-  requestAnimationFrame(() => {
-    forceRepaint();
+  // Force style recalculation immediately
+  const forceStyleUpdate = () => {
+    // Force reflow by accessing a layout property
+    root.offsetHeight;
     
-    // Force style recalculation
+    // Get computed styles to validate application
     const computedStyle = window.getComputedStyle(root);
     const primaryColor = computedStyle.getPropertyValue('--primary').trim();
     const backgroundColor = computedStyle.getPropertyValue('--background').trim();
@@ -100,32 +91,50 @@ export const applyColorScheme = (scheme: ColorScheme) => {
     console.log('  --primary:', primaryColor);
     console.log('  --background:', backgroundColor);
     
-    // Validate that the theme was applied
-    if (!primaryColor || primaryColor === 'initial' || primaryColor === 'inherit') {
-      console.warn('⚠️ Theme may not have applied correctly. Force updating all elements...');
+    // Validate successful application
+    if (primaryColor && primaryColor !== 'initial' && primaryColor !== 'inherit') {
+      console.log('✅ Theme applied successfully');
       
-      // Force all elements to recalculate their styles
-      const allElements = document.querySelectorAll('*');
-      allElements.forEach(el => {
-        if (el instanceof HTMLElement) {
-          el.style.transform = 'translateZ(0)';
-          el.offsetHeight; // Trigger reflow
-          el.style.transform = '';
-        }
+      // Dispatch success event
+      const event = new CustomEvent('themeChanged', { 
+        detail: { 
+          scheme, 
+          colors: theme.colors,
+          success: true 
+        } 
       });
+      document.dispatchEvent(event);
+    } else {
+      console.warn('⚠️ Theme may not have applied correctly, retrying...');
       
-      // Check again after force update
-      const retryPrimary = window.getComputedStyle(root).getPropertyValue('--primary').trim();
-      console.log('🔄 After force update --primary:', retryPrimary);
+      // Force another update cycle
+      setTimeout(() => {
+        root.classList.remove(`theme-${scheme}`);
+        root.offsetHeight; // Force reflow
+        root.classList.add(`theme-${scheme}`);
+        
+        // Check again
+        const retryPrimary = window.getComputedStyle(root).getPropertyValue('--primary').trim();
+        console.log('🔄 After retry --primary:', retryPrimary);
+        
+        if (retryPrimary && retryPrimary !== 'initial') {
+          console.log('✅ Theme applied after retry');
+          const retryEvent = new CustomEvent('themeChanged', { 
+            detail: { 
+              scheme, 
+              colors: theme.colors,
+              success: true 
+            } 
+          });
+          document.dispatchEvent(retryEvent);
+        }
+      }, 100);
     }
-    
-    // Dispatch custom event to notify components about theme change
-    const event = new CustomEvent('themeChanged', { 
-      detail: { scheme, isDarkMode, colors: theme.colors } 
-    });
-    document.dispatchEvent(event);
-    console.log('📡 Dispatched themeChanged event');
-  });
+  };
+  
+  // Apply immediately and also on next frame
+  forceStyleUpdate();
+  requestAnimationFrame(forceStyleUpdate);
   
   // Store in localStorage
   localStorage.setItem('color-scheme', scheme);

@@ -33,37 +33,37 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     }
   }, [resolvedTheme, colorScheme]);
 
-  // Initialize color scheme from profile or localStorage
+  // Initialize color scheme from localStorage first, then profile when available
   useEffect(() => {
     const initializeColorScheme = () => {
       let initialScheme: ColorScheme = 'default';
       
-      // Priority: profile preference > localStorage > default
-      if (profile?.theme_preference) {
-        initialScheme = profile.theme_preference as ColorScheme;
-      } else {
-        const stored = localStorage.getItem('color-scheme') as ColorScheme;
-        if (stored && ['default', 'ocean', 'sunset', 'forest'].includes(stored)) {
-          initialScheme = stored;
-        }
+      // Priority: localStorage > profile preference > default
+      const stored = localStorage.getItem('color-scheme') as ColorScheme;
+      if (stored && ['default', 'ocean', 'sunset', 'forest'].includes(stored)) {
+        initialScheme = stored;
       }
       
-      console.log('🎯 Initializing color scheme:', initialScheme);
+      // If profile is available and has a different preference, use that
+      if (profile?.theme_preference && profile.theme_preference !== initialScheme) {
+        initialScheme = profile.theme_preference as ColorScheme;
+      }
+      
+      console.log('🎯 Initializing color scheme:', initialScheme, 'from:', stored ? 'localStorage' : 'default', profile ? '+ profile' : '');
       setColorSchemeState(initialScheme);
       
-      // Ensure DOM is ready and next-themes has initialized before applying colors
+      // Apply the theme immediately
       const applyInitialScheme = () => {
-        if (document.readyState === 'loading') {
-          document.addEventListener('DOMContentLoaded', () => {
-            setTimeout(() => applyColorScheme(initialScheme), 100);
-          });
-        } else {
-          // Wait for next-themes to initialize
-          setTimeout(() => applyColorScheme(initialScheme), 100);
-        }
+        console.log('⚡ Applying initial color scheme:', initialScheme);
+        setTimeout(() => applyColorScheme(initialScheme), 50);
       };
 
-      applyInitialScheme();
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', applyInitialScheme);
+      } else {
+        applyInitialScheme();
+      }
+      
       setIsLoading(false);
     };
 
@@ -93,15 +93,15 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
       // Apply color scheme immediately for instant feedback
       applyColorScheme(scheme);
       
-      // Save to profile if user is logged in
+      // Save to localStorage immediately
+      localStorage.setItem('color-scheme', scheme);
+      
+      // Save to profile if user is logged in (async, non-blocking)
       if (profile) {
-        try {
-          await updateProfile({ theme_preference: scheme });
-          console.log('✅ Saved theme preference to profile');
-        } catch (profileError) {
+        updateProfile({ theme_preference: scheme }).catch(profileError => {
           console.warn('⚠️ Failed to save theme to profile:', profileError);
-          // Still apply the theme locally even if profile save fails
-        }
+          // Theme is still applied locally even if profile save fails
+        });
       }
     } catch (error) {
       console.error('❌ Failed to apply color scheme:', error);
