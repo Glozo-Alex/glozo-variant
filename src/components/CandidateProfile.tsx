@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -24,7 +24,7 @@ interface CandidateProfileProps {
   projectId: string;
 }
 
-export function CandidateProfile({ children, candidateData, socialLinks = [], projectId }: CandidateProfileProps) {
+export const CandidateProfile = React.memo(function CandidateProfile({ children, candidateData, socialLinks = [], projectId }: CandidateProfileProps) {
   const [open, setOpen] = useState(false);
   const { candidateDetail, loading, error } = useCandidateDetails({
     candidateId: candidateData?.id,
@@ -35,10 +35,10 @@ export function CandidateProfile({ children, candidateData, socialLinks = [], pr
   // Combine basic candidate data with detailed data
   const displayData = candidateDetail ? { ...candidateData, ...candidateDetail } : candidateData;
 
-  const getInitials = (name: string) => {
+  const getInitials = useCallback((name: string) => {
     if (!name) return 'N/A';
     return name.split(' ').map(part => part[0]).join('').toUpperCase().slice(0, 2);
-  };
+  }, []);
 
   console.log('CandidateProfile render:', { 
     candidateData, 
@@ -144,4 +144,4 @@ export function CandidateProfile({ children, candidateData, socialLinks = [], pr
       </SheetContent>
     </Sheet>
   );
-}
+});

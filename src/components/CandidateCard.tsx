@@ -1,6 +1,6 @@
+import React, { useState, useCallback } from "react";
 import { ArrowUpRight, CheckCircle, ChevronDown, MessageSquare, Star, BrainCircuit, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
 import { addToShortlist, removeFromShortlist } from "@/services/shortlist";
 import { useToast } from "@/hooks/use-toast";
 import { CandidateProfile } from "./CandidateProfile";
@@ -51,7 +51,7 @@ const CandidateCard = ({
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  const handleShortlistClick = async () => {
+  const handleShortlistClick = useCallback(async () => {
     if (isLoading) return;
     
     setIsLoading(true);
@@ -91,7 +91,7 @@ const CandidateCard = ({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [candidateId, projectId, name, title, location, experience, matchPercentage, description, skills, openToOffers, isShortlisted, onShortlistToggle, toast]);
   return (
     <article className="glass-card rounded-xl p-5 space-y-3 animate-fade-in hover:shadow-elegant hover:border-primary/30 transition-all duration-300 hover-lift">
       {/* Header */}
@@ -192,4 +192,4 @@ const CandidateCard = ({
   );
 };
 
-export default CandidateCard;
+export default React.memo(CandidateCard);

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import CandidateCard from "./CandidateCard";
@@ -119,9 +119,25 @@ const CandidateList = () => {
       }
     };
 
-    // Initial fetch and polling if pending
+    // Initial fetch and polling optimization
     fetchLatestSearch();
-    timer = setInterval(fetchLatestSearch, 3000) as unknown as number;
+    
+    // Only poll if status is pending or we haven't determined status yet
+    const shouldPoll = () => {
+      return status === "pending" || status === "idle";
+    };
+    
+    if (shouldPoll()) {
+      timer = setInterval(() => {
+        // Re-check if we should still poll before making the request
+        if (shouldPoll()) {
+          fetchLatestSearch();
+        } else {
+          // Stop polling if status is completed
+          if (timer) clearInterval(timer);
+        }
+      }, 3000) as unknown as number;
+    }
 
     return () => {
       cancelled = true;
@@ -205,7 +221,7 @@ const CandidateList = () => {
     });
   }, [candidates, selectedFilters]);
 
-  const handleShortlistToggle = async (candidateId: string, isShortlisted: boolean) => {
+  const handleShortlistToggle = useCallback(async (candidateId: string, isShortlisted: boolean) => {
     // Update local state immediately for optimistic UI
     setShortlistStatus(prev => ({
       ...prev,
@@ -228,7 +244,7 @@ const CandidateList = () => {
         console.error('Failed to update shortlist count:', error);
       }
     }
-  };
+  }, [projectId, updateShortlistCount]);
 
   const headerText = useMemo(() => {
     if (loading) return "Loading candidates...";
