@@ -49,6 +49,8 @@ const CandidateFilters = ({ availableFilters, selectedFilters, onFiltersChange }
   const hasActiveFilters = Object.keys(selectedFilters).length > 0;
   const activeFilterCount = Object.values(selectedFilters).reduce((acc, values) => acc + values.length, 0);
 
+  console.log('CandidateFilters Debug:', { availableFilters, selectedFilters, hasActiveFilters, activeFilterCount });
+
   return (
     <div className="flex items-center gap-2 flex-wrap">
       <Popover open={isOpen} onOpenChange={setIsOpen}>
