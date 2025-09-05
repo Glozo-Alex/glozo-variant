@@ -65,53 +65,68 @@ export const applyColorScheme = (scheme: ColorScheme) => {
     return;
   }
   
+  // Add temporary class to force style recalculation
+  root.classList.add('theme-transition');
+  
   // Remove ALL existing theme classes first
   Object.keys(THEMES).forEach(themeId => {
     root.classList.remove(`theme-${themeId}`);
   });
   
-  // Force immediate reflow
+  // Force immediate reflow by triggering layout calculation
   root.offsetHeight;
   
-  // Add new theme class
+  // Add new theme class to html element for maximum specificity
   root.classList.add(`theme-${scheme}`);
-  console.log('✅ Applied theme class:', `theme-${scheme}`);
+  console.log('✅ Applied theme class to html:', `theme-${scheme}`);
   
-  // Force style recalculation with multiple approaches
-  const validateAndUpdate = () => {
-    // Force immediate style recalculation
+  // More aggressive style forcing
+  const forceStyleUpdate = () => {
+    // Force recalculation of all CSS variables
+    const allElements = document.querySelectorAll('*');
+    allElements.forEach(element => {
+      if (element instanceof HTMLElement) {
+        element.style.cssText = element.style.cssText;
+      }
+    });
+    
+    // Force document style recalculation
+    document.body.style.transform = 'translateZ(0)';
+    document.body.offsetHeight;
+    document.body.style.transform = '';
+    
+    // Verify variables are applied
     const computedStyle = window.getComputedStyle(root);
     const primaryColor = computedStyle.getPropertyValue('--primary').trim();
     const backgroundColor = computedStyle.getPropertyValue('--background').trim();
     
-    console.log('🔍 Applied CSS variables:');
+    console.log('🔍 Current CSS variables after update:');
     console.log('  --primary:', primaryColor);
     console.log('  --background:', backgroundColor);
-    console.log('  Current theme classes:', root.className);
+    console.log('  HTML classes:', root.className);
     
-    // Trigger reflow on body to ensure cascade update
-    document.body.style.display = 'none';
-    document.body.offsetHeight; // Force reflow
-    document.body.style.display = '';
+    // Remove transition class
+    root.classList.remove('theme-transition');
     
-    // Dispatch success event
+    // Dispatch theme change event
     const event = new CustomEvent('themeChanged', { 
       detail: { 
         scheme, 
         colors: theme.colors,
-        success: true,
-        appliedClasses: root.className
+        cssVariables: { primaryColor, backgroundColor },
+        success: true
       } 
     });
     document.dispatchEvent(event);
     
-    console.log('✅ Theme applied successfully');
+    console.log('✅ Theme fully applied with forced updates');
   };
   
-  // Apply immediately and on next frames
-  validateAndUpdate();
-  requestAnimationFrame(validateAndUpdate);
-  setTimeout(validateAndUpdate, 50);
+  // Apply immediately and with fallbacks
+  forceStyleUpdate();
+  requestAnimationFrame(forceStyleUpdate);
+  setTimeout(forceStyleUpdate, 0);
+  setTimeout(forceStyleUpdate, 100);
   
   // Store in localStorage
   localStorage.setItem('color-scheme', scheme);
