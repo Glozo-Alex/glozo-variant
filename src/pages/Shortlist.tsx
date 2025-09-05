@@ -10,8 +10,10 @@ import { Users, Star, Mail, Phone, MapPin, Calendar, ArrowLeft, Trash2, Grid3X3,
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getShortlistForProject, removeFromShortlist } from "@/services/shortlist";
+import { getCachedCandidateDetails, getCandidateDetails } from "@/services/candidateDetails";
 import { useToast } from "@/hooks/use-toast";
 import { ContactInfo } from "@/components/ContactInfo";
+import { CandidateProfile } from "@/components/CandidateProfile";
 
 type ViewMode = 'cards' | 'table';
 
@@ -40,38 +42,87 @@ const Shortlist = () => {
         setError(null);
         const shortlist = await getShortlistForProject(projectId);
         
+        // Get numeric candidate IDs for fetching details
+        const numericIds = shortlist
+          .map(item => parseInt(item.candidate_id, 10))
+          .filter(Number.isFinite);
+        
+        // Fetch cached candidate details
+        const detailsMap = await getCachedCandidateDetails(numericIds, projectId);
+        
         // Transform the data to match the component's expected format
         const transformedCandidates = shortlist.map((item) => {
           const candidateData = item.candidate_snapshot as any;
+          const numericId = parseInt(item.candidate_id, 10);
+          const details = detailsMap[numericId];
           
-          // Handle skills - they might be objects with {name, type} or just strings
-          const skillsArray = candidateData.skills || [];
-          const processedSkills = skillsArray.map((skill: any) => 
-            typeof skill === 'string' ? skill : skill.name || skill
-          );
+          // Use details from cache if available, fallback to snapshot
+          const name = details?.name || candidateData.name || 'Unknown';
+          const title = details?.title || details?.role || candidateData.title || 'No title';
+          const company = details?.employer || candidateData.company || 'Unknown company';
+          const location = details?.location || candidateData.location || 'Unknown location';
+          
+          // Handle skills - prioritize details, fallback to snapshot
+          let processedSkills: string[] = [];
+          if (details?.skills) {
+            // Flatten skills from details (array of clusters)
+            processedSkills = details.skills.flatMap(skillCluster => 
+              Array.isArray(skillCluster) ? skillCluster : [skillCluster]
+            ).filter(Boolean);
+          } else {
+            // Fallback to snapshot skills
+            const skillsArray = candidateData.skills || [];
+            processedSkills = skillsArray.map((skill: any) => 
+              typeof skill === 'string' ? skill : skill.name || skill
+            );
+          }
+          
+          // Handle contacts - prioritize details, fallback to snapshot
+          const contacts = details?.contacts || candidateData.contacts || {
+            emails: candidateData.email && candidateData.email !== 'No email' ? [candidateData.email] : [],
+            phones: candidateData.phone && candidateData.phone !== 'No phone' ? [candidateData.phone] : []
+          };
+          
+          // Prepare social links if available
+          const socialLinks = details?.social || [];
           
           return {
             id: item.candidate_id,
-            name: candidateData.name || 'Unknown',
-            title: candidateData.title || 'No title',
-            company: candidateData.company || 'Unknown company',
-            location: candidateData.location || 'Unknown location',
+            numericId,
+            name,
+            title,
+            company,
+            location,
             match: candidateData.matchPercentage || candidateData.match || 0,
             rating: candidateData.rating || 0,
             skills: processedSkills,
             experience: candidateData.experience || 'No experience',
             email: candidateData.email || 'No email',
             phone: candidateData.phone || 'No phone',
-            contacts: candidateData.contacts || {
-              emails: candidateData.email && candidateData.email !== 'No email' ? [candidateData.email] : [],
-              phones: candidateData.phone && candidateData.phone !== 'No phone' ? [candidateData.phone] : []
-            },
+            contacts,
+            socialLinks,
             addedAt: item.added_at,
-            avatar: candidateData.name ? candidateData.name.split(' ').map((n: string) => n[0]).join('').toUpperCase() : 'UN'
+            avatar: name ? name.split(' ').map((n: string) => n[0]).join('').toUpperCase() : 'UN'
           };
         });
         
         setShortlistedCandidates(transformedCandidates);
+        
+        // Check for candidates without cached details and fetch them in background
+        const missingIds = numericIds.filter(id => !detailsMap[id]);
+        if (missingIds.length > 0) {
+          getCandidateDetails({
+            candidateIds: missingIds,
+            projectId
+          }).then(response => {
+            if (response.success) {
+              // Refresh the list to include the newly fetched details
+              fetchShortlistedCandidates();
+            }
+          }).catch(error => {
+            console.error('Failed to fetch missing candidate details:', error);
+          });
+        }
       } catch (error) {
         console.error('Failed to fetch shortlisted candidates:', error);
         setError('Failed to load shortlisted candidates');
@@ -283,9 +334,23 @@ const Shortlist = () => {
                           </Badge>
                         ))}
                         {candidate.skills.length > 3 && (
-                          <Badge variant="outline" className="text-xs">
-                            +{candidate.skills.length - 3}
-                          </Badge>
+                          <CandidateProfile 
+                            candidateData={{
+                              id: candidate.numericId,
+                              name: candidate.name,
+                              title: candidate.title,
+                              employer: candidate.company,
+                              location: candidate.location,
+                              contacts: candidate.contacts,
+                              skills: candidate.skills
+                            }}
+                            socialLinks={candidate.socialLinks}
+                            projectId={projectId || ''}
+                          >
+                            <Badge variant="outline" className="text-xs cursor-pointer hover:bg-muted">
+                              +{candidate.skills.length - 3}
+                            </Badge>
+                          </CandidateProfile>
                         )}
                       </div>
                     </div>
@@ -306,9 +371,23 @@ const Shortlist = () => {
                       <Mail className="h-4 w-4 mr-2" />
                       Contact
                     </Button>
-                    <Button variant="outline" size="sm" className="flex-1">
-                      View Profile
-                    </Button>
+                    <CandidateProfile 
+                      candidateData={{
+                        id: candidate.numericId,
+                        name: candidate.name,
+                        title: candidate.title,
+                        employer: candidate.company,
+                        location: candidate.location,
+                        contacts: candidate.contacts,
+                        skills: candidate.skills
+                      }}
+                      socialLinks={candidate.socialLinks}
+                      projectId={projectId || ''}
+                    >
+                      <Button variant="outline" size="sm" className="flex-1">
+                        View Profile
+                      </Button>
+                    </CandidateProfile>
                     <Button 
                       variant="outline" 
                       size="sm"
@@ -376,9 +455,23 @@ const Shortlist = () => {
                           </Badge>
                         ))}
                         {candidate.skills.length > 2 && (
-                          <Badge variant="outline" className="text-xs">
-                            +{candidate.skills.length - 2}
-                          </Badge>
+                          <CandidateProfile 
+                            candidateData={{
+                              id: candidate.numericId,
+                              name: candidate.name,
+                              title: candidate.title,
+                              employer: candidate.company,
+                              location: candidate.location,
+                              contacts: candidate.contacts,
+                              skills: candidate.skills
+                            }}
+                            socialLinks={candidate.socialLinks}
+                            projectId={projectId || ''}
+                          >
+                            <Badge variant="outline" className="text-xs cursor-pointer hover:bg-muted">
+                              +{candidate.skills.length - 2}
+                            </Badge>
+                          </CandidateProfile>
                         )}
                       </div>
                     </TableCell>
@@ -390,9 +483,23 @@ const Shortlist = () => {
                         <Button size="sm" variant="outline" className="h-8">
                           <Mail className="h-3 w-3" />
                         </Button>
-                        <Button size="sm" variant="outline" className="h-8">
-                          View
-                        </Button>
+                        <CandidateProfile 
+                          candidateData={{
+                            id: candidate.numericId,
+                            name: candidate.name,
+                            title: candidate.title,
+                            employer: candidate.company,
+                            location: candidate.location,
+                            contacts: candidate.contacts,
+                            skills: candidate.skills
+                          }}
+                          socialLinks={candidate.socialLinks}
+                          projectId={projectId || ''}
+                        >
+                          <Button size="sm" variant="outline" className="h-8">
+                            View
+                          </Button>
+                        </CandidateProfile>
                         <Button 
                           size="sm" 
                           variant="outline"

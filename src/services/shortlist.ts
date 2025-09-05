@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { getCandidateDetails } from './candidateDetails';
 
 export interface ShortlistCandidate {
   id: string;
@@ -44,6 +45,17 @@ export const addToShortlist = async (projectId: string, candidateId: string, can
 
   if (updateError) {
     console.error('Failed to update shortlist count:', updateError);
+  }
+
+  // Background fetch of candidate details
+  const numericCandidateId = parseInt(candidateId, 10);
+  if (Number.isFinite(numericCandidateId)) {
+    getCandidateDetails({
+      candidateIds: [numericCandidateId],
+      projectId
+    }).catch(error => {
+      console.error('Failed to fetch candidate details in background:', error);
+    });
   }
 };
 
