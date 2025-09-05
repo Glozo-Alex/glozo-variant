@@ -9,45 +9,48 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [projects, setProjects] = useState<Project[]>([]);
   const [activeProject, setActiveProjectState] = useState<Project | null>(null);
 
+  // Reload projects from Supabase
+  const reloadProjects = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      setProjects([]);
+      setActiveProjectState(null);
+      return;
+    }
+
+    const { data: supabaseProjects, error } = await supabase
+      .from('projects')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Failed to load projects:', error);
+      return;
+    }
+
+    const mapped = (supabaseProjects || []).map(p => ({
+      id: p.id,
+      name: p.name,
+      query: p.query,
+      createdAt: new Date(p.created_at),
+      updatedAt: new Date(p.updated_at),
+      shortlistCount: p.shortlist_count || 0,
+    }));
+
+    setProjects(mapped);
+
+    // Validate active project from localStorage only if it exists in DB
+    const savedActiveProjectId = localStorage.getItem('activeProjectId');
+    if (savedActiveProjectId) {
+      const activeProj = mapped.find(p => p.id === savedActiveProjectId) || null;
+      setActiveProjectState(activeProj);
+    }
+  };
+
   // Load from Supabase on mount
   useEffect(() => {
-    const loadProjectsFromSupabase = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const { data: supabaseProjects, error } = await supabase
-        .from('projects')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('Failed to load projects:', error);
-        return;
-      }
-
-      const projects = supabaseProjects.map(p => ({
-        id: p.id,
-        name: p.name,
-        query: p.query,
-        createdAt: new Date(p.created_at),
-        updatedAt: new Date(p.updated_at),
-        shortlistCount: p.shortlist_count || 0,
-      }));
-
-      setProjects(projects);
-
-      // Load active project from localStorage if it exists in database
-      const savedActiveProjectId = localStorage.getItem('activeProjectId');
-      if (savedActiveProjectId) {
-        const activeProj = projects.find(p => p.id === savedActiveProjectId);
-        if (activeProj) {
-          setActiveProjectState(activeProj);
-        }
-      }
-    };
-
-    loadProjectsFromSupabase();
+    void reloadProjects();
   }, []);
 
 
@@ -104,43 +107,52 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setActiveProjectState(project);
   };
 
-  const deleteProject = (projectId: string) => {
-    setProjects(prev => prev.filter(p => p.id !== projectId));
+  const deleteProject = async (projectId: string) => {
+    const { error } = await supabase
+      .from('projects')
+      .delete()
+      .eq('id', projectId);
+
+    if (error) {
+      console.error('Failed to delete project in Supabase:', error);
+      throw new Error('Failed to delete project');
+    }
+
     if (activeProject?.id === projectId) {
       setActiveProjectState(null);
     }
+
+    await reloadProjects();
   };
 
-  const updateProject = (projectId: string, updates: Partial<Pick<Project, 'name' | 'query'>>) => {
-    setProjects(prev => prev.map(p => 
-      p.id === projectId 
-        ? { ...p, ...updates, updatedAt: new Date() }
-        : p
-    ));
-    
+  const updateProject = async (projectId: string, updates: Partial<Pick<Project, 'name' | 'query'>>) => {
+    const { error } = await supabase
+      .from('projects')
+      .update({ ...updates })
+      .eq('id', projectId);
+
+    if (error) {
+      console.error('Failed to update project in Supabase:', error);
+      throw new Error('Failed to update project');
+    }
+
+    await reloadProjects();
+
     // Update active project if it's the one being updated
     if (activeProject?.id === projectId) {
       setActiveProjectState(prev => prev ? { ...prev, ...updates, updatedAt: new Date() } : null);
     }
   };
 
-  const duplicateProject = (projectId: string): Project => {
+  const duplicateProject = async (projectId: string): Promise<Project> => {
     const originalProject = projects.find(p => p.id === projectId);
     if (!originalProject) {
       throw new Error('Project not found');
     }
 
-    const duplicatedProject: Project = {
-      id: `project-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      name: `${originalProject.name} (копия)`,
-      query: originalProject.query,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      shortlistCount: 0,
-    };
-    
-    setProjects(prev => [...prev, duplicatedProject]);
-    return duplicatedProject;
+    // Reuse createProject to ensure data is stored in Supabase
+    const created = await createProject(`${originalProject.name} (копия)`, originalProject.query);
+    return created;
   };
 
   const updateShortlistCount = (projectId: string, newCount: number) => {

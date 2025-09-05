@@ -12,8 +12,8 @@ export interface ProjectContextType {
   activeProject: Project | null;
   createProject: (name: string, query: string, similarRoles?: boolean) => Promise<Project>;
   setActiveProject: (project: Project) => void;
-  deleteProject: (projectId: string) => void;
-  updateProject: (projectId: string, updates: Partial<Pick<Project, 'name' | 'query'>>) => void;
-  duplicateProject: (projectId: string) => Project;
+  deleteProject: (projectId: string) => Promise<void>;
+  updateProject: (projectId: string, updates: Partial<Pick<Project, 'name' | 'query'>>) => Promise<void>;
+  duplicateProject: (projectId: string) => Promise<Project>;
   updateShortlistCount: (projectId: string, newCount: number) => void;
 }

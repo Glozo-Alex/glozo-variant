@@ -95,13 +95,17 @@ const Projects = () => {
     setDeleteDialogOpen(true);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (projectToDelete) {
-      deleteProject(projectToDelete);
-      toast({
-        title: "Project Deleted",
-        description: "Project has been successfully deleted",
-      });
+      try {
+        await deleteProject(projectToDelete);
+        toast({
+          title: "Project Deleted",
+          description: "Project has been successfully deleted",
+        });
+      } catch (e) {
+        toast({ title: "Delete failed", description: "Couldn't delete project", variant: "destructive" });
+      }
     }
     setDeleteDialogOpen(false);
     setProjectToDelete(null);
@@ -113,25 +117,33 @@ const Projects = () => {
     setEditDialogOpen(true);
   };
 
-  const confirmEdit = () => {
+  const confirmEdit = async () => {
     if (projectToEdit && newProjectName.trim()) {
-      updateProject(projectToEdit.id, { name: newProjectName.trim() });
-      toast({
-        title: "Project Renamed",
-        description: "Project name has been updated",
-      });
+      try {
+        await updateProject(projectToEdit.id, { name: newProjectName.trim() });
+        toast({
+          title: "Project Renamed",
+          description: "Project name has been updated",
+        });
+      } catch (e) {
+        toast({ title: "Rename failed", description: "Couldn't update project", variant: "destructive" });
+      }
     }
     setEditDialogOpen(false);
     setProjectToEdit(null);
     setNewProjectName("");
   };
 
-  const handleDuplicateProject = (project: any) => {
-    const duplicatedProject = duplicateProject(project.id);
-    toast({
-      title: "Project Duplicated",
-      description: `Created project "${duplicatedProject.name}"`,
-    });
+  const handleDuplicateProject = async (project: any) => {
+    try {
+      const duplicatedProject = await duplicateProject(project.id);
+      toast({
+        title: "Project Duplicated",
+        description: `Created project "${duplicatedProject.name}"`,
+      });
+    } catch (e) {
+      toast({ title: "Duplicate failed", description: "Couldn't duplicate project", variant: "destructive" });
+    }
   };
 
   const handleProjectClick = (project: any) => {
