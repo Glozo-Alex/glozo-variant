@@ -4,11 +4,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Users, Star, Mail, Phone, MapPin, Calendar, ArrowLeft, Trash2 } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Users, Star, Mail, Phone, MapPin, Calendar, ArrowLeft, Trash2, Grid3X3, List } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getShortlistForProject, removeFromShortlist } from "@/services/shortlist";
 import { useToast } from "@/hooks/use-toast";
+import { ContactInfo } from "@/components/ContactInfo";
+
+type ViewMode = 'cards' | 'table';
 
 const Shortlist = () => {
   const { projectId } = useParams();
@@ -19,6 +24,10 @@ const Shortlist = () => {
   const [shortlistedCandidates, setShortlistedCandidates] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<ViewMode>(() => {
+    const saved = localStorage.getItem('shortlist-view-mode');
+    return (saved as ViewMode) || 'cards';
+  });
   
   const project = projects.find(p => p.id === projectId);
 
@@ -53,6 +62,10 @@ const Shortlist = () => {
             experience: candidateData.experience || 'No experience',
             email: candidateData.email || 'No email',
             phone: candidateData.phone || 'No phone',
+            contacts: candidateData.contacts || {
+              emails: candidateData.email && candidateData.email !== 'No email' ? [candidateData.email] : [],
+              phones: candidateData.phone && candidateData.phone !== 'No phone' ? [candidateData.phone] : []
+            },
             addedAt: item.added_at,
             avatar: candidateData.name ? candidateData.name.split(' ').map((n: string) => n[0]).join('').toUpperCase() : 'UN'
           };
@@ -97,6 +110,11 @@ const Shortlist = () => {
     }
   };
 
+  const handleViewModeChange = (mode: ViewMode) => {
+    setViewMode(mode);
+    localStorage.setItem('shortlist-view-mode', mode);
+  };
+
   if (!project) {
     return (
       <div className="flex-1 flex items-center justify-center">
@@ -137,9 +155,31 @@ const Shortlist = () => {
               Selected candidates for <strong>{project.name}</strong>
             </p>
           </div>
-          <div className="text-right">
-            <p className="text-2xl font-bold text-primary">{shortlistedCandidates.length}</p>
-            <p className="text-sm text-muted-foreground">candidates shortlisted</p>
+          <div className="flex items-center gap-4">
+            {/* View Mode Switcher - Hidden on mobile */}
+            <div className="hidden md:flex items-center gap-1 p-1 rounded-lg bg-muted">
+              <Button
+                variant={viewMode === 'cards' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => handleViewModeChange('cards')}
+                className="h-8"
+              >
+                <Grid3X3 className="h-4 w-4" />
+              </Button>
+              <Button
+                variant={viewMode === 'table' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => handleViewModeChange('table')}
+                className="h-8"
+              >
+                <List className="h-4 w-4" />
+              </Button>
+            </div>
+            
+            <div className="text-right">
+              <p className="text-2xl font-bold text-primary">{shortlistedCandidates.length}</p>
+              <p className="text-sm text-muted-foreground">candidates shortlisted</p>
+            </div>
           </div>
         </div>
       </div>
@@ -186,101 +226,189 @@ const Shortlist = () => {
           </CardContent>
         </Card>
       ) : shortlistedCandidates.length > 0 ? (
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-          {shortlistedCandidates.map((candidate) => (
-            <Card key={candidate.id} className="glass-card hover-lift">
-              <CardHeader className="pb-4">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold">
-                      {candidate.avatar}
+        viewMode === 'cards' ? (
+          /* Cards View */
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+            {shortlistedCandidates.map((candidate) => (
+              <Card key={candidate.id} className="glass-card hover-lift h-[440px] flex flex-col">
+                <CardHeader className="pb-4 flex-shrink-0">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <Avatar className="w-12 h-12 ring-2 ring-primary/20">
+                        <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+                          {candidate.avatar}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="min-w-0 flex-1">
+                        <CardTitle className="text-lg truncate">{candidate.name}</CardTitle>
+                        <CardDescription className="truncate" title={candidate.title}>
+                          {candidate.title}
+                        </CardDescription>
+                      </div>
                     </div>
-                    <div>
-                      <CardTitle className="text-lg">{candidate.name}</CardTitle>
-                      <CardDescription>{candidate.title}</CardDescription>
+                    <Badge className={`${getMatchColor(candidate.match)} text-white font-semibold flex-shrink-0`}>
+                      {candidate.match}%
+                    </Badge>
+                  </div>
+                </CardHeader>
+                
+                <CardContent className="flex-1 flex flex-col">
+                  <div className="space-y-4 flex-1">
+                    {/* Company & Location */}
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <span className="font-medium truncate">{candidate.company}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <MapPin className="h-4 w-4 flex-shrink-0" />
+                        <span className="truncate">{candidate.location}</span>
+                      </div>
+                    </div>
+
+                    {/* Rating & Experience */}
+                    <div className="flex items-center justify-between text-sm">
+                      <div className="flex items-center gap-1">
+                        <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                        <span className="font-medium">{candidate.rating}</span>
+                      </div>
+                      <span className="text-muted-foreground truncate">{candidate.experience}</span>
+                    </div>
+
+                    {/* Skills */}
+                    <div className="space-y-2">
+                      <div className="flex flex-wrap gap-1">
+                        {candidate.skills.slice(0, 3).map((skill) => (
+                          <Badge key={skill} variant="secondary" className="text-xs">
+                            {skill}
+                          </Badge>
+                        ))}
+                        {candidate.skills.length > 3 && (
+                          <Badge variant="outline" className="text-xs">
+                            +{candidate.skills.length - 3}
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Contact Info */}
+                    <div className="pt-2 border-t border-border/50">
+                      <ContactInfo candidate={candidate} />
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground mt-2">
+                        <Calendar className="h-4 w-4" />
+                        Added {new Date(candidate.addedAt).toLocaleDateString()}
+                      </div>
                     </div>
                   </div>
-                  <Badge className={`${getMatchColor(candidate.match)} text-white font-semibold`}>
-                    {candidate.match}%
-                  </Badge>
-                </div>
-              </CardHeader>
-              
-              <CardContent className="space-y-4">
-                {/* Company & Location */}
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <span className="font-medium">{candidate.company}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <MapPin className="h-4 w-4" />
-                    {candidate.location}
-                  </div>
-                </div>
 
-                {/* Rating & Experience */}
-                <div className="flex items-center justify-between text-sm">
-                  <div className="flex items-center gap-1">
-                    <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    <span className="font-medium">{candidate.rating}</span>
+                  {/* Actions - Always at bottom */}
+                  <div className="flex gap-2 pt-4 mt-auto flex-shrink-0">
+                    <Button size="sm" className="flex-1">
+                      <Mail className="h-4 w-4 mr-2" />
+                      Contact
+                    </Button>
+                    <Button variant="outline" size="sm" className="flex-1">
+                      View Profile
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => handleRemoveFromShortlist(candidate.id, candidate.name)}
+                      className="text-destructive hover:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
-                  <span className="text-muted-foreground">{candidate.experience}</span>
-                </div>
-
-                {/* Skills */}
-                <div className="space-y-2">
-                  <div className="flex flex-wrap gap-1">
-                    {candidate.skills.slice(0, 3).map((skill) => (
-                      <Badge key={skill} variant="secondary" className="text-xs">
-                        {skill}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          /* Table View */
+          <div className="rounded-md border bg-card">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[250px]">Candidate</TableHead>
+                  <TableHead className="w-[200px]">Company & Location</TableHead>
+                  <TableHead className="w-[80px]">Match</TableHead>
+                  <TableHead className="w-[200px]">Skills</TableHead>
+                  <TableHead className="w-[200px]">Contacts</TableHead>
+                  <TableHead className="w-[200px]">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {shortlistedCandidates.map((candidate) => (
+                  <TableRow key={candidate.id}>
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <Avatar className="w-10 h-10 ring-2 ring-primary/20">
+                          <AvatarFallback className="bg-primary/10 text-primary font-semibold text-sm">
+                            {candidate.avatar}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="min-w-0">
+                          <div className="font-medium truncate">{candidate.name}</div>
+                          <div className="text-sm text-muted-foreground truncate" title={candidate.title}>
+                            {candidate.title}
+                          </div>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="space-y-1">
+                        <div className="font-medium truncate">{candidate.company}</div>
+                        <div className="text-sm text-muted-foreground flex items-center gap-1">
+                          <MapPin className="h-3 w-3" />
+                          <span className="truncate">{candidate.location}</span>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge className={`${getMatchColor(candidate.match)} text-white font-semibold`}>
+                        {candidate.match}%
                       </Badge>
-                    ))}
-                    {candidate.skills.length > 3 && (
-                      <Badge variant="outline" className="text-xs">
-                        +{candidate.skills.length - 3}
-                      </Badge>
-                    )}
-                  </div>
-                </div>
-
-                {/* Contact Info */}
-                <div className="space-y-2 pt-2 border-t border-border/50">
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Mail className="h-4 w-4" />
-                    <span className="truncate">{candidate.email}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Phone className="h-4 w-4" />
-                    {candidate.phone}
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Calendar className="h-4 w-4" />
-                    Added {new Date(candidate.addedAt).toLocaleDateString()}
-                  </div>
-                </div>
-
-                {/* Actions */}
-                <div className="flex gap-2 pt-2">
-                  <Button size="sm" className="flex-1">
-                    <Mail className="h-4 w-4 mr-2" />
-                    Contact
-                  </Button>
-                  <Button variant="outline" size="sm" className="flex-1">
-                    View Profile
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => handleRemoveFromShortlist(candidate.id, candidate.name)}
-                    className="text-destructive hover:text-destructive"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-wrap gap-1">
+                        {candidate.skills.slice(0, 2).map((skill) => (
+                          <Badge key={skill} variant="secondary" className="text-xs">
+                            {skill}
+                          </Badge>
+                        ))}
+                        {candidate.skills.length > 2 && (
+                          <Badge variant="outline" className="text-xs">
+                            +{candidate.skills.length - 2}
+                          </Badge>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <ContactInfo candidate={candidate} size="sm" />
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex gap-1">
+                        <Button size="sm" variant="outline" className="h-8">
+                          <Mail className="h-3 w-3" />
+                        </Button>
+                        <Button size="sm" variant="outline" className="h-8">
+                          View
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => handleRemoveFromShortlist(candidate.id, candidate.name)}
+                          className="h-8 text-destructive hover:text-destructive"
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        )
       ) : (
         /* Empty State */
         <Card className="glass-card">
