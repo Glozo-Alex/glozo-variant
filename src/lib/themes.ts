@@ -80,7 +80,7 @@ export const applyColorScheme = (scheme: ColorScheme) => {
   root.classList.add(`theme-${scheme}`);
   console.log('✅ Applied theme class to html:', `theme-${scheme}`);
   
-  // More aggressive style forcing
+  // Single style update with verification
   const forceStyleUpdate = () => {
     // Force recalculation of all CSS variables
     const allElements = document.querySelectorAll('*');
@@ -108,25 +108,23 @@ export const applyColorScheme = (scheme: ColorScheme) => {
     // Remove transition class
     root.classList.remove('theme-transition');
     
-    // Dispatch theme change event
-    const event = new CustomEvent('themeChanged', { 
-      detail: { 
-        scheme, 
-        colors: theme.colors,
-        cssVariables: { primaryColor, backgroundColor },
-        success: true
-      } 
-    });
-    document.dispatchEvent(event);
-    
     console.log('✅ Theme fully applied with forced updates');
+    return { primaryColor, backgroundColor };
   };
   
-  // Apply immediately and with fallbacks
-  forceStyleUpdate();
-  requestAnimationFrame(forceStyleUpdate);
-  setTimeout(forceStyleUpdate, 0);
-  setTimeout(forceStyleUpdate, 100);
+  // Apply immediately and get result
+  const result = forceStyleUpdate();
+  
+  // Single event dispatch after successful application
+  const event = new CustomEvent('themeChanged', { 
+    detail: { 
+      scheme, 
+      colors: theme.colors,
+      cssVariables: result,
+      success: true
+    } 
+  });
+  document.dispatchEvent(event);
   
   // Store in localStorage
   localStorage.setItem('color-scheme', scheme);
