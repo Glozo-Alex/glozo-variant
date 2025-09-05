@@ -89,9 +89,9 @@ const CandidateList = () => {
 
         // Extract filters from raw response
         const filters = raw?.filters || {};
-        console.log('🔧 CandidateList: Raw filters data:', filters);
+        console.log('🔧 CandidateList: Raw filters data:', JSON.stringify(filters, null, 2));
         const processedFilters = extractFiltersFromResponse(filters, fromArray);
-        console.log('✅ CandidateList: Processed filters:', processedFilters);
+        console.log('✅ CandidateList: Processed filters:', JSON.stringify(processedFilters, null, 2));
 
         if (!cancelled) {
           setStatus(st);

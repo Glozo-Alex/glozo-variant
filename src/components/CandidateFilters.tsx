@@ -101,9 +101,22 @@ const CandidateFilters = ({ availableFilters, selectedFilters, onFiltersChange }
         )}
       </div>
 
-      {/* Dropdown panel */}
+      {/* Dropdown panel with max z-index */}
       {isOpen && (
-        <div className="absolute top-full left-0 mt-2 w-80 bg-background/95 backdrop-blur-md border rounded-lg shadow-lg p-4 z-[9999]">
+        <div 
+          className="fixed top-0 left-0 w-full h-full z-[9999]" 
+          onClick={() => setIsOpen(false)}
+        >
+          <div 
+            className="absolute top-full left-0 mt-2 w-80 bg-background/98 backdrop-blur-md border rounded-lg shadow-lg p-4" 
+            style={{ 
+              position: 'absolute',
+              top: '100%',
+              left: '0',
+              zIndex: 10000
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="font-semibold text-foreground">Filters</h3>
@@ -120,10 +133,10 @@ const CandidateFilters = ({ availableFilters, selectedFilters, onFiltersChange }
             </div>
             
             {Object.entries(safeAvailableFilters).map(([category, filterGroup]) => {
-              console.log('🔍 Rendering filter group:', category, filterGroup);
+              console.log('🔍 Rendering filter group:', category, 'data:', JSON.stringify(filterGroup, null, 2));
               
-              if (!filterGroup || !Array.isArray(filterGroup.values)) {
-                console.warn('❌ Invalid filter group structure:', filterGroup);
+              if (!filterGroup || !filterGroup.values || !Array.isArray(filterGroup.values)) {
+                console.warn('❌ Invalid filter group structure for category:', category, filterGroup);
                 return null;
               }
               
@@ -192,6 +205,7 @@ const CandidateFilters = ({ availableFilters, selectedFilters, onFiltersChange }
                 No filters available
               </div>
             )}
+          </div>
           </div>
         </div>
       )}
