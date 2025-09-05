@@ -1,8 +1,4 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { SummarySection } from './SummarySection';
-import { BasicInfoSection } from './BasicInfoSection';
-import { ContactSection } from './ContactSection';
-import { SocialLinksSection } from './SocialLinksSection';
 import { EmploymentSection } from './EmploymentSection';
 import { EducationSection } from './EducationSection';
 import { ProjectsSection } from './ProjectsSection';
@@ -29,33 +25,13 @@ export function CandidateProfileContent({ displayData, socialLinks }: CandidateP
   }
 
   return (
-    <Tabs defaultValue="summary" className="w-full">
-      <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6 mb-6">
-        <TabsTrigger value="summary">Summary</TabsTrigger>
-        <TabsTrigger value="basic">Basic Info</TabsTrigger>
+    <Tabs defaultValue="employment" className="w-full">
+      <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 mb-6">
         <TabsTrigger value="employment">Employment</TabsTrigger>
         <TabsTrigger value="education">Education</TabsTrigger>
         <TabsTrigger value="projects">Projects</TabsTrigger>
         <TabsTrigger value="skills">Skills</TabsTrigger>
       </TabsList>
-
-      <TabsContent value="summary" className="space-y-4">
-        <ErrorBoundary>
-          <SummarySection displayData={displayData} />
-        </ErrorBoundary>
-      </TabsContent>
-
-      <TabsContent value="basic" className="space-y-4">
-        <ErrorBoundary>
-          <BasicInfoSection displayData={displayData} />
-        </ErrorBoundary>
-        <ErrorBoundary>
-          <ContactSection contacts={displayData.contacts} />
-        </ErrorBoundary>
-        <ErrorBoundary>
-          <SocialLinksSection socialLinks={socialLinks} />
-        </ErrorBoundary>
-      </TabsContent>
 
       <TabsContent value="employment" className="space-y-4">
         <ErrorBoundary>

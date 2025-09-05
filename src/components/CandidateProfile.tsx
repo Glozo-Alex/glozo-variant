@@ -2,9 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Separator } from '@/components/ui/separator';
 import { useCandidateDetails } from '@/hooks/useCandidateDetails';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { CandidateProfileContent } from '@/components/CandidateProfile/CandidateProfileContent';
+import { SummarySection } from '@/components/CandidateProfile/SummarySection';
+import { BasicInfoSection } from '@/components/CandidateProfile/BasicInfoSection';
+import { ContactSection } from '@/components/CandidateProfile/ContactSection';
+import { SocialLinksSection } from '@/components/CandidateProfile/SocialLinksSection';
 
 interface SocialLink {
   platform: string;
@@ -96,12 +101,41 @@ export function CandidateProfile({ children, candidateData, socialLinks = [], pr
               </div>
             )}
 
-            {/* Content - Only show when not loading */}
+            {/* Static sections - Always visible when not loading */}
             {!loading && (
-              <CandidateProfileContent 
-                displayData={displayData} 
-                socialLinks={socialLinks}
-              />
+              <div className="space-y-6">
+                {/* Summary Section */}
+                <ErrorBoundary>
+                  <SummarySection displayData={displayData} />
+                </ErrorBoundary>
+
+                <Separator />
+
+                {/* Basic Info Section */}
+                <ErrorBoundary>
+                  <BasicInfoSection displayData={displayData} />
+                </ErrorBoundary>
+
+                <Separator />
+
+                {/* Contact Section */}
+                <ErrorBoundary>
+                  <ContactSection contacts={displayData.contacts} />
+                </ErrorBoundary>
+
+                {/* Social Links Section */}
+                <ErrorBoundary>
+                  <SocialLinksSection socialLinks={socialLinks} />
+                </ErrorBoundary>
+
+                <Separator />
+
+                {/* Tabbed Content */}
+                <CandidateProfileContent 
+                  displayData={displayData} 
+                  socialLinks={socialLinks}
+                />
+              </div>
             )}
           </div>
         </ErrorBoundary>
