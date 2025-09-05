@@ -14,6 +14,7 @@ import { getCachedCandidateDetails, getCandidateDetails } from "@/services/candi
 import { useToast } from "@/hooks/use-toast";
 import { ContactInfo } from "@/components/ContactInfo";
 import { CandidateProfile } from "@/components/CandidateProfile";
+import CandidateFilters from "@/components/CandidateFilters";
 
 type ViewMode = 'cards' | 'table';
 
@@ -30,6 +31,10 @@ const Shortlist = () => {
     const saved = localStorage.getItem('shortlist-view-mode');
     return (saved as ViewMode) || 'cards';
   });
+  
+  // Filter states
+  const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
+  const [availableFilters, setAvailableFilters] = useState<Record<string, any>>({});
   
   const project = projects.find(p => p.id === projectId);
 
@@ -128,6 +133,10 @@ const Shortlist = () => {
         console.log('Shortlist - Final transformed candidates:', transformedCandidates);
         setShortlistedCandidates(transformedCandidates);
         
+        // Extract filters from candidates
+        const filters = extractFiltersFromCandidates(transformedCandidates);
+        setAvailableFilters(filters);
+        
         // Check for candidates without cached details and fetch them in background
         const missingIds = numericIds.filter(id => !detailsMap[id]);
         if (missingIds.length > 0) {
@@ -186,6 +195,81 @@ const Shortlist = () => {
     setViewMode(mode);
     localStorage.setItem('shortlist-view-mode', mode);
   }, []);
+  
+  // Filter helper functions
+  const extractFiltersFromCandidates = (candidates: any[]) => {
+    const filters: Record<string, any> = {};
+    
+    // Extract skills
+    const skillsMap = new Map<string, number>();
+    const companiesMap = new Map<string, number>();
+    const locationsMap = new Map<string, number>();
+    
+    candidates.forEach(candidate => {
+      // Skills
+      candidate.skills?.forEach((skill: string) => {
+        if (skill?.trim()) {
+          skillsMap.set(skill, (skillsMap.get(skill) || 0) + 1);
+        }
+      });
+      
+      // Companies
+      if (candidate.company?.trim()) {
+        companiesMap.set(candidate.company, (companiesMap.get(candidate.company) || 0) + 1);
+      }
+      
+      // Locations
+      if (candidate.location?.trim()) {
+        locationsMap.set(candidate.location, (locationsMap.get(candidate.location) || 0) + 1);
+      }
+    });
+    
+    filters.skills = {
+      name: 'Skills',
+      values: Array.from(skillsMap.entries())
+        .map(([value, count]) => ({ value, count }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 20) // Limit to top 20 skills
+    };
+    
+    filters.companies = {
+      name: 'Companies',
+      values: Array.from(companiesMap.entries())
+        .map(([value, count]) => ({ value, count }))
+        .sort((a, b) => b.count - a.count)
+    };
+    
+    filters.locations = {
+      name: 'Locations',
+      values: Array.from(locationsMap.entries())
+        .map(([value, count]) => ({ value, count }))
+        .sort((a, b) => b.count - a.count)
+    };
+    
+    return filters;
+  };
+  
+  const handleFiltersChange = useCallback((filters: Record<string, string[]>) => {
+    setSelectedFilters(filters);
+  }, []);
+  
+  // Filter candidates based on selected filters
+  const filteredCandidates = shortlistedCandidates.filter(candidate => {
+    return Object.entries(selectedFilters).every(([category, values]) => {
+      if (values.length === 0) return true;
+      
+      switch (category) {
+        case 'skills':
+          return values.some(value => candidate.skills?.includes(value));
+        case 'companies':
+          return values.includes(candidate.company);
+        case 'locations':
+          return values.includes(candidate.location);
+        default:
+          return true;
+      }
+    });
+  });
 
   if (!project) {
     return (
@@ -249,11 +333,27 @@ const Shortlist = () => {
             </div>
             
             <div className="text-right">
-              <p className="text-2xl font-bold text-primary">{shortlistedCandidates.length}</p>
-              <p className="text-sm text-muted-foreground">candidates shortlisted</p>
+              <p className="text-2xl font-bold text-primary">{filteredCandidates.length}</p>
+              <p className="text-sm text-muted-foreground">
+                {filteredCandidates.length !== shortlistedCandidates.length 
+                  ? `of ${shortlistedCandidates.length} total` 
+                  : 'candidates shortlisted'
+                }
+              </p>
             </div>
           </div>
         </div>
+        
+        {/* Filters */}
+        {!loading && shortlistedCandidates.length > 0 && (
+          <div className="mb-6">
+            <CandidateFilters
+              availableFilters={availableFilters}
+              selectedFilters={selectedFilters}
+              onFiltersChange={handleFiltersChange}
+            />
+          </div>
+        )}
       </div>
 
       {/* Loading State */}
@@ -297,11 +397,11 @@ const Shortlist = () => {
             </Button>
           </CardContent>
         </Card>
-      ) : shortlistedCandidates.length > 0 ? (
+      ) : filteredCandidates.length > 0 ? (
         viewMode === 'cards' ? (
           /* Cards View */
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-            {shortlistedCandidates.map((candidate) => (
+            {filteredCandidates.map((candidate) => (
               <Card key={candidate.id} className="glass-card hover-lift h-[440px] flex flex-col">
                 <CardHeader className="pb-4 flex-shrink-0">
                   <div className="flex items-start justify-between">
@@ -423,56 +523,60 @@ const Shortlist = () => {
             ))}
           </div>
         ) : (
-          /* Table View */
-          <div className="rounded-md border bg-card">
+          /* Table View - Compact */
+          <div className="rounded-lg border bg-card overflow-hidden">
             <Table>
               <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[250px]">Candidate</TableHead>
-                  <TableHead className="w-[200px]">Company & Location</TableHead>
-                  <TableHead className="w-[80px]">Match</TableHead>
-                  <TableHead className="w-[200px]">Skills</TableHead>
-                  <TableHead className="w-[200px]">Contacts</TableHead>
-                  <TableHead className="w-[200px]">Actions</TableHead>
+                <TableRow className="h-10">
+                  <TableHead className="w-[200px]">Candidate</TableHead>
+                  <TableHead className="w-[180px]">Company</TableHead>
+                  <TableHead className="w-16 text-center">Match</TableHead>
+                  <TableHead className="w-[150px]">Skills</TableHead>
+                  <TableHead className="w-20 text-center">Contact</TableHead>
+                  <TableHead className="w-24 text-center">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {shortlistedCandidates.map((candidate) => (
-                  <TableRow key={candidate.id}>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <Avatar className="w-10 h-10 ring-2 ring-primary/20">
-                          <AvatarFallback className="bg-primary/10 text-primary font-semibold text-sm">
+                {filteredCandidates.map((candidate) => (
+                  <TableRow key={candidate.id} className="h-12 group hover:bg-muted/50">
+                    <TableCell className="p-2">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <Avatar className="w-8 h-8 flex-shrink-0">
+                          <AvatarFallback className="bg-muted text-muted-foreground text-xs">
                             {candidate.avatar}
                           </AvatarFallback>
                         </Avatar>
-                        <div className="min-w-0">
-                          <div className="font-medium truncate">{candidate.name}</div>
-                          <div className="text-sm text-muted-foreground truncate" title={candidate.title}>
+                        <div className="min-w-0 flex-1">
+                          <div className="font-medium text-sm truncate" title={candidate.name}>
+                            {candidate.name}
+                          </div>
+                          <div className="text-xs text-muted-foreground truncate" title={candidate.title}>
                             {candidate.title}
                           </div>
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell>
-                      <div className="space-y-1">
-                        <div className="font-medium truncate">{candidate.company}</div>
-                        <div className="text-sm text-muted-foreground flex items-center gap-1">
-                          <MapPin className="h-3 w-3" />
-                          <span className="truncate">{candidate.location}</span>
+                    <TableCell className="p-2">
+                      <div className="min-w-0">
+                        <div className="font-medium text-sm truncate" title={candidate.company}>
+                          {candidate.company}
+                        </div>
+                        <div className="text-xs text-muted-foreground truncate" title={candidate.location}>
+                          <MapPin className="h-3 w-3 inline mr-1" />
+                          {candidate.location}
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell>
-                      <Badge className={`${getMatchColor(candidate.match)} text-white font-semibold`}>
+                    <TableCell className="p-2 text-center">
+                      <Badge className={`${getMatchColor(candidate.match)} text-white text-xs`}>
                         {candidate.match}%
                       </Badge>
                     </TableCell>
-                    <TableCell>
-                      <div className="flex flex-wrap gap-1">
+                    <TableCell className="p-2">
+                      <div className="flex gap-1 overflow-hidden">
                         {candidate.skills.slice(0, 2).map((skill) => (
-                          <Badge key={skill} variant="secondary" className="text-xs">
-                            {skill}
+                          <Badge key={skill} variant="secondary" className="text-xs whitespace-nowrap" title={skill}>
+                            {skill.length > 8 ? `${skill.substring(0, 8)}...` : skill}
                           </Badge>
                         ))}
                         {candidate.skills.length > 2 && (
@@ -489,21 +593,29 @@ const Shortlist = () => {
                             socialLinks={candidate.socialLinks}
                             projectId={projectId || ''}
                           >
-                            <Badge variant="outline" className="text-xs cursor-pointer hover:bg-muted">
+                            <Badge variant="outline" className="text-xs cursor-pointer hover:bg-muted whitespace-nowrap">
                               +{candidate.skills.length - 2}
                             </Badge>
                           </CandidateProfile>
                         )}
                       </div>
                     </TableCell>
-                    <TableCell>
-                      <ContactInfo candidate={candidate} size="sm" />
+                    <TableCell className="p-2 text-center">
+                      <div className="flex justify-center gap-1">
+                        {candidate.contacts?.emails?.length > 0 && (
+                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0" title="Email available">
+                            <Mail className="h-3 w-3" />
+                          </Button>
+                        )}
+                        {candidate.contacts?.phones?.length > 0 && (
+                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0" title="Phone available">
+                            <Phone className="h-3 w-3" />
+                          </Button>
+                        )}
+                      </div>
                     </TableCell>
-                    <TableCell>
-                      <div className="flex gap-1">
-                        <Button size="sm" variant="outline" className="h-8">
-                          <Mail className="h-3 w-3" />
-                        </Button>
+                    <TableCell className="p-2 text-center">
+                      <div className="flex justify-center gap-1">
                         <CandidateProfile 
                           candidateData={{
                             id: candidate.numericId,
@@ -517,15 +629,16 @@ const Shortlist = () => {
                           socialLinks={candidate.socialLinks}
                           projectId={projectId || ''}
                         >
-                          <Button size="sm" variant="outline" className="h-8">
-                            View
+                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0" title="View Profile">
+                            <Users className="h-3 w-3" />
                           </Button>
                         </CandidateProfile>
-                        <Button 
-                          size="sm" 
-                          variant="outline"
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 w-6 p-0 text-destructive hover:text-destructive"
                           onClick={() => handleRemoveFromShortlist(candidate.id, candidate.name)}
-                          className="h-8 text-destructive hover:text-destructive"
+                          title="Remove from shortlist"
                         >
                           <Trash2 className="h-3 w-3" />
                         </Button>
@@ -542,14 +655,28 @@ const Shortlist = () => {
         <Card className="glass-card">
           <CardContent className="pt-12 pb-12 text-center">
             <Users className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-xl font-medium mb-2">No candidates shortlisted</h3>
+            <h3 className="text-xl font-medium mb-2">
+              {shortlistedCandidates.length === 0 
+                ? "No candidates shortlisted" 
+                : "No candidates match the current filters"
+              }
+            </h3>
             <p className="text-muted-foreground mb-6">
-              Start adding candidates to your shortlist from the search results
+              {shortlistedCandidates.length === 0 
+                ? "Start adding candidates to your shortlist from the search results."
+                : "Try adjusting your filters or clear them to see all shortlisted candidates."
+              }
             </p>
-            <Button onClick={() => navigate(`/project/${projectId}/results`)}>
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Search Results
-            </Button>
+            {shortlistedCandidates.length === 0 ? (
+              <Button onClick={() => navigate(`/project/${projectId}/results`)}>
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Search Results
+              </Button>
+            ) : (
+              <Button onClick={() => setSelectedFilters({})}>
+                Clear Filters
+              </Button>
+            )}
           </CardContent>
         </Card>
       )}
