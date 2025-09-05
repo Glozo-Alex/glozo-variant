@@ -30,8 +30,8 @@ const Auth = () => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-accent/10 p-4">
       <Card className="w-full max-w-md glass-card">
         <CardHeader className="text-center pb-6">
-          <div className="mx-auto mb-4 w-16 h-16 rounded-full bg-gradient-primary flex items-center justify-center">
-            <span className="text-2xl font-bold text-white">R</span>
+          <div className="mx-auto mb-4 w-16 h-16 rounded-full bg-gradient-primary flex items-center justify-center shadow-glow">
+            <span className="text-2xl font-bold text-primary-foreground">R</span>
           </div>
           <CardTitle className="text-2xl font-bold text-gradient">
             Welcome to RecruiterPlatform
@@ -39,11 +39,18 @@ const Auth = () => {
           <CardDescription className="text-muted-foreground">
             Sign in with your Google account to access your recruiting dashboard
           </CardDescription>
+          
+          {/* Theme Debug Info */}
+          <div className="mt-4 p-2 rounded border border-primary/20 bg-primary/5">
+            <p className="text-xs text-muted-foreground">
+              Current scheme: <span className="font-mono text-primary">{colorScheme}</span>
+            </p>
+          </div>
         </CardHeader>
         <CardContent className="space-y-4">
           <Button
             onClick={signInWithGoogle}
-            className="w-full h-12 btn-gradient hover-glow"
+            className="w-full h-12 bg-gradient-primary text-primary-foreground hover:shadow-glow transition-all"
             size="lg"
           >
             <svg

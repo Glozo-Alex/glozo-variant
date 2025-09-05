@@ -6,8 +6,7 @@
 
 @layer base {
   /* Light theme (default) - Emerald scheme */
-  :root,
-  .theme-default {
+  :root {
     /* Base surfaces - Warm neutrals */
     --background: 45 23% 97%; /* Warm off-white */
     --foreground: 200 20% 12%; /* Deep slate text */
@@ -114,6 +113,76 @@
     --radius: 0.75rem; /* Increased for modern look */
   }
 
+  /* Default theme explicit class */
+  .theme-default {
+    /* Base surfaces - Warm neutrals */
+    --background: 45 23% 97%; /* Warm off-white */
+    --foreground: 200 20% 12%; /* Deep slate text */
+    
+    /* Primary gradient system - Emerald to Teal */
+    --primary: 168 76% 42%; /* Deep emerald (#059669) */
+    --primary-glow: 187 85% 53%; /* Warm teal (#14B8A6) */
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 168 76% 48%;
+    
+    /* Glassmorphism surfaces */
+    --glass: 45 23% 99% / 0.8; /* Warm semi-transparent white */
+    --glass-border: 168 25% 95% / 0.2; /* Subtle sage border */
+    --glass-shadow: 200 15% 15% / 0.08; /* Soft slate shadow */
+    
+    /* Sidebar glassmorphism */
+    --sidebar-bg: 45 23% 97% / 0.95; /* Warm frosted glass */
+    --sidebar-border: 168 15% 92% / 0.3;
+    --sidebar-text: 200 15% 45%; /* Muted slate */
+    --sidebar-text-active: 200 20% 12%; /* Deep slate */
+    --sidebar-hover: 168 25% 95% / 0.7; /* Sage hover */
+    --sidebar-accent: 168 76% 42% / 0.08; /* Emerald glow */
+    
+    /* Card system with elevation */
+    --card: 45 23% 99%; /* Warm white cards */
+    --card-foreground: 200 20% 12%; /* Deep slate text */
+    --card-border: 168 15% 92% / 0.3; /* Sage border */
+    --card-shadow: 200 15% 15% / 0.04; /* Elegant slate shadow */
+    --card-hover: 168 76% 42% / 0.02; /* Subtle emerald tint */
+    
+    /* Popover system with opaque backgrounds */
+    --popover: 45 23% 98%; /* Slightly darker than background for opacity */
+    --popover-foreground: 200 20% 12%; /* Deep slate text */
+    
+    /* Accent system */
+    --accent: 168 50% 96%; /* Very light sage */
+    --accent-foreground: 168 76% 25%; /* Deep emerald text */
+    --accent-glow: 168 76% 42% / 0.12; /* Emerald glow */
+    
+    /* Secondary surfaces */
+    --secondary: 168 25% 94%; /* Light sage */
+    --secondary-foreground: 200 15% 40%; /* Muted slate */
+    
+    /* Muted elements */
+    --muted: 168 25% 94%; /* Light sage */
+    --muted-foreground: 200 15% 40%; /* Muted slate */
+    
+    /* Form elements */
+    --border: 168 15% 88%; /* Sage border */
+    --input: 45 23% 99%; /* Warm white input */
+    --input-border: 168 15% 88%; /* Sage input border */
+    --ring: 168 76% 42%; /* Emerald focus ring */
+    
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    --gradient-card: linear-gradient(145deg, hsl(var(--card)), hsl(var(--card)) 50%, hsl(168 15% 92% / 0.3));
+    --gradient-glass: linear-gradient(145deg, hsl(var(--glass)), hsl(45 23% 99% / 0.6));
+    --gradient-sidebar: linear-gradient(180deg, hsl(var(--sidebar-bg)), hsl(45 23% 95% / 0.9));
+    
+    /* Shadows with color */
+    --shadow-sm: 0 1px 2px 0 hsl(var(--glass-shadow));
+    --shadow-md: 0 4px 6px -1px hsl(var(--glass-shadow)), 0 2px 4px -2px hsl(var(--glass-shadow));
+    --shadow-lg: 0 10px 15px -3px hsl(var(--glass-shadow)), 0 4px 6px -4px hsl(var(--glass-shadow));
+    --shadow-xl: 0 20px 25px -5px hsl(var(--glass-shadow)), 0 8px 10px -6px hsl(var(--glass-shadow));
+    --shadow-glow: 0 0 0 1px hsl(var(--primary) / 0.05), 0 0 20px hsl(var(--primary) / 0.1);
+  }
+
+  .theme-default.dark,
   .dark {
     /* Dark theme with modern glassmorphism */
     --background: 200 25% 8%; /* Deep slate background */

@@ -65,24 +65,21 @@ export const applyColorScheme = (scheme: ColorScheme) => {
     return;
   }
   
-  // Add transition class for smooth changes
-  root.classList.add('theme-transition');
-  
-  // Remove ALL existing theme classes
+  // Remove ALL existing theme classes first
   Object.keys(THEMES).forEach(themeId => {
     root.classList.remove(`theme-${themeId}`);
   });
+  
+  // Force immediate reflow
+  root.offsetHeight;
   
   // Add new theme class
   root.classList.add(`theme-${scheme}`);
   console.log('✅ Applied theme class:', `theme-${scheme}`);
   
-  // Force style recalculation immediately
-  const forceStyleUpdate = () => {
-    // Force reflow by accessing a layout property
-    root.offsetHeight;
-    
-    // Get computed styles to validate application
+  // Force style recalculation with multiple approaches
+  const validateAndUpdate = () => {
+    // Force immediate style recalculation
     const computedStyle = window.getComputedStyle(root);
     const primaryColor = computedStyle.getPropertyValue('--primary').trim();
     const backgroundColor = computedStyle.getPropertyValue('--background').trim();
@@ -90,57 +87,32 @@ export const applyColorScheme = (scheme: ColorScheme) => {
     console.log('🔍 Applied CSS variables:');
     console.log('  --primary:', primaryColor);
     console.log('  --background:', backgroundColor);
+    console.log('  Current theme classes:', root.className);
     
-    // Validate successful application
-    if (primaryColor && primaryColor !== 'initial' && primaryColor !== 'inherit') {
-      console.log('✅ Theme applied successfully');
-      
-      // Dispatch success event
-      const event = new CustomEvent('themeChanged', { 
-        detail: { 
-          scheme, 
-          colors: theme.colors,
-          success: true 
-        } 
-      });
-      document.dispatchEvent(event);
-    } else {
-      console.warn('⚠️ Theme may not have applied correctly, retrying...');
-      
-      // Force another update cycle
-      setTimeout(() => {
-        root.classList.remove(`theme-${scheme}`);
-        root.offsetHeight; // Force reflow
-        root.classList.add(`theme-${scheme}`);
-        
-        // Check again
-        const retryPrimary = window.getComputedStyle(root).getPropertyValue('--primary').trim();
-        console.log('🔄 After retry --primary:', retryPrimary);
-        
-        if (retryPrimary && retryPrimary !== 'initial') {
-          console.log('✅ Theme applied after retry');
-          const retryEvent = new CustomEvent('themeChanged', { 
-            detail: { 
-              scheme, 
-              colors: theme.colors,
-              success: true 
-            } 
-          });
-          document.dispatchEvent(retryEvent);
-        }
-      }, 100);
-    }
+    // Trigger reflow on body to ensure cascade update
+    document.body.style.display = 'none';
+    document.body.offsetHeight; // Force reflow
+    document.body.style.display = '';
+    
+    // Dispatch success event
+    const event = new CustomEvent('themeChanged', { 
+      detail: { 
+        scheme, 
+        colors: theme.colors,
+        success: true,
+        appliedClasses: root.className
+      } 
+    });
+    document.dispatchEvent(event);
+    
+    console.log('✅ Theme applied successfully');
   };
   
-  // Apply immediately and also on next frame
-  forceStyleUpdate();
-  requestAnimationFrame(forceStyleUpdate);
+  // Apply immediately and on next frames
+  validateAndUpdate();
+  requestAnimationFrame(validateAndUpdate);
+  setTimeout(validateAndUpdate, 50);
   
   // Store in localStorage
   localStorage.setItem('color-scheme', scheme);
-  
-  // Remove transition class after animation completes
-  setTimeout(() => {
-    root.classList.remove('theme-transition');
-  }, 300);
 };
