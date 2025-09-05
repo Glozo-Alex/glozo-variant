@@ -108,21 +108,68 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
   };
 
   const deleteProject = async (projectId: string) => {
-    const { error } = await supabase
-      .from('projects')
-      .delete()
-      .eq('id', projectId);
+    try {
+      // Delete all related data first
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
 
-    if (error) {
-      console.error('Failed to delete project in Supabase:', error);
-      throw new Error('Failed to delete project');
+      // Delete candidate details for this project
+      await supabase
+        .from('candidate_details')
+        .delete()
+        .eq('project_id', projectId)
+        .eq('user_id', user.id);
+
+      // Delete project shortlist entries
+      await supabase
+        .from('project_shortlist')
+        .delete()
+        .eq('project_id', projectId)
+        .eq('user_id', user.id);
+
+      // Delete search results
+      const { data: searches } = await supabase
+        .from('searches')
+        .select('id')
+        .eq('project_id', projectId)
+        .eq('user_id', user.id);
+
+      if (searches?.length) {
+        for (const search of searches) {
+          await supabase
+            .from('search_results')
+            .delete()
+            .eq('search_id', search.id);
+        }
+      }
+
+      // Delete searches
+      await supabase
+        .from('searches')
+        .delete()
+        .eq('project_id', projectId)
+        .eq('user_id', user.id);
+
+      // Finally delete the project
+      const { error } = await supabase
+        .from('projects')
+        .delete()
+        .eq('id', projectId);
+
+      if (error) {
+        console.error('Failed to delete project in Supabase:', error);
+        throw new Error('Failed to delete project');
+      }
+
+      if (activeProject?.id === projectId) {
+        setActiveProjectState(null);
+      }
+
+      await reloadProjects();
+    } catch (error) {
+      console.error('Error deleting project:', error);
+      throw error;
     }
-
-    if (activeProject?.id === projectId) {
-      setActiveProjectState(null);
-    }
-
-    await reloadProjects();
   };
 
   const updateProject = async (projectId: string, updates: Partial<Pick<Project, 'name' | 'query'>>) => {
