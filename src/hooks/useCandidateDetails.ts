@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getCandidateDetails, type CandidateDetail } from '@/services/candidateDetails';
+import { getCandidateDetails, getCachedCandidateDetails, type CandidateDetail } from '@/services/candidateDetails';
 
 interface UseCandidateDetailsParams {
   candidateId: number | null;
@@ -34,8 +34,23 @@ export function useCandidateDetails({
     setError(null);
 
     try {
-      console.log('useCandidateDetails - Calling getCandidateDetails...');
-      
+      console.log('useCandidateDetails - Checking cache via getCachedCandidateDetails...');
+      const cachedMap = await getCachedCandidateDetails([candidateId], projectId);
+      const cachedDetail = cachedMap?.[candidateId];
+
+      if (cachedDetail) {
+        console.log('useCandidateDetails - Using cached details, skipping API call:', {
+          candidateId,
+          name: cachedDetail.name,
+          hasEmployments: !!cachedDetail.employments?.length,
+          hasEducations: !!cachedDetail.educations?.length,
+          hasBio: !!cachedDetail.bio
+        });
+        setCandidateDetail(cachedDetail);
+        return; // finally block will still run
+      }
+
+      console.log('useCandidateDetails - No cache found, calling getCandidateDetails...');
       const response = await getCandidateDetails({
         candidateIds: [candidateId],
         projectId,
@@ -51,7 +66,7 @@ export function useCandidateDetails({
 
       const detail = response.details[candidateId];
       if (detail) {
-        console.log('useCandidateDetails - Detail found:', {
+        console.log('useCandidateDetails - Detail found (from API):', {
           candidateId,
           name: detail.name,
           hasEmployments: !!detail.employments?.length,
