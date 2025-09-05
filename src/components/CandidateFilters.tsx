@@ -7,7 +7,7 @@ import { useState } from "react";
 
 interface FilterGroup {
   name: string;
-  values: Array<{ value: string; count: number }>;
+  values: Array<{ value: string; count: number } | string | any>;
 }
 
 interface CandidateFiltersProps {
@@ -104,7 +104,7 @@ const CandidateFilters = ({ availableFilters, selectedFilters, onFiltersChange }
       {/* Dropdown panel with proper positioning */}
       {isOpen && (
         <div 
-          className="absolute top-full left-0 mt-2 w-80 bg-background border rounded-lg shadow-lg z-50 p-4" 
+          className="absolute top-full left-0 mt-2 w-80 bg-background/95 backdrop-blur-sm border rounded-lg shadow-xl z-[9999] p-4" 
           onClick={(e) => e.stopPropagation()}
         >
           <div className="space-y-4">
@@ -149,14 +149,27 @@ const CandidateFilters = ({ availableFilters, selectedFilters, onFiltersChange }
                       let value = '';
                       let count = 0;
                       
-                       // Handle different data structures
-                       if (typeof item === 'object' && item !== null) {
-                         value = String(item.value || (item as any).name || (item as any).label || '');
-                         count = Number(item.count || 0);
-                       } else {
-                         value = String(item || '');
-                         count = 0;
-                       }
+                      // Handle different data structures
+                      if (typeof item === 'string') {
+                        value = item;
+                        count = 0;
+                      } else if (typeof item === 'object' && item !== null) {
+                        // Handle various object structures with safe property access
+                        const obj = item as any;
+                        value = obj.value || obj.name || obj.label || obj.title || '';
+                        count = Number(obj.count || obj.frequency || obj.total || 0);
+                        
+                        // If value is still an object, try to stringify it properly
+                        if (typeof value === 'object') {
+                          value = JSON.stringify(value);
+                        }
+                      } else {
+                        value = String(item || '');
+                        count = 0;
+                      }
+                      
+                      // Ensure value is a string
+                      value = String(value).trim();
                       
                       // Skip empty values
                       if (!value.trim()) {

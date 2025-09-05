@@ -58,19 +58,24 @@ export const applyColorScheme = (scheme: ColorScheme) => {
   const root = document.documentElement;
   const theme = THEMES[scheme];
   
+  console.log('🎨 Applying color scheme:', scheme, theme);
+  
   // Add transition class for smooth changes
   root.classList.add('theme-transition');
   
   // Remove existing theme classes
   Object.keys(THEMES).forEach(themeId => {
     root.classList.remove(`theme-${themeId}`);
+    console.log('🗑️ Removed theme class:', `theme-${themeId}`);
   });
   
   // Add new theme class
   root.classList.add(`theme-${scheme}`);
+  console.log('✅ Applied theme class:', `theme-${scheme}`);
   
-  // Force style recalculation
-  window.getComputedStyle(root).getPropertyValue('--primary');
+  // Force style recalculation and check if CSS variables are applied
+  const primaryColor = window.getComputedStyle(root).getPropertyValue('--primary');
+  console.log('🔍 Current --primary color:', primaryColor);
   
   // Store in localStorage
   localStorage.setItem('color-scheme', scheme);
