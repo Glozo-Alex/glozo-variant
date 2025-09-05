@@ -45,7 +45,7 @@ export function CandidateProfile({ children, candidateData, socialLinks = [], pr
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       {React.cloneElement(children as React.ReactElement, { onClick: () => setOpen(true) })}
-      <SheetContent className="w-full sm:max-w-2xl overflow-y-auto">
+      <SheetContent className="w-full sm:max-w-4xl overflow-y-auto">
         <ErrorBoundary>
           <SheetHeader className="space-y-4">
             <div className="flex items-center space-x-4">

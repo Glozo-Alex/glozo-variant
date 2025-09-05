@@ -50,12 +50,17 @@ export function SkillsSection({ skills }: SkillsSectionProps) {
               <h4 className="text-sm font-medium text-muted-foreground">{cluster}</h4>
               <div className="flex flex-wrap gap-2">
                 {clusterSkills.slice(0, 10).map((skill, index) => ( // Limit skills per cluster
-                  <Badge key={index} variant="secondary">
+                  <Badge 
+                    key={index} 
+                    variant="secondary"
+                    className="animate-fade-in hover-scale transition-all duration-200 hover:shadow-sm"
+                    style={{ animationDelay: `${index * 50}ms` }}
+                  >
                     {skill}
                   </Badge>
                 ))}
                 {clusterSkills.length > 10 && (
-                  <Badge variant="outline">
+                  <Badge variant="outline" className="hover-scale transition-all duration-200">
                     +{clusterSkills.length - 10} more
                   </Badge>
                 )}

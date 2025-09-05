@@ -1,6 +1,6 @@
-import { MapPin, Briefcase, DollarSign, Target, Award } from 'lucide-react';
-import { Separator } from '@/components/ui/separator';
-import { CandidateDetail } from '@/services/candidateDetails';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { SummarySection } from './SummarySection';
+import { BasicInfoSection } from './BasicInfoSection';
 import { ContactSection } from './ContactSection';
 import { SocialLinksSection } from './SocialLinksSection';
 import { EmploymentSection } from './EmploymentSection';
@@ -29,91 +29,57 @@ export function CandidateProfileContent({ displayData, socialLinks }: CandidateP
   }
 
   return (
-    <div className="space-y-6">
-      {/* Basic Information - Always visible */}
-      <ErrorBoundary>
-        <div className="space-y-3">
-          <h3 className="text-lg font-semibold">Basic Information</h3>
-          <div className="grid grid-cols-1 gap-3 text-sm">
-            <div className="flex items-center gap-2">
-              <MapPin className="h-4 w-4 text-muted-foreground" />
-              <span>{displayData.location || 'Location not specified'}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Briefcase className="h-4 w-4 text-muted-foreground" />
-              <span>{displayData.years_of_experience || displayData.average_years_of_experience || 'Experience not specified'}</span>
-            </div>
-            {displayData.salary && (
-              <div className="flex items-center gap-2">
-                <DollarSign className="h-4 w-4 text-muted-foreground" />
-                <span>Salary: {displayData.salary}</span>
-              </div>
-            )}
-            {displayData.seniority_level && (
-              <div className="flex items-center gap-2">
-                <Target className="h-4 w-4 text-muted-foreground" />
-                <span>Seniority: {displayData.seniority_level}</span>
-              </div>
-            )}
-            {displayData.standout && (
-              <div className="flex items-center gap-2">
-                <Award className="h-4 w-4 text-muted-foreground" />
-                <span>Standout: {displayData.standout}</span>
-              </div>
-            )}
-            {displayData.domain && (
-              <div className="flex items-center gap-2">
-                <span>Domain: {displayData.domain}</span>
-              </div>
-            )}
-          </div>
-        </div>
-      </ErrorBoundary>
+    <Tabs defaultValue="summary" className="w-full">
+      <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6 mb-6">
+        <TabsTrigger value="summary">Summary</TabsTrigger>
+        <TabsTrigger value="basic">Basic Info</TabsTrigger>
+        <TabsTrigger value="employment">Employment</TabsTrigger>
+        <TabsTrigger value="education">Education</TabsTrigger>
+        <TabsTrigger value="projects">Projects</TabsTrigger>
+        <TabsTrigger value="skills">Skills</TabsTrigger>
+      </TabsList>
 
-      <Separator />
-
-      {/* Bio - Always visible if available */}
-      {displayData.bio && (
+      <TabsContent value="summary" className="space-y-4">
         <ErrorBoundary>
-          <div className="space-y-3">
-            <h3 className="text-lg font-semibold">Bio</h3>
-            <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
-              {displayData.bio}
-            </p>
-          </div>
-          <Separator />
+          <SummarySection displayData={displayData} />
         </ErrorBoundary>
-      )}
+      </TabsContent>
 
-      {/* Contact Information */}
-      <ErrorBoundary>
-        <ContactSection contacts={displayData.contacts} />
-      </ErrorBoundary>
+      <TabsContent value="basic" className="space-y-4">
+        <ErrorBoundary>
+          <BasicInfoSection displayData={displayData} />
+        </ErrorBoundary>
+        <ErrorBoundary>
+          <ContactSection contacts={displayData.contacts} />
+        </ErrorBoundary>
+        <ErrorBoundary>
+          <SocialLinksSection socialLinks={socialLinks} />
+        </ErrorBoundary>
+      </TabsContent>
 
-      {/* Social Links */}
-      <ErrorBoundary>
-        <SocialLinksSection socialLinks={socialLinks} />
-      </ErrorBoundary>
+      <TabsContent value="employment" className="space-y-4">
+        <ErrorBoundary>
+          <EmploymentSection employments={displayData.employments} />
+        </ErrorBoundary>
+      </TabsContent>
 
-      {/* Employment History */}
-      <ErrorBoundary>
-        <EmploymentSection employments={displayData.employments} />
-      </ErrorBoundary>
+      <TabsContent value="education" className="space-y-4">
+        <ErrorBoundary>
+          <EducationSection educations={displayData.educations} />
+        </ErrorBoundary>
+      </TabsContent>
 
-      {/* Education */}
-      <ErrorBoundary>
-        <EducationSection educations={displayData.educations} />
-      </ErrorBoundary>
+      <TabsContent value="projects" className="space-y-4">
+        <ErrorBoundary>
+          <ProjectsSection projects={displayData.projects} />
+        </ErrorBoundary>
+      </TabsContent>
 
-      {/* Projects */}
-      <ErrorBoundary>
-        <ProjectsSection projects={displayData.projects} />
-      </ErrorBoundary>
-
-      {/* Skills */}
-      <ErrorBoundary>
-        <SkillsSection skills={displayData.skills} />
-      </ErrorBoundary>
-    </div>
+      <TabsContent value="skills" className="space-y-4">
+        <ErrorBoundary>
+          <SkillsSection skills={displayData.skills} />
+        </ErrorBoundary>
+      </TabsContent>
+    </Tabs>
   );
 }
