@@ -101,12 +101,18 @@ const CandidateFilters = ({ availableFilters, selectedFilters, onFiltersChange }
         </Button>
       </div>
 
-      {/* Dropdown panel with proper positioning */}
+      {/* Dropdown panel with fixed positioning to avoid chat overlap */}
       {isOpen && (
-        <div 
-          className="absolute top-full left-0 mt-2 w-80 bg-background/95 backdrop-blur-sm border rounded-lg shadow-xl z-[9999] p-4" 
-          onClick={(e) => e.stopPropagation()}
-        >
+        <>
+          {/* Overlay to close dropdown when clicking outside */}
+          <div 
+            className="fixed inset-0 z-[99998]" 
+            onClick={() => setIsOpen(false)}
+          />
+          <div 
+            className="fixed top-20 left-4 w-80 bg-background border rounded-lg shadow-2xl z-[99999] p-4 max-h-[70vh] overflow-y-auto" 
+            onClick={(e) => e.stopPropagation()}
+          >
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="font-semibold text-foreground">Filters</h3>
@@ -123,7 +129,9 @@ const CandidateFilters = ({ availableFilters, selectedFilters, onFiltersChange }
             </div>
             
             {Object.entries(safeAvailableFilters).map(([category, filterGroup]) => {
-              console.log('🔍 Rendering filter group:', category, 'data:', JSON.stringify(filterGroup, null, 2));
+              console.log('🔍 Rendering filter group:', category);
+              console.log('📊 Filter group data:', filterGroup);
+              console.log('📋 Filter group values:', filterGroup?.values);
               
               if (!filterGroup || !filterGroup.values || !Array.isArray(filterGroup.values)) {
                 console.warn('❌ Invalid filter group structure for category:', category, filterGroup);
@@ -137,11 +145,11 @@ const CandidateFilters = ({ availableFilters, selectedFilters, onFiltersChange }
                   </h4>
                   <div className="space-y-2 max-h-32 overflow-y-auto">
                     {filterGroup.values.map((item, index) => {
-                      console.log('🔍 Rendering filter item:', item);
+                      console.log(`🔍 Processing filter item [${index}]:`, typeof item, item);
                       
                       // Ensure we have a valid structure
-                      if (!item || typeof item !== 'object') {
-                        console.warn('❌ Invalid filter item:', item);
+                      if (item === null || item === undefined) {
+                        console.warn('❌ Null/undefined filter item at index:', index);
                         return null;
                       }
                       
@@ -210,6 +218,7 @@ const CandidateFilters = ({ availableFilters, selectedFilters, onFiltersChange }
             )}
           </div>
         </div>
+        </>
       )}
     </div>
   );
