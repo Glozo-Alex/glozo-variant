@@ -45,6 +45,13 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
     if (savedActiveProjectId) {
       const activeProj = mapped.find(p => p.id === savedActiveProjectId) || null;
       setActiveProjectState(activeProj);
+      
+      // Clear localStorage if project no longer exists in DB
+      if (!activeProj) {
+        localStorage.removeItem('activeProjectId');
+      }
+    } else {
+      setActiveProjectState(null);
     }
   };
 
@@ -154,7 +161,8 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
       const { error } = await supabase
         .from('projects')
         .delete()
-        .eq('id', projectId);
+        .eq('id', projectId)
+        .eq('user_id', user.id);
 
       if (error) {
         console.error('Failed to delete project in Supabase:', error);
@@ -173,10 +181,16 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
   };
 
   const updateProject = async (projectId: string, updates: Partial<Pick<Project, 'name' | 'query'>>) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      throw new Error('User not authenticated');
+    }
+
     const { error } = await supabase
       .from('projects')
       .update({ ...updates })
-      .eq('id', projectId);
+      .eq('id', projectId)
+      .eq('user_id', user.id);
 
     if (error) {
       console.error('Failed to update project in Supabase:', error);
@@ -184,11 +198,6 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
 
     await reloadProjects();
-
-    // Update active project if it's the one being updated
-    if (activeProject?.id === projectId) {
-      setActiveProjectState(prev => prev ? { ...prev, ...updates, updatedAt: new Date() } : null);
-    }
   };
 
   const duplicateProject = async (projectId: string): Promise<Project> => {
