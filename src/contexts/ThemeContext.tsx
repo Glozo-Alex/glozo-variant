@@ -89,7 +89,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
       lastEventTime = now;
       
       const { scheme } = event.detail;
-      toast.success(`Цветовая схема изменена на ${scheme}`, {
+      toast.success(`Color scheme changed to ${scheme}`, {
         duration: 2000,
       });
     };
