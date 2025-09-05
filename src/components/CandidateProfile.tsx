@@ -171,17 +171,14 @@ export function CandidateProfile({ children, candidateData, socialLinks = [], pr
             </div>
           )}
 
-          {/* Content - Only show when not loading */}
-          {!loading && (
-            <>
-              {/* Basic Information */}
-              <div className="space-y-3">
-                <h3 className="text-lg font-semibold">Basic Information</h3>
-                <div className="grid grid-cols-1 gap-3 text-sm">
-                  <div className="flex items-center gap-2">
-                    <MapPin className="h-4 w-4 text-muted-foreground" />
-                    <span>{displayData.location || 'Location not specified'}</span>
-                  </div>
+          {/* Basic Information - Always visible */}
+          <div className="space-y-3">
+            <h3 className="text-lg font-semibold">Basic Information</h3>
+            <div className="grid grid-cols-1 gap-3 text-sm">
+              <div className="flex items-center gap-2">
+                <MapPin className="h-4 w-4 text-muted-foreground" />
+                <span>{displayData.location || 'Location not specified'}</span>
+              </div>
                   <div className="flex items-center gap-2">
                     <Briefcase className="h-4 w-4 text-muted-foreground" />
                     <span>{displayData.years_of_experience || displayData.average_years_of_experience || 'Experience not specified'}</span>
@@ -210,23 +207,27 @@ export function CandidateProfile({ children, candidateData, socialLinks = [], pr
                       <span>Domain: {displayData.domain}</span>
                     </div>
                   )}
-                </div>
+            </div>
+          </div>
+
+          <Separator />
+
+          {/* Bio - Always visible if available */}
+          {displayData.bio && (
+            <>
+              <div className="space-y-3">
+                <h3 className="text-lg font-semibold">Bio</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
+                  {displayData.bio}
+                </p>
               </div>
-
               <Separator />
+            </>
+          )}
 
-              {/* Bio */}
-              {displayData.bio && (
-                <>
-                  <div className="space-y-3">
-                    <h3 className="text-lg font-semibold">Bio</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
-                      {displayData.bio}
-                    </p>
-                  </div>
-                  <Separator />
-                </>
-              )}
+          {/* Detailed sections - Show only when not loading */}
+          {!loading && (
+            <>
 
               {/* Contact Information */}
               {displayData.contacts && (displayData.contacts.emails?.length > 0 || displayData.contacts.phones?.length > 0) && (
