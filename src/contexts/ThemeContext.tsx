@@ -75,11 +75,21 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     return () => clearTimeout(timer);
   }, [resolvedTheme, colorScheme, isInitialized]);
 
-  // Listen for theme change events to show feedback (only once)
+  // Listen for theme change events to show feedback (prevent duplicates)
   useEffect(() => {
+    let lastEventTime = 0;
+    
     const handleThemeChanged = (event: CustomEvent) => {
+      const now = Date.now();
+      // Prevent duplicate events within 1 second
+      if (now - lastEventTime < 1000) {
+        console.log('🚫 Duplicate theme event blocked');
+        return;
+      }
+      lastEventTime = now;
+      
       const { scheme } = event.detail;
-      toast.success(`Color scheme changed to ${scheme}`, {
+      toast.success(`Цветовая схема изменена на ${scheme}`, {
         duration: 2000,
       });
     };

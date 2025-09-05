@@ -65,67 +65,30 @@ export const applyColorScheme = (scheme: ColorScheme) => {
     return;
   }
   
-  // Add temporary class to force style recalculation
-  root.classList.add('theme-transition');
-  
   // Remove ALL existing theme classes first
   Object.keys(THEMES).forEach(themeId => {
     root.classList.remove(`theme-${themeId}`);
   });
   
-  // Force immediate reflow by triggering layout calculation
+  // Force immediate reflow
   root.offsetHeight;
   
-  // Add new theme class to html element for maximum specificity
+  // Add new theme class
   root.classList.add(`theme-${scheme}`);
-  console.log('✅ Applied theme class to html:', `theme-${scheme}`);
   
-  // Single style update with verification
-  const forceStyleUpdate = () => {
-    // Force recalculation of all CSS variables
-    const allElements = document.querySelectorAll('*');
-    allElements.forEach(element => {
-      if (element instanceof HTMLElement) {
-        element.style.cssText = element.style.cssText;
-      }
-    });
-    
-    // Force document style recalculation
-    document.body.style.transform = 'translateZ(0)';
-    document.body.offsetHeight;
-    document.body.style.transform = '';
-    
-    // Verify variables are applied
-    const computedStyle = window.getComputedStyle(root);
-    const primaryColor = computedStyle.getPropertyValue('--primary').trim();
-    const backgroundColor = computedStyle.getPropertyValue('--background').trim();
-    
-    console.log('🔍 Current CSS variables after update:');
-    console.log('  --primary:', primaryColor);
-    console.log('  --background:', backgroundColor);
-    console.log('  HTML classes:', root.className);
-    
-    // Remove transition class
-    root.classList.remove('theme-transition');
-    
-    console.log('✅ Theme fully applied with forced updates');
-    return { primaryColor, backgroundColor };
-  };
+  // Force style recalculation immediately
+  document.body.style.display = 'none';
+  document.body.offsetHeight;
+  document.body.style.display = '';
   
-  // Apply immediately and get result
-  const result = forceStyleUpdate();
-  
-  // Single event dispatch after successful application
-  const event = new CustomEvent('themeChanged', { 
-    detail: { 
-      scheme, 
-      colors: theme.colors,
-      cssVariables: result,
-      success: true
-    } 
-  });
-  document.dispatchEvent(event);
+  console.log('✅ Applied theme class:', `theme-${scheme}`);
   
   // Store in localStorage
   localStorage.setItem('color-scheme', scheme);
+  
+  // Single event dispatch
+  const event = new CustomEvent('themeChanged', { 
+    detail: { scheme, colors: theme.colors, success: true } 
+  });
+  document.dispatchEvent(event);
 };
