@@ -101,16 +101,16 @@ const CandidateFilters = ({ availableFilters, selectedFilters, onFiltersChange }
         </Button>
       </div>
 
-      {/* Dropdown panel with fixed positioning to avoid chat overlap */}
+      {/* Dropdown panel positioned relative to button */}
       {isOpen && (
         <>
           {/* Overlay to close dropdown when clicking outside */}
           <div 
-            className="fixed inset-0 z-[99998]" 
+            className="fixed inset-0 z-[9998]" 
             onClick={() => setIsOpen(false)}
           />
           <div 
-            className="fixed top-20 left-4 w-80 bg-background border rounded-lg shadow-2xl z-[99999] p-4 max-h-[70vh] overflow-y-auto" 
+            className="absolute top-full right-0 mt-2 w-80 bg-background border rounded-lg shadow-2xl z-[9999] p-4 max-h-[70vh] overflow-y-auto" 
             onClick={(e) => e.stopPropagation()}
           >
           <div className="space-y-4">
@@ -164,20 +164,36 @@ const CandidateFilters = ({ availableFilters, selectedFilters, onFiltersChange }
                       } else if (typeof item === 'object' && item !== null) {
                         // Handle various object structures with safe property access
                         const obj = item as any;
-                        value = obj.value || obj.name || obj.label || obj.title || '';
-                        count = Number(obj.count || obj.frequency || obj.total || 0);
                         
-                        // If value is still an object, try to stringify it properly
-                        if (typeof value === 'object') {
-                          value = JSON.stringify(value);
+                        // First try standard properties
+                        if (obj.value) {
+                          value = String(obj.value);
+                        } else if (obj.name) {
+                          value = String(obj.name);
+                        } else if (obj.label) {
+                          value = String(obj.label);
+                        } else if (obj.title) {
+                          value = String(obj.title);
+                        } else {
+                          // If it's a plain object, use the first non-count property as value
+                          const keys = Object.keys(obj).filter(k => k !== 'count' && k !== 'frequency' && k !== 'total');
+                          if (keys.length > 0) {
+                            value = String(obj[keys[0]]);
+                          } else {
+                            value = JSON.stringify(obj);
+                          }
                         }
+                        
+                        count = Number(obj.count || obj.frequency || obj.total || 0);
                       } else {
                         value = String(item || '');
                         count = 0;
                       }
                       
-                      // Ensure value is a string
+                      // Ensure value is a string and clean it
                       value = String(value).trim();
+                      
+                      console.log(`📝 Extracted filter value: "${value}", count: ${count} from:`, item);
                       
                       // Skip empty values
                       if (!value.trim()) {
@@ -192,9 +208,10 @@ const CandidateFilters = ({ availableFilters, selectedFilters, onFiltersChange }
                           <Checkbox
                             id={key}
                             checked={selectedFilters[category]?.includes(value) || false}
-                            onCheckedChange={(checked) => 
-                              handleFilterToggle(category, value, checked as boolean)
-                            }
+                            onCheckedChange={(checked) => {
+                              console.log(`🔄 Filter toggle: ${category} -> ${value} -> ${checked}`);
+                              handleFilterToggle(category, value, checked as boolean);
+                            }}
                           />
                           <label 
                             htmlFor={key} 
