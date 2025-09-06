@@ -1590,6 +1590,8 @@
   .text-lg { font-size: 1.125rem; line-height: 1.75rem; } /* 18px */
 }
 
+}
+
 /* Theme transition class for smooth color changes */
 .theme-transition,
 .theme-transition *,
@@ -1745,4 +1747,3 @@
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
   }
-}
