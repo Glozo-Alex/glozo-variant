@@ -213,13 +213,13 @@ const Sidebar = () => {
               </>
             )}
           </NavLink>
-
-          {/* Color Scheme Selector */}
-          <ColorSchemeSelector collapsed={collapsed} />
         </nav>
 
         {/* Collapse button at bottom */}
         <div className="mt-auto p-4 space-y-3">
+          {/* Color Scheme Selector */}
+          <ColorSchemeSelector collapsed={collapsed} />
+          
           <button
             aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
             className="w-full h-10 rounded-lg bg-sidebar-hover text-sidebar-text hover:bg-sidebar-accent hover:text-sidebar-text-active flex items-center justify-center transition-all duration-300 hover-scale"

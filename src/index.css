@@ -250,9 +250,9 @@
     --accent-foreground: 217 91% 45%; /* Deep ocean text */
     --accent-glow: 217 91% 60% / 0.12; /* Ocean glow */
     
-    /* Same secondary as default */
-    --secondary: 168 25% 94%; /* Light sage */
-    --secondary-foreground: 200 15% 40%; /* Muted slate */
+    /* Ocean themed secondary */
+    --secondary: 217 91% 95%; /* Light ocean blue */
+    --secondary-foreground: 217 91% 35%; /* Dark ocean blue */
     
     /* Same muted as default */
     --muted: 168 25% 94%; /* Light sage */
@@ -350,9 +350,9 @@
     --accent-foreground: 210 20% 85%;
     --accent-glow: 217 91% 60% / 0.2; /* Ocean glow */
     
-    /* Same dark secondary as default */
-    --secondary: 220 13% 10%;
-    --secondary-foreground: 210 20% 85%;
+    /* Ocean dark themed secondary */
+    --secondary: 217 91% 15%; /* Dark ocean blue */
+    --secondary-foreground: 217 91% 80%; /* Light ocean blue */
     
     /* Same dark muted as default */
     --muted: 220 13% 10%;
@@ -444,9 +444,9 @@
     --accent-foreground: 347 77% 35%; /* Deep sunset text */
     --accent-glow: 347 77% 50% / 0.12; /* Sunset glow */
     
-    /* Same secondary as default */
-    --secondary: 168 25% 94%; /* Light sage */
-    --secondary-foreground: 200 15% 40%; /* Muted slate */
+    /* Sunset themed secondary */
+    --secondary: 347 77% 95%; /* Light sunset pink */
+    --secondary-foreground: 347 77% 35%; /* Dark sunset red */
     
     /* Same muted as default */
     --muted: 168 25% 94%; /* Light sage */
@@ -544,9 +544,9 @@
     --accent-foreground: 210 20% 85%;
     --accent-glow: 347 77% 50% / 0.2; /* Sunset glow */
     
-    /* Same dark secondary as default */
-    --secondary: 220 13% 10%;
-    --secondary-foreground: 210 20% 85%;
+    /* Sunset dark themed secondary */
+    --secondary: 347 77% 15%; /* Dark sunset red */
+    --secondary-foreground: 347 77% 80%; /* Light sunset pink */
     
     /* Same dark muted as default */
     --muted: 220 13% 10%;
@@ -638,9 +638,9 @@
     --accent-foreground: 142 71% 30%; /* Deep forest text */
     --accent-glow: 142 71% 45% / 0.12; /* Forest glow */
     
-    /* Same secondary as default */
-    --secondary: 168 25% 94%; /* Light sage */
-    --secondary-foreground: 200 15% 40%; /* Muted slate */
+    /* Forest themed secondary */
+    --secondary: 142 71% 95%; /* Light forest green */
+    --secondary-foreground: 142 71% 25%; /* Dark forest green */
     
     /* Same muted as default */
     --muted: 168 25% 94%; /* Light sage */
@@ -738,9 +738,9 @@
     --accent-foreground: 210 20% 85%;
     --accent-glow: 142 71% 45% / 0.2; /* Forest glow */
     
-    /* Same dark secondary as default */
-    --secondary: 220 13% 10%;
-    --secondary-foreground: 210 20% 85%;
+    /* Forest dark themed secondary */
+    --secondary: 142 71% 15%; /* Dark forest green */
+    --secondary-foreground: 142 71% 80%; /* Light forest green */
     
     /* Same dark muted as default */
     --muted: 220 13% 10%;
