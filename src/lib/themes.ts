@@ -119,6 +119,11 @@ export const applyColorScheme = (scheme: ColorScheme) => {
   
   // Force immediate style recalculation
   requestAnimationFrame(() => {
+    // Force recomputation by briefly removing and adding the class
+    root.classList.remove(`theme-${scheme}`);
+    root.offsetHeight; // Trigger reflow
+    root.classList.add(`theme-${scheme}`);
+    
     // Verify the theme was applied correctly
     const computedStyle = window.getComputedStyle(root);
     const primaryColor = computedStyle.getPropertyValue('--primary').trim();
