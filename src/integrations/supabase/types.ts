@@ -44,6 +44,159 @@ export type Database = {
         }
         Relationships: []
       }
+      email_logs: {
+        Row: {
+          candidate_id: string
+          clicked_at: string | null
+          content: string
+          created_at: string
+          error_message: string | null
+          id: string
+          opened_at: string | null
+          recipient_id: string
+          sent_at: string | null
+          sequence_id: string
+          status: string
+          subject: string
+          template_id: string
+          user_id: string
+        }
+        Insert: {
+          candidate_id: string
+          clicked_at?: string | null
+          content: string
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          opened_at?: string | null
+          recipient_id: string
+          sent_at?: string | null
+          sequence_id: string
+          status?: string
+          subject: string
+          template_id: string
+          user_id: string
+        }
+        Update: {
+          candidate_id?: string
+          clicked_at?: string | null
+          content?: string
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          opened_at?: string | null
+          recipient_id?: string
+          sent_at?: string | null
+          sequence_id?: string
+          status?: string
+          subject?: string
+          template_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_logs_recipient_id_fkey"
+            columns: ["recipient_id"]
+            isOneToOne: false
+            referencedRelation: "sequence_recipients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "email_logs_sequence_id_fkey"
+            columns: ["sequence_id"]
+            isOneToOne: false
+            referencedRelation: "email_sequences"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "email_logs_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "email_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      email_sequences: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      email_templates: {
+        Row: {
+          content: string
+          created_at: string
+          delay_days: number
+          delay_hours: number
+          id: string
+          name: string
+          order_index: number
+          sequence_id: string
+          subject: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          delay_days?: number
+          delay_hours?: number
+          id?: string
+          name: string
+          order_index?: number
+          sequence_id: string
+          subject: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          delay_days?: number
+          delay_hours?: number
+          id?: string
+          name?: string
+          order_index?: number
+          sequence_id?: string
+          subject?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_templates_sequence_id_fkey"
+            columns: ["sequence_id"]
+            isOneToOne: false
+            referencedRelation: "email_sequences"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -235,6 +388,60 @@ export type Database = {
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sequence_recipients: {
+        Row: {
+          candidate_id: string
+          completed_at: string | null
+          current_template_index: number
+          enrolled_at: string
+          id: string
+          next_send_at: string | null
+          project_id: string
+          sequence_id: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          candidate_id: string
+          completed_at?: string | null
+          current_template_index?: number
+          enrolled_at?: string
+          id?: string
+          next_send_at?: string | null
+          project_id: string
+          sequence_id: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          candidate_id?: string
+          completed_at?: string | null
+          current_template_index?: number
+          enrolled_at?: string
+          id?: string
+          next_send_at?: string | null
+          project_id?: string
+          sequence_id?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sequence_recipients_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sequence_recipients_sequence_id_fkey"
+            columns: ["sequence_id"]
+            isOneToOne: false
+            referencedRelation: "email_sequences"
             referencedColumns: ["id"]
           },
         ]

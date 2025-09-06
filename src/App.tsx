@@ -23,17 +23,20 @@ import Settings from "./pages/Settings";
 import Auth from "./pages/Auth";
 import Projects from "./pages/Projects";
 import TestCandidateDetails from "./pages/TestCandidateDetails";
+import EmailSequences from "./pages/EmailSequences";
+import { HelmetProvider } from "react-helmet-async";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <NextThemeProvider
-      attribute="class"
-      defaultTheme="system"
-      enableSystem
-      disableTransitionOnChange={false}
-    >
+    <HelmetProvider>
+      <NextThemeProvider
+        attribute="class"
+        defaultTheme="system"
+        enableSystem
+        disableTransitionOnChange={false}
+      >
       <AuthProvider>
         <ProjectProvider>
           <ThemeProvider>
@@ -91,6 +94,16 @@ const App = () => (
                        <Projects />
                      </Layout>
                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/email-sequences"
+                  element={
+                    <ProtectedRoute>
+                      <Layout>
+                        <EmailSequences />
+                      </Layout>
+                    </ProtectedRoute>
                   }
                 />
                 <Route
@@ -161,6 +174,7 @@ const App = () => (
         </ProjectProvider>
       </AuthProvider>
     </NextThemeProvider>
+    </HelmetProvider>
   </QueryClientProvider>
 );
 
