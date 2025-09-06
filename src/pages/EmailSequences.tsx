@@ -77,7 +77,7 @@ const EmailSequences: React.FC = () => {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [selectedTemplateId, setSelectedTemplateId] = useState<string>("");
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string>("scratch");
   const [editingSequence, setEditingSequence] = useState<EmailSequence | null>(null);
   const [deleteSequenceId, setDeleteSequenceId] = useState<string | null>(null);
 
@@ -95,14 +95,14 @@ const EmailSequences: React.FC = () => {
           name, 
           description: description || null, 
           is_active: false,
-          global_template_id: templateId || null
+          global_template_id: templateId && templateId !== "scratch" ? templateId : null
         }])
         .select("*")
         .single();
       if (error) throw error;
 
       // If a template is selected, copy its emails to the sequence
-      if (templateId) {
+      if (templateId && templateId !== "scratch") {
         const { data: templateEmails, error: templatesError } = await supabase
           .from("global_template_emails")
           .select("*")
@@ -140,7 +140,7 @@ const EmailSequences: React.FC = () => {
       setOpen(false);
       setName("");
       setDescription("");
-      setSelectedTemplateId("");
+      setSelectedTemplateId("scratch");
       queryClient.invalidateQueries({ queryKey: ["email_sequences"] });
     },
     onError: (err: any) => {
@@ -208,7 +208,7 @@ const EmailSequences: React.FC = () => {
     setEditingSequence(null);
     setName("");
     setDescription("");
-    setSelectedTemplateId("");
+    setSelectedTemplateId("scratch");
     setOpen(false);
   };
 
@@ -268,7 +268,7 @@ const EmailSequences: React.FC = () => {
                             <SelectValue placeholder="Choose a global template or create from scratch" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="">Create from scratch</SelectItem>
+                            <SelectItem value="scratch">Create from scratch</SelectItem>
                             {globalTemplates.map(template => (
                               <SelectItem key={template.id} value={template.id}>
                                 {template.name}
