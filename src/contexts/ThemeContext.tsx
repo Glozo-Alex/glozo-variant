@@ -38,6 +38,14 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
       
       console.log('🎯 Initializing color scheme:', initialScheme);
       setColorSchemeState(initialScheme);
+      
+      // Ensure default theme class is applied on initialization
+      const root = document.documentElement;
+      if (!root.classList.contains('theme-default') && !root.classList.contains('theme-ocean') && 
+          !root.classList.contains('theme-sunset') && !root.classList.contains('theme-forest')) {
+        root.classList.add('theme-default');
+      }
+      
       applyColorScheme(initialScheme);
       setIsLoading(false);
     };

@@ -5,8 +5,17 @@
 /* Modern SaaS Design System - Gradient & Glassmorphism */
 
 @layer base {
-  /* Light theme (default) - Emerald scheme */
-  :root,
+  /* Base system settings - non-color variables only */
+  :root {
+    /* Border radius */
+    --radius: 0.75rem; /* Increased for modern look */
+    
+    /* Transitions */
+    --transition-all: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Default theme (Emerald scheme) */
   .theme-default {
     /* Base surfaces - Warm neutrals */
     --background: 45 23% 97%; /* Warm off-white */
@@ -105,13 +114,6 @@
     --shadow-lg: 0 10px 15px -3px hsl(var(--glass-shadow)), 0 4px 6px -4px hsl(var(--glass-shadow));
     --shadow-xl: 0 20px 25px -5px hsl(var(--glass-shadow)), 0 8px 10px -6px hsl(var(--glass-shadow));
     --shadow-glow: 0 0 0 1px hsl(var(--primary) / 0.05), 0 0 20px hsl(var(--primary) / 0.1);
-    
-    /* Transitions */
-    --transition-all: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    
-    /* Border radius */
-    --radius: 0.75rem; /* Increased for modern look */
   }
 
   .dark {
