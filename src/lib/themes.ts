@@ -119,43 +119,49 @@ export const applyColorScheme = (scheme: ColorScheme) => {
   
   // Force immediate style recalculation
   requestAnimationFrame(() => {
-    // Force recomputation by briefly removing and adding the class
+    // Force CSS recalculation by temporarily removing all stylesheets and adding them back
+    const styleSheets = Array.from(document.styleSheets);
+    
+    // Force recomputation by briefly removing and adding the class multiple times
     root.classList.remove(`theme-${scheme}`);
     root.offsetHeight; // Trigger reflow
     root.classList.add(`theme-${scheme}`);
+    root.offsetHeight; // Trigger reflow again
     
-    // Verify the theme was applied correctly
-    const computedStyle = window.getComputedStyle(root);
-    const primaryColor = computedStyle.getPropertyValue('--primary').trim();
-    const backgroundColor = computedStyle.getPropertyValue('--background').trim();
-    
-    console.log('🎨 Theme applied:', theme.name);
-    console.log('  --primary:', primaryColor);
-    console.log('  --background:', backgroundColor);
-    console.log('  --secondary:', computedStyle.getPropertyValue('--secondary').trim());
-    console.log('  --secondary-foreground:', computedStyle.getPropertyValue('--secondary-foreground').trim());
-    console.log('  Classes on root:', Array.from(root.classList).filter(c => c.startsWith('theme-')));
-    
-    // Check if CSS rules exist for this theme
-    const sheets = Array.from(document.styleSheets);
-    const rules = sheets.flatMap(sheet => {
-      try {
-        return Array.from(sheet.cssRules || []);
-      } catch {
-        return [];
-      }
-    });
-    const themeRule = rules.find(rule => 
-      (rule as CSSStyleRule).selectorText && (rule as CSSStyleRule).selectorText.includes(`.theme-${scheme}`)
-    );
-    console.log('🔍 CSS rule found for theme:', !!themeRule, (themeRule as CSSStyleRule)?.selectorText);
-    
-    // Dispatch event to notify components
-    const event = new CustomEvent('themeChanged', { 
-      detail: { scheme, isDarkMode, colors: theme.colors } 
-    });
-    document.dispatchEvent(event);
-    console.log('📡 Dispatched themeChanged event');
+    // Wait for next frame for CSS to be applied
+    setTimeout(() => {
+      const computedStyle = window.getComputedStyle(root);
+      const primaryColor = computedStyle.getPropertyValue('--primary').trim();
+      const backgroundColor = computedStyle.getPropertyValue('--background').trim();
+      
+      console.log('🎨 Theme applied:', theme.name);
+      console.log('  --primary:', primaryColor);
+      console.log('  --background:', backgroundColor);
+      console.log('  --secondary:', computedStyle.getPropertyValue('--secondary').trim());
+      console.log('  --secondary-foreground:', computedStyle.getPropertyValue('--secondary-foreground').trim());
+      console.log('  Classes on root:', Array.from(root.classList).filter(c => c.startsWith('theme-')));
+      
+      // Check if CSS rules exist for this theme
+      const sheets = Array.from(document.styleSheets);
+      const rules = sheets.flatMap(sheet => {
+        try {
+          return Array.from(sheet.cssRules || []);
+        } catch {
+          return [];
+        }
+      });
+      const themeRule = rules.find(rule => 
+        (rule as CSSStyleRule).selectorText && (rule as CSSStyleRule).selectorText.includes(`.theme-${scheme}`)
+      );
+      console.log('🔍 CSS rule found for theme:', !!themeRule, (themeRule as CSSStyleRule)?.selectorText);
+      
+      // Dispatch event to notify components
+      const event = new CustomEvent('themeChanged', { 
+        detail: { scheme, isDarkMode, colors: theme.colors } 
+      });
+      document.dispatchEvent(event);
+      console.log('📡 Dispatched themeChanged event');
+    }, 50);
   });
   
   // Store in localStorage
