@@ -25,6 +25,8 @@ import Projects from "./pages/Projects";
 import TestCandidateDetails from "./pages/TestCandidateDetails";
 import EmailSequences from "./pages/EmailSequences";
 import EmailSequenceDetails from "./pages/EmailSequenceDetails";
+import GlobalTemplates from "./pages/GlobalTemplates";
+import GlobalTemplateBuilder from "./pages/GlobalTemplateBuilder";
 import { HelmetProvider } from "react-helmet-async";
 
 const queryClient = new QueryClient();
@@ -113,6 +115,36 @@ const App = () => (
                     <ProtectedRoute>
                       <Layout>
                         <EmailSequenceDetails />
+                      </Layout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/outreach/templates"
+                  element={
+                    <ProtectedRoute>
+                      <Layout>
+                        <GlobalTemplates />
+                      </Layout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/outreach/templates/new"
+                  element={
+                    <ProtectedRoute>
+                      <Layout>
+                        <GlobalTemplateBuilder />
+                      </Layout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/outreach/templates/:templateId"
+                  element={
+                    <ProtectedRoute>
+                      <Layout>
+                        <GlobalTemplateBuilder />
                       </Layout>
                     </ProtectedRoute>
                   }

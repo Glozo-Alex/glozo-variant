@@ -121,6 +121,7 @@ export type Database = {
         Row: {
           created_at: string
           description: string | null
+          global_template_id: string | null
           id: string
           is_active: boolean
           name: string
@@ -130,6 +131,7 @@ export type Database = {
         Insert: {
           created_at?: string
           description?: string | null
+          global_template_id?: string | null
           id?: string
           is_active?: boolean
           name: string
@@ -139,6 +141,7 @@ export type Database = {
         Update: {
           created_at?: string
           description?: string | null
+          global_template_id?: string | null
           id?: string
           is_active?: boolean
           name?: string
@@ -156,8 +159,11 @@ export type Database = {
           id: string
           name: string
           order_index: number
+          schedule_config: Json | null
+          schedule_type: string | null
           sequence_id: string
           subject: string
+          trigger_config: Json | null
           updated_at: string
           user_id: string
         }
@@ -169,8 +175,11 @@ export type Database = {
           id?: string
           name: string
           order_index?: number
+          schedule_config?: Json | null
+          schedule_type?: string | null
           sequence_id: string
           subject: string
+          trigger_config?: Json | null
           updated_at?: string
           user_id: string
         }
@@ -182,8 +191,11 @@ export type Database = {
           id?: string
           name?: string
           order_index?: number
+          schedule_config?: Json | null
+          schedule_type?: string | null
           sequence_id?: string
           subject?: string
+          trigger_config?: Json | null
           updated_at?: string
           user_id?: string
         }
@@ -196,6 +208,102 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      global_template_emails: {
+        Row: {
+          content: string
+          created_at: string
+          global_template_id: string
+          id: string
+          name: string
+          order_index: number
+          subject: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          global_template_id: string
+          id?: string
+          name: string
+          order_index?: number
+          subject: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          global_template_id?: string
+          id?: string
+          name?: string
+          order_index?: number
+          subject?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      global_template_schedules: {
+        Row: {
+          created_at: string
+          global_template_email_id: string
+          id: string
+          schedule_config: Json
+          schedule_type: string
+          trigger_config: Json | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          global_template_email_id: string
+          id?: string
+          schedule_config?: Json
+          schedule_type?: string
+          trigger_config?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          global_template_email_id?: string
+          id?: string
+          schedule_config?: Json
+          schedule_type?: string
+          trigger_config?: Json | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      global_templates: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_public: boolean
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_public?: boolean
+          name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_public?: boolean
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
