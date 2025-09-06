@@ -1288,6 +1288,7 @@
     --shadow-xl: 0 20px 25px -5px hsl(var(--glass-shadow)), 0 8px 10px -6px hsl(var(--glass-shadow));
     --shadow-glow: 0 0 0 1px hsl(var(--primary) / 0.08), 0 0 20px hsl(var(--primary) / 0.15);
   }
+  }
 }
 
 /* Theme transition class for smooth color changes */
