@@ -211,224 +211,584 @@
 
   /* Ocean Theme - Blue-Purple */
   .theme-ocean {
-    --background: 210 40% 98%;
-    --foreground: 220 13% 18%;
-    --card: 210 40% 98%;
-    --card-foreground: 220 13% 18%;
-    --popover: 210 40% 98%;
-    --popover-foreground: 220 13% 18%;
-    --primary: 217 91% 60%; /* #3b82f6 */
-    --primary-foreground: 210 40% 98%;
-    --primary-glow: 262 83% 58%; /* #8b5cf6 */
-    --primary-hover: 217 91% 55%;
-    --secondary: 188 94% 43%; /* #06b6d4 */
-    --secondary-foreground: 210 40% 98%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 13% 35%;
-    --accent: 210 40% 96%;
-    --accent-foreground: 217 91% 60%;
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214 32% 91%;
-    --input: 210 40% 98%;
-    --ring: 217 91% 60%;
-    --glass: 210 40% 98% / 0.8;
-    --glass-border: 214 32% 91% / 0.2;
-    --glass-shadow: 220 13% 18% / 0.08;
-    --sidebar-bg: 210 40% 98% / 0.95;
-    --sidebar-border: 214 32% 91% / 0.3;
-    --sidebar-text: 215 13% 35%;
-    --sidebar-text-active: 220 13% 18%;
-    --sidebar-hover: 214 32% 91% / 0.7;
-    --sidebar-accent: 217 91% 60% / 0.08;
+    /* Base surfaces - Same as default */
+    --background: 45 23% 97%; /* Warm off-white */
+    --foreground: 200 20% 12%; /* Deep slate text */
     
-    --gradient-primary: linear-gradient(135deg, hsl(217 91% 60%), hsl(262 83% 58%));
-    --gradient-card: linear-gradient(145deg, hsl(210 40% 98%), hsl(214 32% 91% / 0.3));
-    --gradient-glass: linear-gradient(145deg, hsl(210 40% 98% / 0.8), hsl(210 40% 96% / 0.6));
-    --gradient-sidebar: linear-gradient(180deg, hsl(210 40% 98% / 0.95), hsl(210 40% 96% / 0.9));
-    --shadow-glow: 0 0 0 1px hsl(217 91% 60% / 0.05), 0 0 20px hsl(217 91% 60% / 0.1);
+    /* Primary gradient system - Blue-Purple Ocean */
+    --primary: 217 91% 60%; /* #3b82f6 */
+    --primary-glow: 262 83% 58%; /* #8b5cf6 */
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 217 91% 55%;
+    
+    /* Same glassmorphism as default */
+    --glass: 45 23% 99% / 0.8; /* Warm semi-transparent white */
+    --glass-border: 168 25% 95% / 0.2; /* Subtle sage border */
+    --glass-shadow: 200 15% 15% / 0.08; /* Soft slate shadow */
+    
+    /* Same sidebar as default */
+    --sidebar-bg: 45 23% 97% / 0.95; /* Warm frosted glass */
+    --sidebar-border: 168 15% 92% / 0.3;
+    --sidebar-text: 200 15% 45%; /* Muted slate */
+    --sidebar-text-active: 200 20% 12%; /* Deep slate */
+    --sidebar-hover: 168 25% 95% / 0.7; /* Sage hover */
+    --sidebar-accent: 217 91% 60% / 0.08; /* Ocean glow */
+    
+    /* Same card system as default */
+    --card: 45 23% 99%; /* Warm white cards */
+    --card-foreground: 200 20% 12%; /* Deep slate text */
+    --card-border: 168 15% 92% / 0.3; /* Sage border */
+    --card-shadow: 200 15% 15% / 0.04; /* Elegant slate shadow */
+    --card-hover: 217 91% 60% / 0.02; /* Subtle ocean tint */
+    
+    /* Same popover as default */
+    --popover: 45 23% 98%; /* Slightly darker than background for opacity */
+    --popover-foreground: 200 20% 12%; /* Deep slate text */
+    
+    /* Accent system with ocean colors */
+    --accent: 168 50% 96%; /* Very light sage */
+    --accent-foreground: 217 91% 45%; /* Deep ocean text */
+    --accent-glow: 217 91% 60% / 0.12; /* Ocean glow */
+    
+    /* Same secondary as default */
+    --secondary: 168 25% 94%; /* Light sage */
+    --secondary-foreground: 200 15% 40%; /* Muted slate */
+    
+    /* Same muted as default */
+    --muted: 168 25% 94%; /* Light sage */
+    --muted-foreground: 200 15% 40%; /* Muted slate */
+    
+    /* Same status colors as default */
+    --success: 142 76% 36%;
+    --success-glow: 142 76% 36% / 0.2;
+    --success-foreground: 0 0% 100%;
+    
+    --warning: 38 92% 50%;
+    --warning-glow: 38 92% 50% / 0.2;
+    --warning-foreground: 0 0% 100%;
+    
+    --destructive: 0 84% 60%;
+    --destructive-glow: 0 84% 60% / 0.2;
+    --destructive-foreground: 0 0% 100%;
+    
+    /* Same match indicators as default */
+    --match-excellent: 142 76% 36%; /* Green for 90%+ */
+    --match-good: 45 93% 47%; /* Yellow for 70-89% */
+    --match-fair: 25 95% 53%; /* Orange for 50-69% */
+    --match-poor: 0 84% 60%; /* Red for <50% */
+    
+    /* Same tag system as default */
+    --tag-blue: 187 85% 92%; /* Teal light */
+    --tag-blue-text: 187 85% 35%; /* Teal dark */
+    --tag-blue-glow: 187 85% 53% / 0.1;
+    
+    --tag-purple: 168 50% 92%; /* Sage light */
+    --tag-purple-text: 168 76% 30%; /* Emerald dark */
+    --tag-purple-glow: 168 76% 42% / 0.1;
+    
+    --tag-green: 142 76% 92%; /* Green light */
+    --tag-green-text: 142 76% 28%; /* Green dark */
+    --tag-green-glow: 142 76% 36% / 0.1;
+    
+    /* Same form elements as default */
+    --border: 168 15% 88%; /* Sage border */
+    --input: 45 23% 99%; /* Warm white input */
+    --input-border: 168 15% 88%; /* Sage input border */
+    --ring: 217 91% 60%; /* Ocean focus ring */
+    
+    /* Gradients with ocean colors */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    --gradient-card: linear-gradient(145deg, hsl(var(--card)), hsl(var(--card)) 50%, hsl(168 15% 92% / 0.3));
+    --gradient-glass: linear-gradient(145deg, hsl(var(--glass)), hsl(45 23% 99% / 0.6));
+    --gradient-sidebar: linear-gradient(180deg, hsl(var(--sidebar-bg)), hsl(45 23% 95% / 0.9));
+    
+    /* Same shadows as default */
+    --shadow-sm: 0 1px 2px 0 hsl(var(--glass-shadow));
+    --shadow-md: 0 4px 6px -1px hsl(var(--glass-shadow)), 0 2px 4px -2px hsl(var(--glass-shadow));
+    --shadow-lg: 0 10px 15px -3px hsl(var(--glass-shadow)), 0 4px 6px -4px hsl(var(--glass-shadow));
+    --shadow-xl: 0 20px 25px -5px hsl(var(--glass-shadow)), 0 8px 10px -6px hsl(var(--glass-shadow));
+    --shadow-glow: 0 0 0 1px hsl(var(--primary) / 0.05), 0 0 20px hsl(var(--primary) / 0.1);
   }
 
   .theme-ocean.dark {
-    --background: 240 10% 3.9%;
-    --foreground: 210 40% 98%;
-    --card: 240 10% 3.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 217 91% 60%;
-    --primary-foreground: 210 40% 98%;
-    --primary-glow: 262 83% 58%;
+    /* Same dark theme base as default */
+    --background: 200 25% 8%; /* Deep slate background */
+    --foreground: 45 23% 96%; /* Warm near-white text */
+    
+    /* Primary system with ocean colors */
+    --primary: 217 91% 60%; /* Ocean blue */
+    --primary-glow: 262 83% 58%; /* Ocean purple */
+    --primary-foreground: 0 0% 100%;
     --primary-hover: 217 91% 65%;
-    --secondary: 188 94% 43%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 240 5% 26%;
-    --muted-foreground: 240 5% 65%;
-    --accent: 240 5% 26%;
-    --accent-foreground: 217 91% 60%;
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 240 5% 26%;
-    --input: 240 5% 26%;
-    --ring: 217 91% 60%;
-    --glass: 240 10% 3.9% / 0.95;
-    --glass-border: 210 40% 98% / 0.1;
+    
+    /* Same dark glassmorphism as default */
+    --glass: 224 71% 4% / 0.9;
+    --glass-border: 210 20% 98% / 0.1;
     --glass-shadow: 0 0% 0% / 0.3;
-    --sidebar-bg: 240 10% 3.9% / 0.95;
-    --sidebar-border: 240 5% 26% / 0.5;
-    --sidebar-text: 240 5% 65%;
-    --sidebar-text-active: 210 40% 98%;
-    --sidebar-hover: 240 5% 26% / 0.7;
-    --sidebar-accent: 217 91% 60% / 0.15;
-    --shadow-glow: 0 0 0 1px hsl(217 91% 60% / 0.05), 0 0 20px hsl(217 91% 60% / 0.1);
+    
+    /* Same dark sidebar as default */
+    --sidebar-bg: 224 71% 4% / 0.95;
+    --sidebar-border: 220 13% 18% / 0.5;
+    --sidebar-text: 215 16% 65%;
+    --sidebar-text-active: 210 20% 98%;
+    --sidebar-hover: 220 13% 18% / 0.7;
+    --sidebar-accent: 217 91% 60% / 0.15; /* Ocean accent */
+    
+    /* Same dark cards as default */
+    --card: 224 71% 6%;
+    --card-foreground: 210 20% 98%;
+    --card-border: 220 13% 18%;
+    --card-shadow: 0 0% 0% / 0.2;
+    --card-hover: 217 91% 60% / 0.05; /* Ocean tint */
+    
+    /* Same dark popover as default */
+    --popover: 224 71% 5%; /* Slightly darker than card for opacity */
+    --popover-foreground: 210 20% 98%; /* Light text */
+    
+    /* Same dark accents as default */
+    --accent: 224 71% 8%;
+    --accent-foreground: 210 20% 85%;
+    --accent-glow: 217 91% 60% / 0.2; /* Ocean glow */
+    
+    /* Same dark secondary as default */
+    --secondary: 220 13% 10%;
+    --secondary-foreground: 210 20% 85%;
+    
+    /* Same dark muted as default */
+    --muted: 220 13% 10%;
+    --muted-foreground: 215 16% 65%;
+    
+    /* Same enhanced status colors as default */
+    --success: 142 76% 50%;
+    --success-glow: 142 76% 50% / 0.3;
+    --success-foreground: 0 0% 100%;
+    
+    --warning: 38 92% 60%;
+    --warning-glow: 38 92% 60% / 0.3;
+    --warning-foreground: 0 0% 100%;
+    
+    --destructive: 0 84% 70%;
+    --destructive-glow: 0 84% 70% / 0.3;
+    --destructive-foreground: 0 0% 100%;
+    
+    /* Same dark match indicators as default */
+    --match-excellent: 142 76% 50%;
+    --match-good: 45 93% 60%;
+    --match-fair: 25 95% 65%;
+    --match-poor: 0 84% 70%;
+    
+    /* Same dark tag system as default */
+    --tag-blue: 217 91% 15%;
+    --tag-blue-text: 217 91% 80%;
+    --tag-blue-glow: 217 91% 60% / 0.15;
+    
+    --tag-purple: 262 83% 15%;
+    --tag-purple-text: 262 83% 80%;
+    --tag-purple-glow: 262 83% 65% / 0.15;
+    
+    --tag-green: 142 76% 15%;
+    --tag-green-text: 142 76% 80%;
+    --tag-green-glow: 142 76% 50% / 0.15;
+    
+    /* Same dark form elements as default */
+    --border: 220 13% 18%;
+    --input: 224 71% 6%;
+    --input-border: 220 13% 18%;
+    --ring: 217 91% 60%; /* Ocean focus ring */
+    
+    /* Same dark gradients as default */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    --gradient-card: linear-gradient(145deg, hsl(var(--card)), hsl(224 71% 8%));
+    --gradient-glass: linear-gradient(145deg, hsl(var(--glass)), hsl(224 71% 4% / 0.8));
+    --gradient-sidebar: linear-gradient(180deg, hsl(var(--sidebar-bg)), hsl(224 71% 3% / 0.9));
   }
 
   /* Sunset Theme - Orange-Pink */
   .theme-sunset {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
-    --primary: 347 77% 50%; /* #f43f5e */
-    --primary-foreground: 0 0% 98%;
-    --primary-glow: 330 81% 60%; /* #ec4899 */
-    --primary-hover: 347 77% 55%;
-    --secondary: 43 96% 56%; /* #f59e0b */
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 347 77% 50%;
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 100%;
-    --ring: 347 77% 50%;
-    --glass: 0 0% 100% / 0.8;
-    --glass-border: 0 0% 89.8% / 0.2;
-    --glass-shadow: 0 0% 3.9% / 0.08;
-    --sidebar-bg: 0 0% 100% / 0.95;
-    --sidebar-border: 0 0% 89.8% / 0.3;
-    --sidebar-text: 0 0% 45.1%;
-    --sidebar-text-active: 0 0% 3.9%;
-    --sidebar-hover: 0 0% 89.8% / 0.7;
-    --sidebar-accent: 347 77% 50% / 0.08;
+    /* Base surfaces - Same as default */
+    --background: 45 23% 97%; /* Warm off-white */
+    --foreground: 200 20% 12%; /* Deep slate text */
     
-    --gradient-primary: linear-gradient(135deg, hsl(347 77% 50%), hsl(330 81% 60%));
-    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(0 0% 96.1% / 0.3));
-    --gradient-glass: linear-gradient(145deg, hsl(0 0% 100% / 0.8), hsl(0 0% 96.1% / 0.6));
-    --gradient-sidebar: linear-gradient(180deg, hsl(0 0% 100% / 0.95), hsl(0 0% 96.1% / 0.9));
-    --shadow-glow: 0 0 0 1px hsl(347 77% 50% / 0.05), 0 0 20px hsl(347 77% 50% / 0.1);
+    /* Primary gradient system - Sunset colors */
+    --primary: 347 77% 50%; /* #f43f5e */
+    --primary-glow: 330 81% 60%; /* #ec4899 */
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 347 77% 55%;
+    
+    /* Same glassmorphism as default */
+    --glass: 45 23% 99% / 0.8; /* Warm semi-transparent white */
+    --glass-border: 168 25% 95% / 0.2; /* Subtle sage border */
+    --glass-shadow: 200 15% 15% / 0.08; /* Soft slate shadow */
+    
+    /* Same sidebar as default */
+    --sidebar-bg: 45 23% 97% / 0.95; /* Warm frosted glass */
+    --sidebar-border: 168 15% 92% / 0.3;
+    --sidebar-text: 200 15% 45%; /* Muted slate */
+    --sidebar-text-active: 200 20% 12%; /* Deep slate */
+    --sidebar-hover: 168 25% 95% / 0.7; /* Sage hover */
+    --sidebar-accent: 347 77% 50% / 0.08; /* Sunset glow */
+    
+    /* Same card system as default */
+    --card: 45 23% 99%; /* Warm white cards */
+    --card-foreground: 200 20% 12%; /* Deep slate text */
+    --card-border: 168 15% 92% / 0.3; /* Sage border */
+    --card-shadow: 200 15% 15% / 0.04; /* Elegant slate shadow */
+    --card-hover: 347 77% 50% / 0.02; /* Subtle sunset tint */
+    
+    /* Same popover as default */
+    --popover: 45 23% 98%; /* Slightly darker than background for opacity */
+    --popover-foreground: 200 20% 12%; /* Deep slate text */
+    
+    /* Accent system with sunset colors */
+    --accent: 168 50% 96%; /* Very light sage */
+    --accent-foreground: 347 77% 35%; /* Deep sunset text */
+    --accent-glow: 347 77% 50% / 0.12; /* Sunset glow */
+    
+    /* Same secondary as default */
+    --secondary: 168 25% 94%; /* Light sage */
+    --secondary-foreground: 200 15% 40%; /* Muted slate */
+    
+    /* Same muted as default */
+    --muted: 168 25% 94%; /* Light sage */
+    --muted-foreground: 200 15% 40%; /* Muted slate */
+    
+    /* Same status colors as default */
+    --success: 142 76% 36%;
+    --success-glow: 142 76% 36% / 0.2;
+    --success-foreground: 0 0% 100%;
+    
+    --warning: 38 92% 50%;
+    --warning-glow: 38 92% 50% / 0.2;
+    --warning-foreground: 0 0% 100%;
+    
+    --destructive: 0 84% 60%;
+    --destructive-glow: 0 84% 60% / 0.2;
+    --destructive-foreground: 0 0% 100%;
+    
+    /* Same match indicators as default */
+    --match-excellent: 142 76% 36%; /* Green for 90%+ */
+    --match-good: 45 93% 47%; /* Yellow for 70-89% */
+    --match-fair: 25 95% 53%; /* Orange for 50-69% */
+    --match-poor: 0 84% 60%; /* Red for <50% */
+    
+    /* Same tag system as default */
+    --tag-blue: 187 85% 92%; /* Teal light */
+    --tag-blue-text: 187 85% 35%; /* Teal dark */
+    --tag-blue-glow: 187 85% 53% / 0.1;
+    
+    --tag-purple: 168 50% 92%; /* Sage light */
+    --tag-purple-text: 168 76% 30%; /* Emerald dark */
+    --tag-purple-glow: 168 76% 42% / 0.1;
+    
+    --tag-green: 142 76% 92%; /* Green light */
+    --tag-green-text: 142 76% 28%; /* Green dark */
+    --tag-green-glow: 142 76% 36% / 0.1;
+    
+    /* Same form elements as default */
+    --border: 168 15% 88%; /* Sage border */
+    --input: 45 23% 99%; /* Warm white input */
+    --input-border: 168 15% 88%; /* Sage input border */
+    --ring: 347 77% 50%; /* Sunset focus ring */
+    
+    /* Gradients with sunset colors */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    --gradient-card: linear-gradient(145deg, hsl(var(--card)), hsl(var(--card)) 50%, hsl(168 15% 92% / 0.3));
+    --gradient-glass: linear-gradient(145deg, hsl(var(--glass)), hsl(45 23% 99% / 0.6));
+    --gradient-sidebar: linear-gradient(180deg, hsl(var(--sidebar-bg)), hsl(45 23% 95% / 0.9));
+    
+    /* Same shadows as default */
+    --shadow-sm: 0 1px 2px 0 hsl(var(--glass-shadow));
+    --shadow-md: 0 4px 6px -1px hsl(var(--glass-shadow)), 0 2px 4px -2px hsl(var(--glass-shadow));
+    --shadow-lg: 0 10px 15px -3px hsl(var(--glass-shadow)), 0 4px 6px -4px hsl(var(--glass-shadow));
+    --shadow-xl: 0 20px 25px -5px hsl(var(--glass-shadow)), 0 8px 10px -6px hsl(var(--glass-shadow));
+    --shadow-glow: 0 0 0 1px hsl(var(--primary) / 0.05), 0 0 20px hsl(var(--primary) / 0.1);
   }
 
   .theme-sunset.dark {
-    --background: 20 14% 4.1%;
-    --foreground: 60 9% 98%;
-    --card: 20 14% 4.1%;
-    --card-foreground: 60 9% 98%;
-    --popover: 20 14% 4.1%;
-    --popover-foreground: 60 9% 98%;
-    --primary: 347 77% 50%;
-    --primary-foreground: 60 9% 98%;
-    --primary-glow: 330 81% 60%;
+    /* Same dark theme base as default */
+    --background: 200 25% 8%; /* Deep slate background */
+    --foreground: 45 23% 96%; /* Warm near-white text */
+    
+    /* Primary system with sunset colors */
+    --primary: 347 77% 50%; /* Sunset red */
+    --primary-glow: 330 81% 60%; /* Sunset pink */
+    --primary-foreground: 0 0% 100%;
     --primary-hover: 347 77% 55%;
-    --secondary: 43 96% 56%;
-    --secondary-foreground: 60 9% 98%;
-    --muted: 12 6% 15%;
-    --muted-foreground: 24 5% 64%;
-    --accent: 12 6% 15%;
-    --accent-foreground: 347 77% 50%;
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 60 9% 98%;
-    --border: 12 6% 15%;
-    --input: 12 6% 15%;
-    --ring: 347 77% 50%;
-    --glass: 20 14% 4.1% / 0.95;
-    --glass-border: 60 9% 98% / 0.1;
+    
+    /* Same dark glassmorphism as default */
+    --glass: 224 71% 4% / 0.9;
+    --glass-border: 210 20% 98% / 0.1;
     --glass-shadow: 0 0% 0% / 0.3;
-    --sidebar-bg: 20 14% 4.1% / 0.95;
-    --sidebar-border: 12 6% 15% / 0.5;
-    --sidebar-text: 24 5% 64%;
-    --sidebar-text-active: 60 9% 98%;
-    --sidebar-hover: 12 6% 15% / 0.7;
-    --sidebar-accent: 347 77% 50% / 0.15;
-    --shadow-glow: 0 0 0 1px hsl(347 77% 50% / 0.05), 0 0 20px hsl(347 77% 50% / 0.1);
+    
+    /* Same dark sidebar as default */
+    --sidebar-bg: 224 71% 4% / 0.95;
+    --sidebar-border: 220 13% 18% / 0.5;
+    --sidebar-text: 215 16% 65%;
+    --sidebar-text-active: 210 20% 98%;
+    --sidebar-hover: 220 13% 18% / 0.7;
+    --sidebar-accent: 347 77% 50% / 0.15; /* Sunset accent */
+    
+    /* Same dark cards as default */
+    --card: 224 71% 6%;
+    --card-foreground: 210 20% 98%;
+    --card-border: 220 13% 18%;
+    --card-shadow: 0 0% 0% / 0.2;
+    --card-hover: 347 77% 50% / 0.05; /* Sunset tint */
+    
+    /* Same dark popover as default */
+    --popover: 224 71% 5%; /* Slightly darker than card for opacity */
+    --popover-foreground: 210 20% 98%; /* Light text */
+    
+    /* Same dark accents as default */
+    --accent: 224 71% 8%;
+    --accent-foreground: 210 20% 85%;
+    --accent-glow: 347 77% 50% / 0.2; /* Sunset glow */
+    
+    /* Same dark secondary as default */
+    --secondary: 220 13% 10%;
+    --secondary-foreground: 210 20% 85%;
+    
+    /* Same dark muted as default */
+    --muted: 220 13% 10%;
+    --muted-foreground: 215 16% 65%;
+    
+    /* Same enhanced status colors as default */
+    --success: 142 76% 50%;
+    --success-glow: 142 76% 50% / 0.3;
+    --success-foreground: 0 0% 100%;
+    
+    --warning: 38 92% 60%;
+    --warning-glow: 38 92% 60% / 0.3;
+    --warning-foreground: 0 0% 100%;
+    
+    --destructive: 0 84% 70%;
+    --destructive-glow: 0 84% 70% / 0.3;
+    --destructive-foreground: 0 0% 100%;
+    
+    /* Same dark match indicators as default */
+    --match-excellent: 142 76% 50%;
+    --match-good: 45 93% 60%;
+    --match-fair: 25 95% 65%;
+    --match-poor: 0 84% 70%;
+    
+    /* Same dark tag system as default */
+    --tag-blue: 217 91% 15%;
+    --tag-blue-text: 217 91% 80%;
+    --tag-blue-glow: 217 91% 60% / 0.15;
+    
+    --tag-purple: 262 83% 15%;
+    --tag-purple-text: 262 83% 80%;
+    --tag-purple-glow: 262 83% 65% / 0.15;
+    
+    --tag-green: 142 76% 15%;
+    --tag-green-text: 142 76% 80%;
+    --tag-green-glow: 142 76% 50% / 0.15;
+    
+    /* Same dark form elements as default */
+    --border: 220 13% 18%;
+    --input: 224 71% 6%;
+    --input-border: 220 13% 18%;
+    --ring: 347 77% 50%; /* Sunset focus ring */
+    
+    /* Same dark gradients as default */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    --gradient-card: linear-gradient(145deg, hsl(var(--card)), hsl(224 71% 8%));
+    --gradient-glass: linear-gradient(145deg, hsl(var(--glass)), hsl(224 71% 4% / 0.8));
+    --gradient-sidebar: linear-gradient(180deg, hsl(var(--sidebar-bg)), hsl(224 71% 3% / 0.9));
   }
 
   /* Forest Theme - Green-Earth */
   .theme-forest {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
-    --primary: 142 71% 45%; /* #22c55e */
-    --primary-foreground: 0 0% 98%;
-    --primary-glow: 160 84% 39%; /* #10b981 */
-    --primary-hover: 142 71% 50%;
-    --secondary: 78 92% 50%; /* #84cc16 */
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 142 71% 45%;
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 100%;
-    --ring: 142 71% 45%;
-    --glass: 0 0% 100% / 0.8;
-    --glass-border: 0 0% 89.8% / 0.2;
-    --glass-shadow: 0 0% 3.9% / 0.08;
-    --sidebar-bg: 0 0% 100% / 0.95;
-    --sidebar-border: 0 0% 89.8% / 0.3;
-    --sidebar-text: 0 0% 45.1%;
-    --sidebar-text-active: 0 0% 3.9%;
-    --sidebar-hover: 0 0% 89.8% / 0.7;
-    --sidebar-accent: 142 71% 45% / 0.08;
+    /* Base surfaces - Same as default */
+    --background: 45 23% 97%; /* Warm off-white */
+    --foreground: 200 20% 12%; /* Deep slate text */
     
-    --gradient-primary: linear-gradient(135deg, hsl(142 71% 45%), hsl(160 84% 39%));
-    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(0 0% 96.1% / 0.3));
-    --gradient-glass: linear-gradient(145deg, hsl(0 0% 100% / 0.8), hsl(0 0% 96.1% / 0.6));
-    --gradient-sidebar: linear-gradient(180deg, hsl(0 0% 100% / 0.95), hsl(0 0% 96.1% / 0.9));
-    --shadow-glow: 0 0 0 1px hsl(142 71% 45% / 0.05), 0 0 20px hsl(142 71% 45% / 0.1);
+    /* Primary gradient system - Forest colors */
+    --primary: 142 71% 45%; /* #22c55e */
+    --primary-glow: 160 84% 39%; /* #10b981 */
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 142 71% 50%;
+    
+    /* Same glassmorphism as default */
+    --glass: 45 23% 99% / 0.8; /* Warm semi-transparent white */
+    --glass-border: 168 25% 95% / 0.2; /* Subtle sage border */
+    --glass-shadow: 200 15% 15% / 0.08; /* Soft slate shadow */
+    
+    /* Same sidebar as default */
+    --sidebar-bg: 45 23% 97% / 0.95; /* Warm frosted glass */
+    --sidebar-border: 168 15% 92% / 0.3;
+    --sidebar-text: 200 15% 45%; /* Muted slate */
+    --sidebar-text-active: 200 20% 12%; /* Deep slate */
+    --sidebar-hover: 168 25% 95% / 0.7; /* Sage hover */
+    --sidebar-accent: 142 71% 45% / 0.08; /* Forest glow */
+    
+    /* Same card system as default */
+    --card: 45 23% 99%; /* Warm white cards */
+    --card-foreground: 200 20% 12%; /* Deep slate text */
+    --card-border: 168 15% 92% / 0.3; /* Sage border */
+    --card-shadow: 200 15% 15% / 0.04; /* Elegant slate shadow */
+    --card-hover: 142 71% 45% / 0.02; /* Subtle forest tint */
+    
+    /* Same popover as default */
+    --popover: 45 23% 98%; /* Slightly darker than background for opacity */
+    --popover-foreground: 200 20% 12%; /* Deep slate text */
+    
+    /* Accent system with forest colors */
+    --accent: 168 50% 96%; /* Very light sage */
+    --accent-foreground: 142 71% 30%; /* Deep forest text */
+    --accent-glow: 142 71% 45% / 0.12; /* Forest glow */
+    
+    /* Same secondary as default */
+    --secondary: 168 25% 94%; /* Light sage */
+    --secondary-foreground: 200 15% 40%; /* Muted slate */
+    
+    /* Same muted as default */
+    --muted: 168 25% 94%; /* Light sage */
+    --muted-foreground: 200 15% 40%; /* Muted slate */
+    
+    /* Same status colors as default */
+    --success: 142 76% 36%;
+    --success-glow: 142 76% 36% / 0.2;
+    --success-foreground: 0 0% 100%;
+    
+    --warning: 38 92% 50%;
+    --warning-glow: 38 92% 50% / 0.2;
+    --warning-foreground: 0 0% 100%;
+    
+    --destructive: 0 84% 60%;
+    --destructive-glow: 0 84% 60% / 0.2;
+    --destructive-foreground: 0 0% 100%;
+    
+    /* Same match indicators as default */
+    --match-excellent: 142 76% 36%; /* Green for 90%+ */
+    --match-good: 45 93% 47%; /* Yellow for 70-89% */
+    --match-fair: 25 95% 53%; /* Orange for 50-69% */
+    --match-poor: 0 84% 60%; /* Red for <50% */
+    
+    /* Same tag system as default */
+    --tag-blue: 187 85% 92%; /* Teal light */
+    --tag-blue-text: 187 85% 35%; /* Teal dark */
+    --tag-blue-glow: 187 85% 53% / 0.1;
+    
+    --tag-purple: 168 50% 92%; /* Sage light */
+    --tag-purple-text: 168 76% 30%; /* Emerald dark */
+    --tag-purple-glow: 168 76% 42% / 0.1;
+    
+    --tag-green: 142 76% 92%; /* Green light */
+    --tag-green-text: 142 76% 28%; /* Green dark */
+    --tag-green-glow: 142 76% 36% / 0.1;
+    
+    /* Same form elements as default */
+    --border: 168 15% 88%; /* Sage border */
+    --input: 45 23% 99%; /* Warm white input */
+    --input-border: 168 15% 88%; /* Sage input border */
+    --ring: 142 71% 45%; /* Forest focus ring */
+    
+    /* Gradients with forest colors */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    --gradient-card: linear-gradient(145deg, hsl(var(--card)), hsl(var(--card)) 50%, hsl(168 15% 92% / 0.3));
+    --gradient-glass: linear-gradient(145deg, hsl(var(--glass)), hsl(45 23% 99% / 0.6));
+    --gradient-sidebar: linear-gradient(180deg, hsl(var(--sidebar-bg)), hsl(45 23% 95% / 0.9));
+    
+    /* Same shadows as default */
+    --shadow-sm: 0 1px 2px 0 hsl(var(--glass-shadow));
+    --shadow-md: 0 4px 6px -1px hsl(var(--glass-shadow)), 0 2px 4px -2px hsl(var(--glass-shadow));
+    --shadow-lg: 0 10px 15px -3px hsl(var(--glass-shadow)), 0 4px 6px -4px hsl(var(--glass-shadow));
+    --shadow-xl: 0 20px 25px -5px hsl(var(--glass-shadow)), 0 8px 10px -6px hsl(var(--glass-shadow));
+    --shadow-glow: 0 0 0 1px hsl(var(--primary) / 0.05), 0 0 20px hsl(var(--primary) / 0.1);
   }
 
   .theme-forest.dark {
-    --background: 120 7% 3.9%;
-    --foreground: 120 10% 98%;
-    --card: 120 7% 3.9%;
-    --card-foreground: 120 10% 98%;
-    --popover: 120 7% 3.9%;
-    --popover-foreground: 120 10% 98%;
-    --primary: 142 71% 45%;
-    --primary-foreground: 120 10% 98%;
-    --primary-glow: 160 84% 39%;
+    /* Same dark theme base as default */
+    --background: 200 25% 8%; /* Deep slate background */
+    --foreground: 45 23% 96%; /* Warm near-white text */
+    
+    /* Primary system with forest colors */
+    --primary: 142 71% 45%; /* Forest green */
+    --primary-glow: 160 84% 39%; /* Forest teal */
+    --primary-foreground: 0 0% 100%;
     --primary-hover: 142 71% 50%;
-    --secondary: 78 92% 50%;
-    --secondary-foreground: 120 10% 98%;
-    --muted: 120 4% 15%;
-    --muted-foreground: 120 5% 64%;
-    --accent: 120 4% 15%;
-    --accent-foreground: 142 71% 45%;
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 120 10% 98%;
-    --border: 120 4% 15%;
-    --input: 120 4% 15%;
-    --ring: 142 71% 45%;
-    --glass: 120 7% 3.9% / 0.95;
-    --glass-border: 120 10% 98% / 0.1;
+    
+    /* Same dark glassmorphism as default */
+    --glass: 224 71% 4% / 0.9;
+    --glass-border: 210 20% 98% / 0.1;
     --glass-shadow: 0 0% 0% / 0.3;
-    --sidebar-bg: 120 7% 3.9% / 0.95;
-    --sidebar-border: 120 4% 15% / 0.5;
-    --sidebar-text: 120 5% 64%;
-    --sidebar-text-active: 120 10% 98%;
-    --sidebar-hover: 120 4% 15% / 0.7;
-    --sidebar-accent: 142 71% 45% / 0.15;
-    --shadow-glow: 0 0 0 1px hsl(142 71% 45% / 0.05), 0 0 20px hsl(142 71% 45% / 0.1);
+    
+    /* Same dark sidebar as default */
+    --sidebar-bg: 224 71% 4% / 0.95;
+    --sidebar-border: 220 13% 18% / 0.5;
+    --sidebar-text: 215 16% 65%;
+    --sidebar-text-active: 210 20% 98%;
+    --sidebar-hover: 220 13% 18% / 0.7;
+    --sidebar-accent: 142 71% 45% / 0.15; /* Forest accent */
+    
+    /* Same dark cards as default */
+    --card: 224 71% 6%;
+    --card-foreground: 210 20% 98%;
+    --card-border: 220 13% 18%;
+    --card-shadow: 0 0% 0% / 0.2;
+    --card-hover: 142 71% 45% / 0.05; /* Forest tint */
+    
+    /* Same dark popover as default */
+    --popover: 224 71% 5%; /* Slightly darker than card for opacity */
+    --popover-foreground: 210 20% 98%; /* Light text */
+    
+    /* Same dark accents as default */
+    --accent: 224 71% 8%;
+    --accent-foreground: 210 20% 85%;
+    --accent-glow: 142 71% 45% / 0.2; /* Forest glow */
+    
+    /* Same dark secondary as default */
+    --secondary: 220 13% 10%;
+    --secondary-foreground: 210 20% 85%;
+    
+    /* Same dark muted as default */
+    --muted: 220 13% 10%;
+    --muted-foreground: 215 16% 65%;
+    
+    /* Same enhanced status colors as default */
+    --success: 142 76% 50%;
+    --success-glow: 142 76% 50% / 0.3;
+    --success-foreground: 0 0% 100%;
+    
+    --warning: 38 92% 60%;
+    --warning-glow: 38 92% 60% / 0.3;
+    --warning-foreground: 0 0% 100%;
+    
+    --destructive: 0 84% 70%;
+    --destructive-glow: 0 84% 70% / 0.3;
+    --destructive-foreground: 0 0% 100%;
+    
+    /* Same dark match indicators as default */
+    --match-excellent: 142 76% 50%;
+    --match-good: 45 93% 60%;
+    --match-fair: 25 95% 65%;
+    --match-poor: 0 84% 70%;
+    
+    /* Same dark tag system as default */
+    --tag-blue: 217 91% 15%;
+    --tag-blue-text: 217 91% 80%;
+    --tag-blue-glow: 217 91% 60% / 0.15;
+    
+    --tag-purple: 262 83% 15%;
+    --tag-purple-text: 262 83% 80%;
+    --tag-purple-glow: 262 83% 65% / 0.15;
+    
+    --tag-green: 142 76% 15%;
+    --tag-green-text: 142 76% 80%;
+    --tag-green-glow: 142 76% 50% / 0.15;
+    
+    /* Same dark form elements as default */
+    --border: 220 13% 18%;
+    --input: 224 71% 6%;
+    --input-border: 220 13% 18%;
+    --ring: 142 71% 45%; /* Forest focus ring */
+    
+    /* Same dark gradients as default */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    --gradient-card: linear-gradient(145deg, hsl(var(--card)), hsl(224 71% 8%));
+    --gradient-glass: linear-gradient(145deg, hsl(var(--glass)), hsl(224 71% 4% / 0.8));
+    --gradient-sidebar: linear-gradient(180deg, hsl(var(--sidebar-bg)), hsl(224 71% 3% / 0.9));
   }
 }
 
