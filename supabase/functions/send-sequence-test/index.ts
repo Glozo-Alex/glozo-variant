@@ -33,7 +33,11 @@ serve(async (req) => {
     const mgApiKey = Deno.env.get('MAILGUN_API_KEY');
     const mgDomain = Deno.env.get('MAILGUN_DOMAIN');
     const mgFrom = Deno.env.get('MAILGUN_FROM') || `Sequences Test <mailgun@${mgDomain}>`;
-    const mgBaseUrl = Deno.env.get('MAILGUN_BASE_URL') || 'https://api.mailgun.net/v3';
+    const mgBaseUrlRaw = Deno.env.get('MAILGUN_BASE_URL') || 'https://api.mailgun.net';
+    const mgApiRoot = mgBaseUrlRaw.replace(/\/$/, '').endsWith('/v3')
+      ? mgBaseUrlRaw.replace(/\/$/, '')
+      : `${mgBaseUrlRaw.replace(/\/$/, '')}/v3`;
+
 
     if (!mgApiKey || !mgDomain) {
       throw new Error('Missing Mailgun env vars');
@@ -102,7 +106,8 @@ serve(async (req) => {
     const html = template.content || '<p>(empty content)</p>';
 
     // Send via Mailgun
-    const endpoint = `${mgBaseUrl}/${mgDomain}/messages`;
+    const endpoint = `${mgApiRoot}/${mgDomain}/messages`;
+    console.log('Mailgun endpoint', endpoint);
     const params = new URLSearchParams();
     params.append('from', mgFrom);
     params.append('to', toEmail);
