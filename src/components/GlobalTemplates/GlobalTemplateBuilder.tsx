@@ -70,6 +70,28 @@ export function GlobalTemplateBuilder({
   );
   const { toast } = useToast();
 
+  // Sync local state when initialData loads (fixes editing showing only one email)
+  useEffect(() => {
+    if (!initialData) return;
+
+    setTemplateName(initialData.name || '');
+    setTemplateDescription(initialData.description || '');
+    setEmails(
+      initialData.emails && initialData.emails.length > 0
+        ? initialData.emails
+        : [
+            {
+              name: 'Initial Outreach',
+              subject: '',
+              content: '',
+              order_index: 0,
+              schedule_type: 'delay',
+              schedule_config: { delay: { days: 0, hours: 0 } },
+            },
+          ]
+    );
+  }, [initialData]);
+
   const addEmail = () => {
     const newEmail: TemplateEmail = {
       name: `Follow-up ${emails.length}`,
