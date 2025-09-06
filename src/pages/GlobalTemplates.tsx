@@ -26,21 +26,39 @@ const useGlobalTemplates = () => {
   return useQuery({
     queryKey: ['global-templates'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // First, get all templates
+      const { data: templates, error: templatesError } = await supabase
         .from('global_templates')
-        .select(`
-          *,
-          global_template_emails(count)
-        `)
+        .select('*')
         .order('updated_at', { ascending: false });
 
-      if (error) throw error;
+      if (templatesError) throw templatesError;
       
-      return data.map(template => ({
-        ...template,
-        email_count: Array.isArray(template.global_template_emails) ? template.global_template_emails.length : 0
-      }));
+      if (!templates || templates.length === 0) {
+        return [];
+      }
+
+      // Then, get email counts for each template
+      const templatesWithCounts = await Promise.all(
+        templates.map(async (template) => {
+          const { count, error: countError } = await supabase
+            .from('global_template_emails')
+            .select('*', { count: 'exact', head: true })
+            .eq('global_template_id', template.id);
+
+          if (countError) {
+            console.error('Error counting emails for template:', template.id, countError);
+            return { ...template, email_count: 0 };
+          }
+
+          return { ...template, email_count: count || 0 };
+        })
+      );
+
+      return templatesWithCounts;
     },
+    retry: 1,
+    refetchOnWindowFocus: false,
   });
 };
 

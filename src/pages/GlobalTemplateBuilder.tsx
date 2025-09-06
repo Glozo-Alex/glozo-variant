@@ -57,8 +57,8 @@ const useGlobalTemplate = (templateId?: string) => {
           content: email.content,
           order_index: email.order_index,
           schedule_type: schedule?.schedule_type || 'delay',
-          schedule_config: schedule?.schedule_config || { delay: { days: 0, hours: 0 } },
-          trigger_config: schedule?.trigger_config,
+          schedule_config: (schedule?.schedule_config as any) || { delay: { days: 0, hours: 0 } },
+          trigger_config: schedule?.trigger_config as any,
         };
       });
 

@@ -148,7 +148,15 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "fk_email_sequences_global_template_id"
+            columns: ["global_template_id"]
+            isOneToOne: false
+            referencedRelation: "global_templates"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       email_templates: {
         Row: {
@@ -243,7 +251,15 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "fk_global_template_emails_global_template_id"
+            columns: ["global_template_id"]
+            isOneToOne: false
+            referencedRelation: "global_templates"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       global_template_schedules: {
         Row: {
@@ -273,7 +289,15 @@ export type Database = {
           trigger_config?: Json | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "fk_global_template_schedules_global_template_email_id"
+            columns: ["global_template_email_id"]
+            isOneToOne: false
+            referencedRelation: "global_template_emails"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       global_templates: {
         Row: {
