@@ -21,73 +21,58 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   const { profile, updateProfile } = useProfile();
   const [colorScheme, setColorSchemeState] = useState<ColorScheme>('default');
   const [isLoading, setIsLoading] = useState(true);
-  const [isInitialized, setIsInitialized] = useState(false);
 
-  // Initialize color scheme ONCE on mount
+  // Listen for theme changes from next-themes and reapply color scheme
   useEffect(() => {
-    if (isInitialized) return;
-    
+    if (resolvedTheme && colorScheme) {
+      console.log('🌓 Theme mode changed:', resolvedTheme, 'Reapplying scheme:', colorScheme);
+      // Wait for next-themes to finish updating the DOM
+      setTimeout(() => {
+        applyColorScheme(colorScheme);
+      }, 50);
+    }
+  }, [resolvedTheme, colorScheme]);
+
+  // Initialize color scheme from profile or localStorage
+  useEffect(() => {
     const initializeColorScheme = () => {
       let initialScheme: ColorScheme = 'default';
       
-      // Priority: localStorage > profile preference > default
-      const stored = localStorage.getItem('color-scheme') as ColorScheme;
-      if (stored && ['default', 'ocean', 'sunset', 'forest'].includes(stored)) {
-        initialScheme = stored;
-      }
-      
-      // If profile is available and has a different preference, use that
-      if (profile?.theme_preference && profile.theme_preference !== initialScheme) {
+      // Priority: profile preference > localStorage > default
+      if (profile?.theme_preference) {
         initialScheme = profile.theme_preference as ColorScheme;
+      } else {
+        const stored = localStorage.getItem('color-scheme') as ColorScheme;
+        if (stored && ['default', 'ocean', 'sunset', 'forest'].includes(stored)) {
+          initialScheme = stored;
+        }
       }
       
       console.log('🎯 Initializing color scheme:', initialScheme);
       setColorSchemeState(initialScheme);
       
-      // Apply the theme immediately, only once
+      // Ensure DOM is ready and next-themes has initialized before applying colors
       const applyInitialScheme = () => {
-        console.log('⚡ Applying initial color scheme:', initialScheme);
-        applyColorScheme(initialScheme);
-        setIsInitialized(true);
-        setIsLoading(false);
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => applyColorScheme(initialScheme), 100);
+          });
+        } else {
+          // Wait for next-themes to initialize
+          setTimeout(() => applyColorScheme(initialScheme), 100);
+        }
       };
 
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', applyInitialScheme);
-      } else {
-        applyInitialScheme();
-      }
+      applyInitialScheme();
+      setIsLoading(false);
     };
 
     initializeColorScheme();
-  }, [profile, isInitialized]);
+  }, [profile]);
 
-  // Listen for theme mode changes (dark/light) and reapply ONLY if initialized
+  // Listen for theme change events to show feedback
   useEffect(() => {
-    if (!isInitialized || !resolvedTheme || !colorScheme) return;
-    
-    console.log('🌓 Theme mode changed:', resolvedTheme, 'Reapplying scheme:', colorScheme);
-    // Small delay to ensure next-themes has updated the DOM
-    const timer = setTimeout(() => {
-      applyColorScheme(colorScheme);
-    }, 100);
-    
-    return () => clearTimeout(timer);
-  }, [resolvedTheme, colorScheme, isInitialized]);
-
-  // Listen for theme change events to show feedback (prevent duplicates)
-  useEffect(() => {
-    let lastEventTime = 0;
-    
     const handleThemeChanged = (event: CustomEvent) => {
-      const now = Date.now();
-      // Prevent duplicate events within 1 second
-      if (now - lastEventTime < 1000) {
-        console.log('🚫 Duplicate theme event blocked');
-        return;
-      }
-      lastEventTime = now;
-      
       const { scheme } = event.detail;
       toast.success(`Color scheme changed to ${scheme}`, {
         duration: 2000,
@@ -101,29 +86,22 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   }, []);
 
   const setColorScheme = async (scheme: ColorScheme) => {
-    if (!isInitialized || scheme === colorScheme) return;
-    
     try {
       console.log('🎨 Changing color scheme to:', scheme);
       setColorSchemeState(scheme);
       
-      // Apply color scheme immediately
+      // Apply color scheme immediately for instant feedback
       applyColorScheme(scheme);
       
-      // Save to localStorage
-      localStorage.setItem('color-scheme', scheme);
-      
-      // Save to profile only once if user is logged in (debounced)
+      // Save to profile if user is logged in
       if (profile) {
-        // Use a timeout to debounce profile updates
-        setTimeout(async () => {
-          try {
-            await updateProfile({ theme_preference: scheme });
-            console.log('✅ Profile updated with new theme preference');
-          } catch (error) {
-            console.error('❌ Failed to update profile:', error);
-          }
-        }, 500);
+        try {
+          await updateProfile({ theme_preference: scheme });
+          console.log('✅ Saved theme preference to profile');
+        } catch (profileError) {
+          console.warn('⚠️ Failed to save theme to profile:', profileError);
+          // Still apply the theme locally even if profile save fails
+        }
       }
     } catch (error) {
       console.error('❌ Failed to apply color scheme:', error);

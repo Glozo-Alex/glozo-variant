@@ -1,14 +1,12 @@
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useColorScheme } from '@/contexts/ThemeContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Navigate } from 'react-router-dom';
-import { Loader2, Palette } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 
 const Auth = () => {
   const { user, loading, signInWithGoogle } = useAuth();
-  const { colorScheme, setColorScheme } = useColorScheme();
 
   // Redirect authenticated users to dashboard
   if (user && !loading) {
@@ -30,8 +28,8 @@ const Auth = () => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-accent/10 p-4">
       <Card className="w-full max-w-md glass-card">
         <CardHeader className="text-center pb-6">
-          <div className="mx-auto mb-4 w-16 h-16 rounded-full bg-gradient-primary flex items-center justify-center shadow-glow">
-            <span className="text-2xl font-bold text-primary-foreground">R</span>
+          <div className="mx-auto mb-4 w-16 h-16 rounded-full bg-gradient-primary flex items-center justify-center">
+            <span className="text-2xl font-bold text-white">R</span>
           </div>
           <CardTitle className="text-2xl font-bold text-gradient">
             Welcome to RecruiterPlatform
@@ -39,18 +37,11 @@ const Auth = () => {
           <CardDescription className="text-muted-foreground">
             Sign in with your Google account to access your recruiting dashboard
           </CardDescription>
-          
-          {/* Theme Debug Info */}
-          <div className="mt-4 p-2 rounded border border-primary/20 bg-primary/5">
-            <p className="text-xs text-muted-foreground">
-              Current scheme: <span className="font-mono text-primary">{colorScheme}</span>
-            </p>
-          </div>
         </CardHeader>
         <CardContent className="space-y-4">
           <Button
             onClick={signInWithGoogle}
-            className="w-full h-12 bg-gradient-primary text-primary-foreground hover:shadow-glow transition-all"
+            className="w-full h-12 btn-gradient hover-glow"
             size="lg"
           >
             <svg
@@ -65,41 +56,6 @@ const Auth = () => {
             </svg>
             Continue with Google
           </Button>
-          
-          {/* Test Color Schemes */}
-          <div className="space-y-2">
-            <p className="text-xs text-muted-foreground text-center">Test Color Schemes:</p>
-            <div className="flex gap-2 justify-center">
-              <Button
-                size="sm"
-                variant={colorScheme === 'default' ? 'default' : 'outline'}
-                onClick={() => setColorScheme('default')}
-              >
-                Default
-              </Button>
-              <Button
-                size="sm"
-                variant={colorScheme === 'ocean' ? 'default' : 'outline'}
-                onClick={() => setColorScheme('ocean')}
-              >
-                Ocean
-              </Button>
-              <Button
-                size="sm"
-                variant={colorScheme === 'sunset' ? 'default' : 'outline'}
-                onClick={() => setColorScheme('sunset')}
-              >
-                Sunset
-              </Button>
-              <Button
-                size="sm"
-                variant={colorScheme === 'forest' ? 'default' : 'outline'}
-                onClick={() => setColorScheme('forest')}
-              >
-                Forest
-              </Button>
-            </div>
-          </div>
           
           <div className="text-center">
             <p className="text-xs text-muted-foreground">
