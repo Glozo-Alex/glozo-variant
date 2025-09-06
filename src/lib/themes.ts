@@ -1,4 +1,4 @@
-export type ColorScheme = 'default' | 'ocean' | 'sunset' | 'forest';
+export type ColorScheme = 'default' | 'ocean' | 'sunset' | 'forest' | 'midnight' | 'monochrome' | 'warm' | 'cyberpunk';
 
 export interface ThemeConfig {
   id: ColorScheme;
@@ -50,6 +50,46 @@ export const THEMES: Record<ColorScheme, ThemeConfig> = {
       primary: '#22c55e',
       secondary: '#10b981',
       accent: '#84cc16'
+    }
+  },
+  midnight: {
+    id: 'midnight',
+    name: 'Midnight',
+    description: 'Professional dark blue theme',
+    colors: {
+      primary: '#1e40af',
+      secondary: '#3730a3',
+      accent: '#0ea5e9'
+    }
+  },
+  monochrome: {
+    id: 'monochrome',
+    name: 'Monochrome',
+    description: 'Elegant black & white minimalist',
+    colors: {
+      primary: '#18181b',
+      secondary: '#52525b',
+      accent: '#71717a'
+    }
+  },
+  warm: {
+    id: 'warm',
+    name: 'Warm',
+    description: 'Cozy brown & cream neutrals',
+    colors: {
+      primary: '#a16207',
+      secondary: '#d97706',
+      accent: '#ea580c'
+    }
+  },
+  cyberpunk: {
+    id: 'cyberpunk',
+    name: 'Cyberpunk',
+    description: 'Neon purple & cyan on dark',
+    colors: {
+      primary: '#a855f7',
+      secondary: '#06b6d4',
+      accent: '#f0047f'
     }
   }
 };
