@@ -35,6 +35,16 @@ interface EmailTemplate {
   updated_at: string;
 }
 
+interface SequenceRecipient {
+  id: string;
+  candidate_id: string;
+  status: string;
+  current_template_index: number;
+  enrolled_at: string;
+  next_send_at: string | null;
+  completed_at: string | null;
+}
+
 const useEmailSequence = (sequenceId: string) => {
   return useQuery<EmailSequence>({
     queryKey: ["email_sequence", sequenceId],
@@ -65,6 +75,21 @@ const useEmailTemplates = (sequenceId: string) => {
   });
 };
 
+const useSequenceRecipients = (sequenceId: string) => {
+  return useQuery<SequenceRecipient[]>({
+    queryKey: ["sequence_recipients", sequenceId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("sequence_recipients")
+        .select("*")
+        .eq("sequence_id", sequenceId)
+        .order("enrolled_at", { ascending: false });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+};
+
 const EmailSequenceDetails: React.FC = () => {
   const { sequenceId } = useParams<{ sequenceId: string }>();
   const navigate = useNavigate();
@@ -83,6 +108,7 @@ const EmailSequenceDetails: React.FC = () => {
 
   const { data: sequence, isLoading: sequenceLoading } = useEmailSequence(sequenceId);
   const { data: templates = [], isLoading: templatesLoading } = useEmailTemplates(sequenceId);
+  const { data: recipients = [], isLoading: recipientsLoading } = useSequenceRecipients(sequenceId);
 
   const createTemplateMutation = useMutation({
     mutationFn: async (templateData: Omit<EmailTemplate, 'id' | 'sequence_id' | 'created_at' | 'updated_at'>) => {
@@ -189,6 +215,19 @@ const EmailSequenceDetails: React.FC = () => {
     if (days === 0) return `${hours}h`;
     if (hours === 0) return `${days}d`;
     return `${days}d ${hours}h`;
+  };
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'active':
+        return <Badge variant="default">Active</Badge>;
+      case 'completed':
+        return <Badge variant="secondary">Completed</Badge>;
+      case 'paused':
+        return <Badge variant="outline">Paused</Badge>;
+      default:
+        return <Badge variant="outline">{status}</Badge>;
+    }
   };
 
   if (sequenceLoading) {
@@ -349,15 +388,61 @@ const EmailSequenceDetails: React.FC = () => {
           <TabsContent value="recipients" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Recipients</CardTitle>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Users className="h-5 w-5" />
+                  Recipients ({recipients.length})
+                </CardTitle>
                 <CardDescription>Manage candidates enrolled in this sequence.</CardDescription>
               </CardHeader>
               <Separator />
               <CardContent>
-                <div className="py-10 text-center text-muted-foreground">
-                  <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  Recipients management coming soon...
-                </div>
+                {recipientsLoading ? (
+                  <div className="py-10 text-center text-muted-foreground">Loading recipients...</div>
+                ) : recipients.length === 0 ? (
+                  <div className="py-10 text-center text-muted-foreground">
+                    <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    No recipients enrolled yet. Create this sequence from a project shortlist to automatically add candidates.
+                  </div>
+                ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Candidate ID</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Current Step</TableHead>
+                        <TableHead>Enrolled</TableHead>
+                        <TableHead>Next Send</TableHead>
+                        <TableHead>Completed</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {recipients.map((recipient) => (
+                        <TableRow key={recipient.id}>
+                          <TableCell className="font-medium">{recipient.candidate_id}</TableCell>
+                          <TableCell>{getStatusBadge(recipient.status)}</TableCell>
+                          <TableCell>
+                            {recipient.current_template_index + 1} / {templates.length}
+                          </TableCell>
+                          <TableCell>
+                            {new Date(recipient.enrolled_at).toLocaleDateString()}
+                          </TableCell>
+                          <TableCell>
+                            {recipient.next_send_at 
+                              ? new Date(recipient.next_send_at).toLocaleDateString()
+                              : '-'
+                            }
+                          </TableCell>
+                          <TableCell>
+                            {recipient.completed_at 
+                              ? new Date(recipient.completed_at).toLocaleDateString()
+                              : '-'
+                            }
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
