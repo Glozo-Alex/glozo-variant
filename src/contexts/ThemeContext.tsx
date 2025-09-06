@@ -113,9 +113,17 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
       // Save to localStorage
       localStorage.setItem('color-scheme', scheme);
       
-      // Save to profile only once if user is logged in
+      // Save to profile only once if user is logged in (debounced)
       if (profile) {
-        await updateProfile({ theme_preference: scheme });
+        // Use a timeout to debounce profile updates
+        setTimeout(async () => {
+          try {
+            await updateProfile({ theme_preference: scheme });
+            console.log('✅ Profile updated with new theme preference');
+          } catch (error) {
+            console.error('❌ Failed to update profile:', error);
+          }
+        }, 500);
       }
     } catch (error) {
       console.error('❌ Failed to apply color scheme:', error);
