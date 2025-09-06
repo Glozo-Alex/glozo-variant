@@ -86,6 +86,8 @@ export const applyColorScheme = (scheme: ColorScheme) => {
     
     console.log('🔍 Applied CSS variables:');
     console.log('  --primary:', primaryColor);
+    console.log('  --secondary:', computedStyle.getPropertyValue('--secondary').trim());
+    console.log('  --secondary-foreground:', computedStyle.getPropertyValue('--secondary-foreground').trim());
     console.log('  --background:', backgroundColor);
     
     // Dispatch event to notify components
