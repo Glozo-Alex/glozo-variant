@@ -128,11 +128,11 @@ const Sidebar = () => {
           {collapsed ? (
             <Tooltip>
               <TooltipTrigger asChild>
-                <NavLink to="/email-sequences" className={({ isActive }) => `${navCls} ${isOutreachActive ? 'bg-sidebar-accent text-sidebar-text-active' : ''}`}>
+                <div className={`${navCls} ${isOutreachActive ? 'bg-sidebar-accent text-sidebar-text-active' : ''}`}>
                   <div className="flex items-center justify-center">
                     <Mail className="h-5 w-5" />
                   </div>
-                </NavLink>
+                </div>
               </TooltipTrigger>
               <TooltipContent side="right">
                 <div className="space-y-1">
