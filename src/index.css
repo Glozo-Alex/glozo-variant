@@ -698,6 +698,789 @@
     --shadow-glow: 0 0 0 1px hsl(var(--primary) / 0.05), 0 0 20px hsl(var(--primary) / 0.1);
   }
 
+  /* Midnight Theme - Professional Dark Blue */
+  .theme-midnight {
+    /* Base surfaces with sophisticated blues */
+    --background: 210 30% 98%; /* Cool light background */
+    --foreground: 222 84% 5%; /* Near-black text */
+    
+    /* Professional blue gradient system */
+    --primary: 214 88% 27%; /* Deep blue #1e40af */
+    --primary-glow: 213 94% 34%; /* Indigo #3730a3 */
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 214 88% 32%;
+    
+    /* Enhanced glassmorphism with blue tints */
+    --glass: 210 30% 99% / 0.85;
+    --glass-border: 214 20% 90% / 0.3;
+    --glass-shadow: 222 84% 5% / 0.12;
+    
+    /* Professional sidebar */
+    --sidebar-bg: 210 30% 98% / 0.95;
+    --sidebar-border: 214 20% 88% / 0.4;
+    --sidebar-text: 215 25% 27%;
+    --sidebar-text-active: 222 84% 5%;
+    --sidebar-hover: 214 20% 92% / 0.8;
+    --sidebar-accent: 214 88% 27% / 0.1;
+    
+    /* Professional cards */
+    --card: 210 30% 99%;
+    --card-foreground: 222 84% 5%;
+    --card-border: 214 20% 88% / 0.4;
+    --card-shadow: 222 84% 5% / 0.08;
+    --card-hover: 214 88% 27% / 0.03;
+    
+    /* Professional popovers */
+    --popover: 210 30% 97%;
+    --popover-foreground: 222 84% 5%;
+    
+    /* Professional accents */
+    --accent: 214 20% 95%;
+    --accent-foreground: 214 88% 20%;
+    --accent-glow: 214 88% 27% / 0.15;
+    
+    /* Professional secondary */
+    --secondary: 214 88% 92%; /* Light professional blue */
+    --secondary-foreground: 214 88% 15%; /* Dark professional blue */
+    
+    /* Professional muted */
+    --muted: 214 20% 95%;
+    --muted-foreground: 215 25% 27%;
+    
+    /* Professional status colors */
+    --success: 142 76% 36%;
+    --success-glow: 142 76% 36% / 0.2;
+    --success-foreground: 0 0% 100%;
+    
+    --warning: 38 92% 50%;
+    --warning-glow: 38 92% 50% / 0.2;
+    --warning-foreground: 0 0% 100%;
+    
+    --destructive: 0 84% 60%;
+    --destructive-glow: 0 84% 60% / 0.2;
+    --destructive-foreground: 0 0% 100%;
+    
+    /* Professional match indicators */
+    --match-excellent: 142 76% 36%;
+    --match-good: 45 93% 47%;
+    --match-fair: 25 95% 53%;
+    --match-poor: 0 84% 60%;
+    
+    /* Professional tag system */
+    --tag-blue: 214 88% 88%;
+    --tag-blue-text: 214 88% 15%;
+    --tag-blue-glow: 214 88% 27% / 0.1;
+    
+    --tag-purple: 213 94% 88%;
+    --tag-purple-text: 213 94% 20%;
+    --tag-purple-glow: 213 94% 34% / 0.1;
+    
+    --tag-green: 197 100% 85%;
+    --tag-green-text: 197 100% 25%;
+    --tag-green-glow: 197 100% 47% / 0.1;
+    
+    /* Professional form elements */
+    --border: 214 20% 85%;
+    --input: 210 30% 99%;
+    --input-border: 214 20% 85%;
+    --ring: 214 88% 27%;
+    
+    /* Professional gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    --gradient-card: linear-gradient(145deg, hsl(var(--card)), hsl(214 20% 95%));
+    --gradient-glass: linear-gradient(145deg, hsl(var(--glass)), hsl(210 30% 97% / 0.7));
+    --gradient-sidebar: linear-gradient(180deg, hsl(var(--sidebar-bg)), hsl(210 30% 96% / 0.9));
+    
+    /* Enhanced professional shadows */
+    --shadow-sm: 0 1px 2px 0 hsl(var(--glass-shadow));
+    --shadow-md: 0 4px 6px -1px hsl(var(--glass-shadow)), 0 2px 4px -2px hsl(var(--glass-shadow));
+    --shadow-lg: 0 10px 15px -3px hsl(var(--glass-shadow)), 0 4px 6px -4px hsl(var(--glass-shadow));
+    --shadow-xl: 0 20px 25px -5px hsl(var(--glass-shadow)), 0 8px 10px -6px hsl(var(--glass-shadow));
+    --shadow-glow: 0 0 0 1px hsl(var(--primary) / 0.08), 0 0 25px hsl(var(--primary) / 0.15);
+  }
+
+  .theme-midnight.dark {
+    /* Professional dark theme */
+    --background: 222 84% 5%; /* Deep professional dark */
+    --foreground: 210 30% 98%; /* Cool white text */
+    
+    /* Enhanced dark professional blues */
+    --primary: 214 88% 45%; /* Brighter professional blue */
+    --primary-glow: 213 94% 55%; /* Brighter indigo */
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 214 88% 50%;
+    
+    /* Enhanced dark glassmorphism */
+    --glass: 222 84% 3% / 0.95;
+    --glass-border: 210 30% 98% / 0.08;
+    --glass-shadow: 0 0% 0% / 0.4;
+    
+    /* Professional dark sidebar */
+    --sidebar-bg: 222 84% 3% / 0.98;
+    --sidebar-border: 215 25% 15% / 0.6;
+    --sidebar-text: 215 25% 70%;
+    --sidebar-text-active: 210 30% 98%;
+    --sidebar-hover: 215 25% 15% / 0.8;
+    --sidebar-accent: 214 88% 45% / 0.2;
+    
+    /* Professional dark cards */
+    --card: 222 84% 4%;
+    --card-foreground: 210 30% 98%;
+    --card-border: 215 25% 15%;
+    --card-shadow: 0 0% 0% / 0.3;
+    --card-hover: 214 88% 45% / 0.08;
+    
+    /* Professional dark popovers */
+    --popover: 222 84% 3%;
+    --popover-foreground: 210 30% 98%;
+    
+    /* Professional dark accents */
+    --accent: 222 84% 6%;
+    --accent-foreground: 210 30% 90%;
+    --accent-glow: 214 88% 45% / 0.25;
+    
+    /* Professional dark secondary */
+    --secondary: 214 88% 12%;
+    --secondary-foreground: 214 88% 85%;
+    
+    /* Professional dark muted */
+    --muted: 215 25% 8%;
+    --muted-foreground: 215 25% 70%;
+    
+    /* Enhanced dark status colors */
+    --success: 142 76% 55%;
+    --success-glow: 142 76% 55% / 0.4;
+    --success-foreground: 0 0% 100%;
+    
+    --warning: 38 92% 65%;
+    --warning-glow: 38 92% 65% / 0.4;
+    --warning-foreground: 0 0% 100%;
+    
+    --destructive: 0 84% 75%;
+    --destructive-glow: 0 84% 75% / 0.4;
+    --destructive-foreground: 0 0% 100%;
+    
+    /* Professional dark match indicators */
+    --match-excellent: 142 76% 55%;
+    --match-good: 45 93% 65%;
+    --match-fair: 25 95% 70%;
+    --match-poor: 0 84% 75%;
+    
+    /* Professional dark tag system */
+    --tag-blue: 214 88% 12%;
+    --tag-blue-text: 214 88% 85%;
+    --tag-blue-glow: 214 88% 45% / 0.2;
+    
+    --tag-purple: 213 94% 12%;
+    --tag-purple-text: 213 94% 85%;
+    --tag-purple-glow: 213 94% 55% / 0.2;
+    
+    --tag-green: 197 100% 12%;
+    --tag-green-text: 197 100% 85%;
+    --tag-green-glow: 197 100% 47% / 0.2;
+    
+    /* Professional dark form elements */
+    --border: 215 25% 15%;
+    --input: 222 84% 4%;
+    --input-border: 215 25% 15%;
+    --ring: 214 88% 45%;
+    
+    /* Professional dark gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    --gradient-card: linear-gradient(145deg, hsl(var(--card)), hsl(222 84% 6%));
+    --gradient-glass: linear-gradient(145deg, hsl(var(--glass)), hsl(222 84% 2% / 0.9));
+    --gradient-sidebar: linear-gradient(180deg, hsl(var(--sidebar-bg)), hsl(222 84% 2% / 0.95));
+  }
+
+  /* Monochrome Theme - Elegant Minimalist */
+  .theme-monochrome {
+    /* Pure minimalist base */
+    --background: 0 0% 99%; /* Near-white */
+    --foreground: 0 0% 9%; /* Near-black */
+    
+    /* Sophisticated grayscale system */
+    --primary: 0 0% 9%; /* Pure dark #18181b */
+    --primary-glow: 0 0% 32%; /* Medium gray #52525b */
+    --primary-foreground: 0 0% 98%;
+    --primary-hover: 0 0% 15%;
+    
+    /* Minimalist glassmorphism */
+    --glass: 0 0% 100% / 0.9;
+    --glass-border: 0 0% 88% / 0.4;
+    --glass-shadow: 0 0% 0% / 0.08;
+    
+    /* Clean sidebar */
+    --sidebar-bg: 0 0% 99% / 0.98;
+    --sidebar-border: 0 0% 85% / 0.5;
+    --sidebar-text: 0 0% 45%;
+    --sidebar-text-active: 0 0% 9%;
+    --sidebar-hover: 0 0% 94%;
+    --sidebar-accent: 0 0% 9% / 0.06;
+    
+    /* Minimalist cards */
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 9%;
+    --card-border: 0 0% 88% / 0.4;
+    --card-shadow: 0 0% 0% / 0.04;
+    --card-hover: 0 0% 9% / 0.02;
+    
+    /* Clean popovers */
+    --popover: 0 0% 98%;
+    --popover-foreground: 0 0% 9%;
+    
+    /* Minimalist accents */
+    --accent: 0 0% 96%;
+    --accent-foreground: 0 0% 15%;
+    --accent-glow: 0 0% 9% / 0.1;
+    
+    /* Grayscale secondary */
+    --secondary: 0 0% 94%; /* Light gray */
+    --secondary-foreground: 0 0% 32%; /* Medium gray */
+    
+    /* Minimalist muted */
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
+    
+    /* Minimalist status colors */
+    --success: 142 76% 36%;
+    --success-glow: 142 76% 36% / 0.15;
+    --success-foreground: 0 0% 100%;
+    
+    --warning: 38 92% 50%;
+    --warning-glow: 38 92% 50% / 0.15;
+    --warning-foreground: 0 0% 100%;
+    
+    --destructive: 0 84% 60%;
+    --destructive-glow: 0 84% 60% / 0.15;
+    --destructive-foreground: 0 0% 100%;
+    
+    /* Grayscale match indicators */
+    --match-excellent: 0 0% 20%;
+    --match-good: 0 0% 32%;
+    --match-fair: 0 0% 52%;
+    --match-poor: 0 0% 68%;
+    
+    /* Minimalist tag system */
+    --tag-blue: 0 0% 90%;
+    --tag-blue-text: 0 0% 20%;
+    --tag-blue-glow: 0 0% 32% / 0.08;
+    
+    --tag-purple: 0 0% 88%;
+    --tag-purple-text: 0 0% 15%;
+    --tag-purple-glow: 0 0% 9% / 0.08;
+    
+    --tag-green: 0 0% 92%;
+    --tag-green-text: 0 0% 25%;
+    --tag-green-glow: 0 0% 45% / 0.08;
+    
+    /* Minimalist form elements */
+    --border: 0 0% 85%;
+    --input: 0 0% 100%;
+    --input-border: 0 0% 85%;
+    --ring: 0 0% 9%;
+    
+    /* Clean gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    --gradient-card: linear-gradient(145deg, hsl(var(--card)), hsl(0 0% 96%));
+    --gradient-glass: linear-gradient(145deg, hsl(var(--glass)), hsl(0 0% 98% / 0.8));
+    --gradient-sidebar: linear-gradient(180deg, hsl(var(--sidebar-bg)), hsl(0 0% 97%));
+    
+    /* Subtle shadows */
+    --shadow-sm: 0 1px 2px 0 hsl(var(--glass-shadow));
+    --shadow-md: 0 4px 6px -1px hsl(var(--glass-shadow)), 0 2px 4px -2px hsl(var(--glass-shadow));
+    --shadow-lg: 0 10px 15px -3px hsl(var(--glass-shadow)), 0 4px 6px -4px hsl(var(--glass-shadow));
+    --shadow-xl: 0 20px 25px -5px hsl(var(--glass-shadow)), 0 8px 10px -6px hsl(var(--glass-shadow));
+    --shadow-glow: 0 0 0 1px hsl(var(--primary) / 0.04), 0 0 15px hsl(var(--primary) / 0.08);
+  }
+
+  .theme-monochrome.dark {
+    /* Dark minimalist theme */
+    --background: 0 0% 4%; /* Near-black */
+    --foreground: 0 0% 96%; /* Near-white */
+    
+    /* Dark grayscale system */
+    --primary: 0 0% 85%; /* Light gray */
+    --primary-glow: 0 0% 68%; /* Medium light gray */
+    --primary-foreground: 0 0% 9%;
+    --primary-hover: 0 0% 90%;
+    
+    /* Dark minimalist glassmorphism */
+    --glass: 0 0% 3% / 0.95;
+    --glass-border: 0 0% 96% / 0.06;
+    --glass-shadow: 0 0% 0% / 0.5;
+    
+    /* Dark clean sidebar */
+    --sidebar-bg: 0 0% 3% / 0.98;
+    --sidebar-border: 0 0% 15% / 0.6;
+    --sidebar-text: 0 0% 68%;
+    --sidebar-text-active: 0 0% 96%;
+    --sidebar-hover: 0 0% 8%;
+    --sidebar-accent: 0 0% 85% / 0.08;
+    
+    /* Dark minimalist cards */
+    --card: 0 0% 5%;
+    --card-foreground: 0 0% 96%;
+    --card-border: 0 0% 15%;
+    --card-shadow: 0 0% 0% / 0.3;
+    --card-hover: 0 0% 85% / 0.04;
+    
+    /* Dark clean popovers */
+    --popover: 0 0% 4%;
+    --popover-foreground: 0 0% 96%;
+    
+    /* Dark minimalist accents */
+    --accent: 0 0% 7%;
+    --accent-foreground: 0 0% 85%;
+    --accent-glow: 0 0% 85% / 0.15;
+    
+    /* Dark grayscale secondary */
+    --secondary: 0 0% 10%;
+    --secondary-foreground: 0 0% 85%;
+    
+    /* Dark minimalist muted */
+    --muted: 0 0% 8%;
+    --muted-foreground: 0 0% 68%;
+    
+    /* Dark status colors */
+    --success: 142 76% 55%;
+    --success-glow: 142 76% 55% / 0.3;
+    --success-foreground: 0 0% 100%;
+    
+    --warning: 38 92% 65%;
+    --warning-glow: 38 92% 65% / 0.3;
+    --warning-foreground: 0 0% 100%;
+    
+    --destructive: 0 84% 75%;
+    --destructive-glow: 0 84% 75% / 0.3;
+    --destructive-foreground: 0 0% 100%;
+    
+    /* Dark grayscale match indicators */
+    --match-excellent: 0 0% 85%;
+    --match-good: 0 0% 68%;
+    --match-fair: 0 0% 52%;
+    --match-poor: 0 0% 32%;
+    
+    /* Dark minimalist tag system */
+    --tag-blue: 0 0% 12%;
+    --tag-blue-text: 0 0% 85%;
+    --tag-blue-glow: 0 0% 68% / 0.15;
+    
+    --tag-purple: 0 0% 10%;
+    --tag-purple-text: 0 0% 90%;
+    --tag-purple-glow: 0 0% 85% / 0.15;
+    
+    --tag-green: 0 0% 8%;
+    --tag-green-text: 0 0% 80%;
+    --tag-green-glow: 0 0% 68% / 0.15;
+    
+    /* Dark minimalist form elements */
+    --border: 0 0% 15%;
+    --input: 0 0% 5%;
+    --input-border: 0 0% 15%;
+    --ring: 0 0% 85%;
+    
+    /* Dark clean gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    --gradient-card: linear-gradient(145deg, hsl(var(--card)), hsl(0 0% 7%));
+    --gradient-glass: linear-gradient(145deg, hsl(var(--glass)), hsl(0 0% 2% / 0.9));
+    --gradient-sidebar: linear-gradient(180deg, hsl(var(--sidebar-bg)), hsl(0 0% 2%));
+  }
+
+  /* Warm Theme - Cozy Brown & Cream */
+  .theme-warm {
+    /* Warm, cozy base */
+    --background: 30 40% 98%; /* Warm cream */
+    --foreground: 20 14% 8%; /* Dark brown */
+    
+    /* Warm earth tones system */
+    --primary: 45 95% 31%; /* Warm amber #a16207 */
+    --primary-glow: 32 95% 44%; /* Orange #d97706 */
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 45 95% 36%;
+    
+    /* Warm glassmorphism */
+    --glass: 30 40% 99% / 0.9;
+    --glass-border: 30 20% 88% / 0.4;
+    --glass-shadow: 20 14% 8% / 0.1;
+    
+    /* Cozy sidebar */
+    --sidebar-bg: 30 40% 98% / 0.95;
+    --sidebar-border: 30 20% 85% / 0.5;
+    --sidebar-text: 25 20% 35%;
+    --sidebar-text-active: 20 14% 8%;
+    --sidebar-hover: 30 30% 92%;
+    --sidebar-accent: 45 95% 31% / 0.08;
+    
+    /* Warm cards */
+    --card: 30 40% 99%;
+    --card-foreground: 20 14% 8%;
+    --card-border: 30 20% 85% / 0.4;
+    --card-shadow: 20 14% 8% / 0.06;
+    --card-hover: 45 95% 31% / 0.03;
+    
+    /* Warm popovers */
+    --popover: 30 40% 97%;
+    --popover-foreground: 20 14% 8%;
+    
+    /* Warm accents */
+    --accent: 30 30% 94%;
+    --accent-foreground: 45 95% 25%;
+    --accent-glow: 45 95% 31% / 0.12;
+    
+    /* Warm secondary */
+    --secondary: 45 95% 88%; /* Light warm amber */
+    --secondary-foreground: 45 95% 20%; /* Dark warm amber */
+    
+    /* Warm muted */
+    --muted: 30 30% 94%;
+    --muted-foreground: 25 20% 35%;
+    
+    /* Warm status colors */
+    --success: 142 76% 36%;
+    --success-glow: 142 76% 36% / 0.2;
+    --success-foreground: 0 0% 100%;
+    
+    --warning: 38 92% 50%;
+    --warning-glow: 38 92% 50% / 0.2;
+    --warning-foreground: 0 0% 100%;
+    
+    --destructive: 0 84% 60%;
+    --destructive-glow: 0 84% 60% / 0.2;
+    --destructive-foreground: 0 0% 100%;
+    
+    /* Warm match indicators */
+    --match-excellent: 142 76% 36%;
+    --match-good: 45 93% 47%;
+    --match-fair: 25 95% 53%;
+    --match-poor: 0 84% 60%;
+    
+    /* Warm tag system */
+    --tag-blue: 32 95% 85%; /* Warm orange light */
+    --tag-blue-text: 32 95% 25%; /* Warm orange dark */
+    --tag-blue-glow: 32 95% 44% / 0.1;
+    
+    --tag-purple: 45 95% 85%; /* Amber light */
+    --tag-purple-text: 45 95% 18%; /* Amber dark */
+    --tag-purple-glow: 45 95% 31% / 0.1;
+    
+    --tag-green: 17 88% 85%; /* Warm red-orange light */
+    --tag-green-text: 17 88% 25%; /* Warm red-orange dark */
+    --tag-green-glow: 17 88% 40% / 0.1;
+    
+    /* Warm form elements */
+    --border: 30 20% 82%;
+    --input: 30 40% 99%;
+    --input-border: 30 20% 82%;
+    --ring: 45 95% 31%;
+    
+    /* Warm gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    --gradient-card: linear-gradient(145deg, hsl(var(--card)), hsl(30 30% 94%));
+    --gradient-glass: linear-gradient(145deg, hsl(var(--glass)), hsl(30 40% 97% / 0.8));
+    --gradient-sidebar: linear-gradient(180deg, hsl(var(--sidebar-bg)), hsl(30 35% 96%));
+    
+    /* Warm shadows */
+    --shadow-sm: 0 1px 2px 0 hsl(var(--glass-shadow));
+    --shadow-md: 0 4px 6px -1px hsl(var(--glass-shadow)), 0 2px 4px -2px hsl(var(--glass-shadow));
+    --shadow-lg: 0 10px 15px -3px hsl(var(--glass-shadow)), 0 4px 6px -4px hsl(var(--glass-shadow));
+    --shadow-xl: 0 20px 25px -5px hsl(var(--glass-shadow)), 0 8px 10px -6px hsl(var(--glass-shadow));
+    --shadow-glow: 0 0 0 1px hsl(var(--primary) / 0.06), 0 0 20px hsl(var(--primary) / 0.12);
+  }
+
+  .theme-warm.dark {
+    /* Dark warm theme */
+    --background: 20 14% 6%; /* Dark brown */
+    --foreground: 30 40% 96%; /* Warm cream */
+    
+    /* Dark warm system */
+    --primary: 45 95% 55%; /* Brighter amber */
+    --primary-glow: 32 95% 65%; /* Brighter orange */
+    --primary-foreground: 20 14% 8%;
+    --primary-hover: 45 95% 60%;
+    
+    /* Dark warm glassmorphism */
+    --glass: 20 14% 4% / 0.95;
+    --glass-border: 30 40% 96% / 0.06;
+    --glass-shadow: 0 0% 0% / 0.4;
+    
+    /* Dark cozy sidebar */
+    --sidebar-bg: 20 14% 4% / 0.98;
+    --sidebar-border: 25 20% 15% / 0.6;
+    --sidebar-text: 30 20% 65%;
+    --sidebar-text-active: 30 40% 96%;
+    --sidebar-hover: 25 20% 12%;
+    --sidebar-accent: 45 95% 55% / 0.15;
+    
+    /* Dark warm cards */
+    --card: 20 14% 5%;
+    --card-foreground: 30 40% 96%;
+    --card-border: 25 20% 15%;
+    --card-shadow: 0 0% 0% / 0.3;
+    --card-hover: 45 95% 55% / 0.06;
+    
+    /* Dark warm popovers */
+    --popover: 20 14% 4%;
+    --popover-foreground: 30 40% 96%;
+    
+    /* Dark warm accents */
+    --accent: 20 14% 8%;
+    --accent-foreground: 30 40% 85%;
+    --accent-glow: 45 95% 55% / 0.2;
+    
+    /* Dark warm secondary */
+    --secondary: 45 95% 12%;
+    --secondary-foreground: 45 95% 80%;
+    
+    /* Dark warm muted */
+    --muted: 25 20% 8%;
+    --muted-foreground: 30 20% 65%;
+    
+    /* Enhanced dark warm status colors */
+    --success: 142 76% 55%;
+    --success-glow: 142 76% 55% / 0.3;
+    --success-foreground: 0 0% 100%;
+    
+    --warning: 38 92% 65%;
+    --warning-glow: 38 92% 65% / 0.3;
+    --warning-foreground: 0 0% 100%;
+    
+    --destructive: 0 84% 75%;
+    --destructive-glow: 0 84% 75% / 0.3;
+    --destructive-foreground: 0 0% 100%;
+    
+    /* Dark warm match indicators */
+    --match-excellent: 142 76% 55%;
+    --match-good: 45 93% 65%;
+    --match-fair: 25 95% 70%;
+    --match-poor: 0 84% 75%;
+    
+    /* Dark warm tag system */
+    --tag-blue: 32 95% 12%;
+    --tag-blue-text: 32 95% 80%;
+    --tag-blue-glow: 32 95% 65% / 0.2;
+    
+    --tag-purple: 45 95% 12%;
+    --tag-purple-text: 45 95% 85%;
+    --tag-purple-glow: 45 95% 55% / 0.2;
+    
+    --tag-green: 17 88% 12%;
+    --tag-green-text: 17 88% 80%;
+    --tag-green-glow: 17 88% 50% / 0.2;
+    
+    /* Dark warm form elements */
+    --border: 25 20% 15%;
+    --input: 20 14% 5%;
+    --input-border: 25 20% 15%;
+    --ring: 45 95% 55%;
+    
+    /* Dark warm gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    --gradient-card: linear-gradient(145deg, hsl(var(--card)), hsl(20 14% 7%));
+    --gradient-glass: linear-gradient(145deg, hsl(var(--glass)), hsl(20 14% 2% / 0.9));
+    --gradient-sidebar: linear-gradient(180deg, hsl(var(--sidebar-bg)), hsl(20 14% 2%));
+  }
+
+  /* Cyberpunk Theme - Neon Future */
+  .theme-cyberpunk {
+    /* High-tech base */
+    --background: 0 0% 7%; /* Dark tech background */
+    --foreground: 315 100% 98%; /* Bright neon white */
+    
+    /* Neon system */
+    --primary: 271 91% 65%; /* Neon purple #a855f7 */
+    --primary-glow: 189 94% 43%; /* Neon cyan #06b6d4 */
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 271 91% 70%;
+    
+    /* Cyberpunk glassmorphism */
+    --glass: 0 0% 5% / 0.9;
+    --glass-border: 271 91% 65% / 0.2;
+    --glass-shadow: 271 91% 65% / 0.15;
+    
+    /* Neon sidebar */
+    --sidebar-bg: 0 0% 5% / 0.95;
+    --sidebar-border: 271 91% 65% / 0.3;
+    --sidebar-text: 189 94% 70%;
+    --sidebar-text-active: 315 100% 98%;
+    --sidebar-hover: 271 91% 65% / 0.1;
+    --sidebar-accent: 271 91% 65% / 0.15;
+    
+    /* Cyberpunk cards */
+    --card: 0 0% 6%;
+    --card-foreground: 315 100% 98%;
+    --card-border: 271 91% 65% / 0.3;
+    --card-shadow: 271 91% 65% / 0.1;
+    --card-hover: 271 91% 65% / 0.05;
+    
+    /* Cyberpunk popovers */
+    --popover: 0 0% 5%;
+    --popover-foreground: 315 100% 98%;
+    
+    /* Neon accents */
+    --accent: 271 91% 10%;
+    --accent-foreground: 271 91% 80%;
+    --accent-glow: 271 91% 65% / 0.25;
+    
+    /* Cyberpunk secondary */
+    --secondary: 271 91% 15%; /* Dark neon purple */
+    --secondary-foreground: 271 91% 85%; /* Bright neon purple */
+    
+    /* Cyberpunk muted */
+    --muted: 0 0% 10%;
+    --muted-foreground: 189 94% 70%;
+    
+    /* Cyberpunk status colors */
+    --success: 142 91% 55%; /* Neon green */
+    --success-glow: 142 91% 55% / 0.4;
+    --success-foreground: 0 0% 100%;
+    
+    --warning: 38 100% 60%; /* Neon orange */
+    --warning-glow: 38 100% 60% / 0.4;
+    --warning-foreground: 0 0% 100%;
+    
+    --destructive: 345 91% 65%; /* Neon red */
+    --destructive-glow: 345 91% 65% / 0.4;
+    --destructive-foreground: 0 0% 100%;
+    
+    /* Cyberpunk match indicators */
+    --match-excellent: 142 91% 55%;
+    --match-good: 60 100% 60%;
+    --match-fair: 38 100% 60%;
+    --match-poor: 345 91% 65%;
+    
+    /* Cyberpunk tag system */
+    --tag-blue: 189 94% 15%; /* Dark neon cyan */
+    --tag-blue-text: 189 94% 80%; /* Bright neon cyan */
+    --tag-blue-glow: 189 94% 43% / 0.2;
+    
+    --tag-purple: 271 91% 15%; /* Dark neon purple */
+    --tag-purple-text: 271 91% 85%; /* Bright neon purple */
+    --tag-purple-glow: 271 91% 65% / 0.2;
+    
+    --tag-green: 345 91% 15%; /* Dark neon pink */
+    --tag-green-text: 345 91% 80%; /* Bright neon pink */
+    --tag-green-glow: 345 91% 65% / 0.2;
+    
+    /* Cyberpunk form elements */
+    --border: 271 91% 20%;
+    --input: 0 0% 6%;
+    --input-border: 271 91% 30%;
+    --ring: 271 91% 65%;
+    
+    /* Neon gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    --gradient-card: linear-gradient(145deg, hsl(var(--card)), hsl(271 91% 8%));
+    --gradient-glass: linear-gradient(145deg, hsl(var(--glass)), hsl(0 0% 3% / 0.9));
+    --gradient-sidebar: linear-gradient(180deg, hsl(var(--sidebar-bg)), hsl(0 0% 3%));
+    
+    /* Enhanced neon shadows */
+    --shadow-sm: 0 1px 2px 0 hsl(var(--glass-shadow));
+    --shadow-md: 0 4px 6px -1px hsl(var(--glass-shadow)), 0 2px 4px -2px hsl(var(--glass-shadow));
+    --shadow-lg: 0 10px 15px -3px hsl(var(--glass-shadow)), 0 4px 6px -4px hsl(var(--glass-shadow));
+    --shadow-xl: 0 20px 25px -5px hsl(var(--glass-shadow)), 0 8px 10px -6px hsl(var(--glass-shadow));
+    --shadow-glow: 0 0 0 1px hsl(var(--primary) / 0.2), 0 0 30px hsl(var(--primary) / 0.3), 0 0 60px hsl(var(--primary-glow) / 0.1);
+  }
+
+  .theme-cyberpunk.dark {
+    /* Cyberpunk is inherently dark, but we can make it even darker */
+    --background: 0 0% 3%; /* Ultra-dark tech */
+    --foreground: 315 100% 100%; /* Pure neon white */
+    
+    /* Enhanced neon system */
+    --primary: 271 91% 70%; /* Brighter neon purple */
+    --primary-glow: 189 94% 50%; /* Brighter neon cyan */
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 271 91% 75%;
+    
+    /* Enhanced cyberpunk glassmorphism */
+    --glass: 0 0% 2% / 0.95;
+    --glass-border: 271 91% 70% / 0.25;
+    --glass-shadow: 271 91% 70% / 0.2;
+    
+    /* Enhanced neon sidebar */
+    --sidebar-bg: 0 0% 2% / 0.98;
+    --sidebar-border: 271 91% 70% / 0.4;
+    --sidebar-text: 189 94% 75%;
+    --sidebar-text-active: 315 100% 100%;
+    --sidebar-hover: 271 91% 70% / 0.15;
+    --sidebar-accent: 271 91% 70% / 0.2;
+    
+    /* Enhanced cyberpunk cards */
+    --card: 0 0% 4%;
+    --card-foreground: 315 100% 100%;
+    --card-border: 271 91% 70% / 0.4;
+    --card-shadow: 271 91% 70% / 0.15;
+    --card-hover: 271 91% 70% / 0.08;
+    
+    /* Enhanced cyberpunk popovers */
+    --popover: 0 0% 3%;
+    --popover-foreground: 315 100% 100%;
+    
+    /* Enhanced neon accents */
+    --accent: 271 91% 8%;
+    --accent-foreground: 271 91% 85%;
+    --accent-glow: 271 91% 70% / 0.3;
+    
+    /* Enhanced cyberpunk secondary */
+    --secondary: 271 91% 12%;
+    --secondary-foreground: 271 91% 90%;
+    
+    /* Enhanced cyberpunk muted */
+    --muted: 0 0% 8%;
+    --muted-foreground: 189 94% 75%;
+    
+    /* Enhanced cyberpunk status colors */
+    --success: 142 91% 60%;
+    --success-glow: 142 91% 60% / 0.5;
+    --success-foreground: 0 0% 100%;
+    
+    --warning: 38 100% 65%;
+    --warning-glow: 38 100% 65% / 0.5;
+    --warning-foreground: 0 0% 100%;
+    
+    --destructive: 345 91% 70%;
+    --destructive-glow: 345 91% 70% / 0.5;
+    --destructive-foreground: 0 0% 100%;
+    
+    /* Enhanced cyberpunk match indicators */
+    --match-excellent: 142 91% 60%;
+    --match-good: 60 100% 65%;
+    --match-fair: 38 100% 65%;
+    --match-poor: 345 91% 70%;
+    
+    /* Enhanced cyberpunk tag system */
+    --tag-blue: 189 94% 10%;
+    --tag-blue-text: 189 94% 85%;
+    --tag-blue-glow: 189 94% 50% / 0.25;
+    
+    --tag-purple: 271 91% 10%;
+    --tag-purple-text: 271 91% 90%;
+    --tag-purple-glow: 271 91% 70% / 0.25;
+    
+    --tag-green: 345 91% 10%;
+    --tag-green-text: 345 91% 85%;
+    --tag-green-glow: 345 91% 70% / 0.25;
+    
+    /* Enhanced cyberpunk form elements */
+    --border: 271 91% 25%;
+    --input: 0 0% 4%;
+    --input-border: 271 91% 35%;
+    --ring: 271 91% 70%;
+    
+    /* Enhanced neon gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    --gradient-card: linear-gradient(145deg, hsl(var(--card)), hsl(271 91% 6%));
+    --gradient-glass: linear-gradient(145deg, hsl(var(--glass)), hsl(0 0% 1% / 0.95));
+    --gradient-sidebar: linear-gradient(180deg, hsl(var(--sidebar-bg)), hsl(0 0% 1%));
+    
+    /* Intense neon shadows */
+    --shadow-sm: 0 1px 2px 0 hsl(var(--glass-shadow));
+    --shadow-md: 0 4px 6px -1px hsl(var(--glass-shadow)), 0 2px 4px -2px hsl(var(--glass-shadow));
+    --shadow-lg: 0 10px 15px -3px hsl(var(--glass-shadow)), 0 4px 6px -4px hsl(var(--glass-shadow));
+    --shadow-xl: 0 20px 25px -5px hsl(var(--glass-shadow)), 0 8px 10px -6px hsl(var(--glass-shadow));
+    --shadow-glow: 0 0 0 1px hsl(var(--primary) / 0.3), 0 0 40px hsl(var(--primary) / 0.4), 0 0 80px hsl(var(--primary-glow) / 0.2);
+  }
+
   .theme-forest.dark {
     /* Same dark theme base as default */
     --background: 200 25% 8%; /* Deep slate background */
