@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -16,6 +16,8 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Plus, MoreVertical, Edit, Trash2 } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useProject } from "@/contexts/ProjectContext";
 
 interface EmailSequence {
   id: string;
@@ -26,6 +28,7 @@ interface EmailSequence {
   created_at: string;
   updated_at: string;
   global_template_id: string | null;
+  project_id: string | null;
 }
 
 interface GlobalTemplate {
@@ -72,7 +75,11 @@ const EmailSequences: React.FC = () => {
   const queryClient = useQueryClient();
 
   const { data: sequences = [], isLoading } = useEmailSequences();
-  const { data: globalTemplates = [] } = useGlobalTemplates();
+const { data: globalTemplates = [] } = useGlobalTemplates();
+const { projects, activeProject } = useProject();
+const [viewFilter, setViewFilter] = useState<'all' | 'project' | 'standalone'>('all');
+const [filterProjectId, setFilterProjectId] = useState<string>(activeProject?.id ?? 'all');
+useEffect(() => { setFilterProjectId(activeProject?.id ?? 'all'); }, [activeProject]);
 
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
@@ -80,6 +87,9 @@ const EmailSequences: React.FC = () => {
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>("scratch");
   const [editingSequence, setEditingSequence] = useState<EmailSequence | null>(null);
   const [deleteSequenceId, setDeleteSequenceId] = useState<string | null>(null);
+
+  const [selectedProjectId, setSelectedProjectId] = useState<string>(activeProject?.id ?? 'none');
+  useEffect(() => { if (!editingSequence) setSelectedProjectId(activeProject?.id ?? 'none'); }, [activeProject, editingSequence]);
 
   const createMutation = useMutation({
     mutationFn: async ({ name, description, templateId }: { name: string; description?: string; templateId?: string }) => {
@@ -95,6 +105,7 @@ const EmailSequences: React.FC = () => {
           name, 
           description: description || null, 
           is_active: false,
+          project_id: selectedProjectId !== 'none' ? selectedProjectId : null,
           global_template_id: templateId && templateId !== "scratch" ? templateId : null
         }])
         .select("*")
@@ -141,6 +152,7 @@ const EmailSequences: React.FC = () => {
       setName("");
       setDescription("");
       setSelectedTemplateId("scratch");
+      setSelectedProjectId(activeProject?.id ?? 'none');
       queryClient.invalidateQueries({ queryKey: ["email_sequences"] });
     },
     onError: (err: any) => {
@@ -209,6 +221,7 @@ const EmailSequences: React.FC = () => {
     setName("");
     setDescription("");
     setSelectedTemplateId("scratch");
+    setSelectedProjectId(activeProject?.id ?? 'none');
     setOpen(false);
   };
 
@@ -219,6 +232,15 @@ const EmailSequences: React.FC = () => {
       year: 'numeric'
     });
   };
+
+  const filteredSequences = useMemo(() => {
+    if (viewFilter === 'standalone') return sequences.filter(s => !s.project_id);
+    if (viewFilter === 'project') {
+      if (filterProjectId === 'all') return sequences.filter(s => !!s.project_id);
+      return sequences.filter(s => s.project_id === filterProjectId);
+    }
+    return sequences;
+  }, [sequences, viewFilter, filterProjectId]);
 
   return (
     <>
@@ -261,22 +283,40 @@ const EmailSequences: React.FC = () => {
                       <Textarea placeholder="Short description (optional)" value={description} onChange={(e) => setDescription(e.target.value)} />
                     </div>
                     {!editingSequence && (
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">Template (optional)</label>
-                        <Select value={selectedTemplateId} onValueChange={setSelectedTemplateId}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Choose a global template or create from scratch" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="scratch">Create from scratch</SelectItem>
-                            {globalTemplates.map(template => (
-                              <SelectItem key={template.id} value={template.id}>
-                                {template.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
+                      <>
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium">Project (optional)</label>
+                          <Select value={selectedProjectId} onValueChange={setSelectedProjectId}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a project or keep standalone" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="none">None (Standalone)</SelectItem>
+                              {projects.map((p) => (
+                                <SelectItem key={p.id} value={p.id}>
+                                  {p.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium">Template (optional)</label>
+                          <Select value={selectedTemplateId} onValueChange={setSelectedTemplateId}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Choose a global template or create from scratch" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="scratch">Create from scratch</SelectItem>
+                              {globalTemplates.map(template => (
+                                <SelectItem key={template.id} value={template.id}>
+                                  {template.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </>
                     )}
                   </div>
                   <DialogFooter>
@@ -294,6 +334,30 @@ const EmailSequences: React.FC = () => {
             </CardHeader>
             <Separator />
             <CardContent>
+              <div className="flex items-center justify-between gap-2 mb-4">
+                <div className="flex items-center gap-2">
+                  <Tabs value={viewFilter} onValueChange={(v) => setViewFilter(v as any)}>
+                    <TabsList>
+                      <TabsTrigger value="all">All</TabsTrigger>
+                      <TabsTrigger value="project">Project-specific</TabsTrigger>
+                      <TabsTrigger value="standalone">Standalone</TabsTrigger>
+                    </TabsList>
+                  </Tabs>
+                  {viewFilter === 'project' && (
+                    <Select value={filterProjectId} onValueChange={setFilterProjectId}>
+                      <SelectTrigger className="w-[220px]">
+                        <SelectValue placeholder="Select project" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All projects</SelectItem>
+                        {projects.map(p => (
+                          <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                </div>
+              </div>
               {isLoading ? (
                 <div className="py-10 text-center text-muted-foreground">Loading sequences…</div>
               ) : sequences.length === 0 ? (
@@ -303,13 +367,14 @@ const EmailSequences: React.FC = () => {
                   <TableHeader>
                     <TableRow>
                       <TableHead>Name</TableHead>
+                      <TableHead>Project</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead>Created</TableHead>
                       <TableHead className="w-16">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {sequences.map((seq) => (
+                    {filteredSequences.map((seq) => (
                       <TableRow 
                         key={seq.id} 
                         className="hover:bg-muted/50"
@@ -319,6 +384,13 @@ const EmailSequences: React.FC = () => {
                           onClick={() => navigate(`/email-sequences/${seq.id}`)}
                         >
                           {seq.name}
+                        </TableCell>
+                        <TableCell>
+                          {seq.project_id ? (
+                            <Badge variant="secondary">{projects.find(p => p.id === seq.project_id)?.name ?? "Project"}</Badge>
+                          ) : (
+                            <Badge variant="outline">Standalone</Badge>
+                          )}
                         </TableCell>
                         <TableCell>
                           {seq.is_active ? (

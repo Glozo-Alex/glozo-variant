@@ -125,6 +125,7 @@ export type Database = {
           id: string
           is_active: boolean
           name: string
+          project_id: string | null
           updated_at: string
           user_id: string
         }
@@ -135,6 +136,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           name: string
+          project_id?: string | null
           updated_at?: string
           user_id: string
         }
@@ -145,10 +147,18 @@ export type Database = {
           id?: string
           is_active?: boolean
           name?: string
+          project_id?: string | null
           updated_at?: string
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "email_sequences_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "fk_email_sequences_global_template_id"
             columns: ["global_template_id"]
