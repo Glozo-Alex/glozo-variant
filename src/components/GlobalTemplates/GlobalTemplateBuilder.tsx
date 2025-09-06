@@ -1,11 +1,13 @@
-import { useState, useEffect } from 'react';
-import { Plus, Trash2, GripVertical, Save, ArrowLeft } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Plus, Trash2, GripVertical, Save, ArrowLeft, ChevronDown, ChevronUp, CheckCircle2, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useToast } from '@/hooks/use-toast';
 import { AdvancedScheduler, ScheduleConfig, TriggerConfig } from './AdvancedScheduler';
 
@@ -68,6 +70,10 @@ export function GlobalTemplateBuilder({
       }
     ]
   );
+  const [collapsedEmails, setCollapsedEmails] = useState<Set<number>>(new Set());
+  const [activeField, setActiveField] = useState<{ emailIndex: number; field: 'subject' | 'content' } | null>(null);
+  const subjectRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const contentRefs = useRef<(HTMLTextAreaElement | null)[]>([]);
   const { toast } = useToast();
 
   // Sync local state when initialData loads (fixes editing showing only one email)
@@ -123,11 +129,42 @@ export function GlobalTemplateBuilder({
     setEmails(updatedEmails);
   };
 
-  const insertVariable = (emailIndex: number, field: 'subject' | 'content', variable: string) => {
-    const email = emails[emailIndex];
-    const currentValue = email[field];
-    const updatedValue = currentValue + variable;
-    updateEmail(emailIndex, field, updatedValue);
+  const insertVariable = (variable: string) => {
+    if (!activeField) return;
+    
+    const { emailIndex, field } = activeField;
+    const ref = field === 'subject' ? subjectRefs.current[emailIndex] : contentRefs.current[emailIndex];
+    
+    if (ref) {
+      const start = ref.selectionStart || 0;
+      const end = ref.selectionEnd || 0;
+      const currentValue = emails[emailIndex][field];
+      const newValue = currentValue.slice(0, start) + variable + currentValue.slice(end);
+      
+      updateEmail(emailIndex, field, newValue);
+      
+      // Restore cursor position after the inserted variable
+      setTimeout(() => {
+        if (ref) {
+          ref.focus();
+          ref.setSelectionRange(start + variable.length, start + variable.length);
+        }
+      }, 0);
+    }
+  };
+
+  const toggleEmailCollapse = (index: number) => {
+    const newCollapsed = new Set(collapsedEmails);
+    if (newCollapsed.has(index)) {
+      newCollapsed.delete(index);
+    } else {
+      newCollapsed.add(index);
+    }
+    setCollapsedEmails(newCollapsed);
+  };
+
+  const isEmailComplete = (email: TemplateEmail) => {
+    return email.name.trim() && email.subject.trim() && email.content.trim();
   };
 
   const handleSave = async () => {
@@ -232,70 +269,124 @@ export function GlobalTemplateBuilder({
             </div>
 
             {emails.map((email, index) => (
-              <Card key={index}>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <GripVertical className="h-4 w-4 text-muted-foreground" />
-                      <CardTitle className="text-base">
-                        Email {index + 1}: {email.name}
-                      </CardTitle>
-                    </div>
-                    {emails.length > 1 && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => removeEmail(index)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    )}
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <Label htmlFor={`email-name-${index}`}>Email Name</Label>
-                    <Input
-                      id={`email-name-${index}`}
-                      value={email.name}
-                      onChange={(e) => updateEmail(index, 'name', e.target.value)}
-                      placeholder="Enter email name"
-                    />
-                  </div>
+              <Collapsible 
+                key={index} 
+                open={!collapsedEmails.has(index)} 
+                onOpenChange={() => toggleEmailCollapse(index)}
+              >
+                <Card>
+                  <CollapsibleTrigger asChild>
+                    <CardHeader className="cursor-pointer hover:bg-accent/50 transition-colors">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <GripVertical className="h-4 w-4 text-muted-foreground" />
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline" className="text-xs">
+                              {index + 1}
+                            </Badge>
+                            <CardTitle className="text-base">
+                              {email.name || `Email ${index + 1}`}
+                            </CardTitle>
+                            {isEmailComplete(email) ? (
+                              <CheckCircle2 className="h-4 w-4 text-green-500" />
+                            ) : (
+                              <AlertCircle className="h-4 w-4 text-amber-500" />
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {emails.length > 1 && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                removeEmail(index);
+                              }}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          )}
+                          {collapsedEmails.has(index) ? (
+                            <ChevronDown className="h-4 w-4" />
+                          ) : (
+                            <ChevronUp className="h-4 w-4" />
+                          )}
+                        </div>
+                      </div>
+                    </CardHeader>
+                  </CollapsibleTrigger>
+                  
+                  <CollapsibleContent>
+                    <CardContent className="space-y-4">
+                      <div>
+                        <Label htmlFor={`email-name-${index}`}>Email Name</Label>
+                        <Input
+                          id={`email-name-${index}`}
+                          value={email.name}
+                          onChange={(e) => updateEmail(index, 'name', e.target.value)}
+                          placeholder="Enter email name"
+                        />
+                      </div>
 
-                  <div>
-                    <Label htmlFor={`email-subject-${index}`}>Subject Line</Label>
-                    <Input
-                      id={`email-subject-${index}`}
-                      value={email.subject}
-                      onChange={(e) => updateEmail(index, 'subject', e.target.value)}
-                      placeholder="Enter email subject"
-                    />
-                  </div>
+                      <div>
+                        <Label htmlFor={`email-subject-${index}`}>Subject Line</Label>
+                        <Input
+                          ref={(el) => (subjectRefs.current[index] = el)}
+                          id={`email-subject-${index}`}
+                          value={email.subject}
+                          onChange={(e) => updateEmail(index, 'subject', e.target.value)}
+                          onFocus={() => setActiveField({ emailIndex: index, field: 'subject' })}
+                          placeholder="Enter email subject"
+                        />
+                      </div>
 
-                  <div>
-                    <Label htmlFor={`email-content-${index}`}>Email Content</Label>
-                    <Textarea
-                      id={`email-content-${index}`}
-                      value={email.content}
-                      onChange={(e) => updateEmail(index, 'content', e.target.value)}
-                      placeholder="Enter email content..."
-                      rows={6}
-                    />
-                  </div>
+                      <div>
+                        <Label htmlFor={`email-content-${index}`}>Email Content</Label>
+                        <Textarea
+                          ref={(el) => (contentRefs.current[index] = el)}
+                          id={`email-content-${index}`}
+                          value={email.content}
+                          onChange={(e) => updateEmail(index, 'content', e.target.value)}
+                          onFocus={() => setActiveField({ emailIndex: index, field: 'content' })}
+                          placeholder="Enter email content..."
+                          rows={6}
+                        />
+                      </div>
 
-                  <Separator />
+                      <Separator />
 
-                  <AdvancedScheduler
-                    scheduleType={email.schedule_type}
-                    scheduleConfig={email.schedule_config}
-                    triggerConfig={email.trigger_config}
-                    onScheduleTypeChange={(type) => updateEmail(index, 'schedule_type', type)}
-                    onScheduleConfigChange={(config) => updateEmail(index, 'schedule_config', config)}
-                    onTriggerConfigChange={(config) => updateEmail(index, 'trigger_config', config)}
-                  />
-                </CardContent>
-              </Card>
+                      <Collapsible defaultOpen={false}>
+                        <CollapsibleTrigger asChild>
+                          <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors">
+                            <div className="flex items-center gap-2">
+                              <h4 className="text-sm font-medium">Schedule Settings</h4>
+                              <Badge variant="outline" className="text-xs">
+                                {email.schedule_type === 'delay' && 
+                                  `${email.schedule_config.delay?.days || 0}d ${email.schedule_config.delay?.hours || 0}h`}
+                                {email.schedule_type === 'specific_date' && 'Specific Date'}
+                                {email.schedule_type === 'days_of_week' && 'Weekly'}
+                                {email.schedule_type === 'trigger_based' && 'Trigger Based'}
+                              </Badge>
+                            </div>
+                            <ChevronDown className="h-4 w-4" />
+                          </div>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent className="pt-4">
+                          <AdvancedScheduler
+                            scheduleType={email.schedule_type}
+                            scheduleConfig={email.schedule_config}
+                            triggerConfig={email.trigger_config}
+                            onScheduleTypeChange={(type) => updateEmail(index, 'schedule_type', type)}
+                            onScheduleConfigChange={(config) => updateEmail(index, 'schedule_config', config)}
+                            onTriggerConfigChange={(config) => updateEmail(index, 'trigger_config', config)}
+                          />
+                        </CollapsibleContent>
+                      </Collapsible>
+                    </CardContent>
+                  </CollapsibleContent>
+                </Card>
+              </Collapsible>
             ))}
           </div>
         </div>
@@ -306,15 +397,29 @@ export function GlobalTemplateBuilder({
             <CardHeader>
               <CardTitle className="text-base">Available Variables</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-2">
-              {EMAIL_VARIABLES.map(({ variable, description }) => (
-                <div key={variable} className="text-sm">
-                  <code className="bg-muted px-2 py-1 rounded text-xs font-mono">
-                    {variable}
-                  </code>
-                  <p className="text-muted-foreground mt-1 text-xs">{description}</p>
-                </div>
-              ))}
+            <CardContent className="space-y-3">
+              <p className="text-xs text-muted-foreground">
+                {activeField ? 
+                  `Click to insert at cursor in Email ${activeField.emailIndex + 1} ${activeField.field}` : 
+                  'Focus on a field to insert variables'
+                }
+              </p>
+              <div className="grid grid-cols-1 gap-2">
+                {EMAIL_VARIABLES.map(({ variable, description }) => (
+                  <div key={variable}>
+                    <Badge
+                      variant="outline"
+                      className={`w-full justify-start cursor-pointer hover:bg-accent text-xs ${
+                        activeField ? 'hover:bg-primary hover:text-primary-foreground' : 'opacity-50'
+                      }`}
+                      onClick={() => activeField && insertVariable(variable)}
+                    >
+                      {variable}
+                    </Badge>
+                    <p className="text-muted-foreground mt-1 text-xs pl-2">{description}</p>
+                  </div>
+                ))}
+              </div>
             </CardContent>
           </Card>
 

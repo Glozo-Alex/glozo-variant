@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -7,7 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Eye, Save, X } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Eye, Save, X, ChevronDown } from "lucide-react";
 
 interface EmailTemplate {
   id?: string;
@@ -96,6 +97,9 @@ const EmailTemplateBuilder: React.FC<EmailTemplateBuilderProps> = ({
   });
 
   const [showPreview, setShowPreview] = useState(false);
+  const [activeField, setActiveField] = useState<'subject' | 'content' | null>(null);
+  const subjectRef = useRef<HTMLInputElement>(null);
+  const contentRef = useRef<HTMLTextAreaElement>(null);
 
   const handlePresetSelect = (presetKey: string) => {
     const preset = TEMPLATE_PRESETS[presetKey as keyof typeof TEMPLATE_PRESETS];
@@ -110,10 +114,29 @@ const EmailTemplateBuilder: React.FC<EmailTemplateBuilderProps> = ({
   };
 
   const insertVariable = (variable: string) => {
-    setFormData(prev => ({
-      ...prev,
-      content: prev.content + variable
-    }));
+    if (!activeField) return;
+    
+    const ref = activeField === 'subject' ? subjectRef.current : contentRef.current;
+    
+    if (ref) {
+      const start = ref.selectionStart || 0;
+      const end = ref.selectionEnd || 0;
+      const currentValue = formData[activeField];
+      const newValue = currentValue.slice(0, start) + variable + currentValue.slice(end);
+      
+      setFormData(prev => ({
+        ...prev,
+        [activeField]: newValue
+      }));
+      
+      // Restore cursor position after the inserted variable
+      setTimeout(() => {
+        if (ref) {
+          ref.focus();
+          ref.setSelectionRange(start + variable.length, start + variable.length);
+        }
+      }, 0);
+    }
   };
 
   const renderPreview = () => {
@@ -183,47 +206,66 @@ const EmailTemplateBuilder: React.FC<EmailTemplateBuilderProps> = ({
             <div className="space-y-2">
               <Label htmlFor="template-subject">Email Subject</Label>
               <Input
+                ref={subjectRef}
                 id="template-subject"
                 placeholder="e.g. Exciting opportunity at {{company}}"
                 value={formData.subject}
                 onChange={(e) => setFormData(prev => ({ ...prev, subject: e.target.value }))}
+                onFocus={() => setActiveField('subject')}
               />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="template-content">Email Content</Label>
               <Textarea
+                ref={contentRef}
                 id="template-content"
                 placeholder="Write your email content here..."
                 rows={12}
                 value={formData.content}
                 onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
+                onFocus={() => setActiveField('content')}
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="delay-days">Delay (Days)</Label>
-                <Input
-                  id="delay-days"
-                  type="number"
-                  min="0"
-                  value={formData.delay_days}
-                  onChange={(e) => setFormData(prev => ({ ...prev, delay_days: parseInt(e.target.value) || 0 }))}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="delay-hours">Additional Hours</Label>
-                <Input
-                  id="delay-hours"
-                  type="number"
-                  min="0"
-                  max="23"
-                  value={formData.delay_hours}
-                  onChange={(e) => setFormData(prev => ({ ...prev, delay_hours: parseInt(e.target.value) || 0 }))}
-                />
-              </div>
-            </div>
+            <Collapsible defaultOpen={false}>
+              <CollapsibleTrigger asChild>
+                <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors">
+                  <div className="flex items-center gap-2">
+                    <h4 className="text-sm font-medium">Delay Settings</h4>
+                    <Badge variant="outline" className="text-xs">
+                      {formData.delay_days}d {formData.delay_hours}h
+                    </Badge>
+                  </div>
+                  <ChevronDown className="h-4 w-4" />
+                </div>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="pt-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="delay-days">Delay (Days)</Label>
+                    <Input
+                      id="delay-days"
+                      type="number"
+                      min="0"
+                      value={formData.delay_days}
+                      onChange={(e) => setFormData(prev => ({ ...prev, delay_days: parseInt(e.target.value) || 0 }))}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="delay-hours">Additional Hours</Label>
+                    <Input
+                      id="delay-hours"
+                      type="number"
+                      min="0"
+                      max="23"
+                      value={formData.delay_hours}
+                      onChange={(e) => setFormData(prev => ({ ...prev, delay_hours: parseInt(e.target.value) || 0 }))}
+                    />
+                  </div>
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
           </div>
 
           <div className="space-y-4">
@@ -250,25 +292,26 @@ const EmailTemplateBuilder: React.FC<EmailTemplateBuilderProps> = ({
               <CardHeader>
                 <CardTitle className="text-sm">Variables</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-2">
-                <Label className="text-xs">Click to insert:</Label>
-                <div className="flex flex-wrap gap-1">
+              <CardContent className="space-y-3">
+                <p className="text-xs text-muted-foreground">
+                  {activeField ? 
+                    `Click to insert at cursor in ${activeField}` : 
+                    'Focus on a field to insert variables'
+                  }
+                </p>
+                <div className="grid grid-cols-1 gap-2">
                   {EMAIL_VARIABLES.map((variable) => (
-                    <Badge
-                      key={variable.key}
-                      variant="outline"
-                      className="cursor-pointer hover:bg-accent text-xs"
-                      onClick={() => insertVariable(variable.key)}
-                    >
-                      {variable.key}
-                    </Badge>
-                  ))}
-                </div>
-                <Separator className="my-2" />
-                <div className="space-y-1">
-                  {EMAIL_VARIABLES.map((variable) => (
-                    <div key={variable.key} className="text-xs text-muted-foreground">
-                      <code className="bg-muted px-1 rounded">{variable.key}</code>: {variable.description}
+                    <div key={variable.key}>
+                      <Badge
+                        variant="outline"
+                        className={`w-full justify-start cursor-pointer hover:bg-accent text-xs ${
+                          activeField ? 'hover:bg-primary hover:text-primary-foreground' : 'opacity-50'
+                        }`}
+                        onClick={() => activeField && insertVariable(variable.key)}
+                      >
+                        {variable.key}
+                      </Badge>
+                      <p className="text-muted-foreground mt-1 text-xs pl-2">{variable.description}</p>
                     </div>
                   ))}
                 </div>
