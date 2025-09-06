@@ -15,6 +15,7 @@ import SearchResults from "./pages/SearchResults";
 import Shortlist from "./pages/Shortlist";
 import NotFound from "./pages/NotFound";
 import Analytics from "./pages/Analytics";
+import OutreachAnalytics from "./pages/OutreachAnalytics";
 import Search from "./pages/Search";
 import Pipeline from "./pages/Pipeline";
 import Team from "./pages/Team";
@@ -149,16 +150,26 @@ const App = () => (
                     </ProtectedRoute>
                   }
                 />
-                <Route
-                  path="/outreach/analytics"
-                  element={
-                    <ProtectedRoute>
-                      <Layout>
-                        <Analytics />
-                      </Layout>
-                    </ProtectedRoute>
-                  }
-                />
+          <Route 
+            path="/analytics" 
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <Analytics />
+                </Layout>
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/outreach/analytics" 
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <OutreachAnalytics />
+                </Layout>
+              </ProtectedRoute>
+            } 
+          />
                 <Route
                   path="/pipeline"
                   element={

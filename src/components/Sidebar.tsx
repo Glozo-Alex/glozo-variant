@@ -196,6 +196,24 @@ const Sidebar = () => {
             )}
           </NavLink>
 
+          <NavLink to="/analytics" className={({ isActive }) => `${navCls} ${isActive ? 'bg-sidebar-accent text-sidebar-text-active' : ''}`}>
+            {collapsed ? (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center justify-center">
+                    <BarChart3 className="h-5 w-5" />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="right">Analytics</TooltipContent>
+              </Tooltip>
+            ) : (
+              <>
+                <BarChart3 className="h-5 w-5" />
+                <span>Analytics</span>
+              </>
+            )}
+          </NavLink>
+
         </nav>
 
         {/* System navigation */}
