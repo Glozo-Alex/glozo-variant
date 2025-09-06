@@ -698,106 +698,7 @@
     --shadow-glow: 0 0 0 1px hsl(var(--primary) / 0.05), 0 0 20px hsl(var(--primary) / 0.1);
   }
 
-  /* Midnight Theme - Professional Dark Blue */
-  .theme-midnight {
-    /* Base surfaces with sophisticated blues */
-    --background: 210 30% 98%; /* Cool light background */
-    --foreground: 222 84% 5%; /* Near-black text */
-    
-    /* Professional blue gradient system */
-    --primary: 214 88% 27%; /* Deep blue #1e40af */
-    --primary-glow: 213 94% 34%; /* Indigo #3730a3 */
-    --primary-foreground: 0 0% 100%;
-    --primary-hover: 214 88% 32%;
-    
-    /* Enhanced glassmorphism with blue tints */
-    --glass: 210 30% 99% / 0.85;
-    --glass-border: 214 20% 90% / 0.3;
-    --glass-shadow: 222 84% 5% / 0.12;
-    
-    /* Professional sidebar */
-    --sidebar-bg: 210 30% 98% / 0.95;
-    --sidebar-border: 214 20% 88% / 0.4;
-    --sidebar-text: 215 25% 27%;
-    --sidebar-text-active: 222 84% 5%;
-    --sidebar-hover: 214 20% 92% / 0.8;
-    --sidebar-accent: 214 88% 27% / 0.1;
-    
-    /* Professional cards */
-    --card: 210 30% 99%;
-    --card-foreground: 222 84% 5%;
-    --card-border: 214 20% 88% / 0.4;
-    --card-shadow: 222 84% 5% / 0.08;
-    --card-hover: 214 88% 27% / 0.03;
-    
-    /* Professional popovers */
-    --popover: 210 30% 97%;
-    --popover-foreground: 222 84% 5%;
-    
-    /* Professional accents */
-    --accent: 214 20% 95%;
-    --accent-foreground: 214 88% 20%;
-    --accent-glow: 214 88% 27% / 0.15;
-    
-    /* Professional secondary */
-    --secondary: 214 88% 92%; /* Light professional blue */
-    --secondary-foreground: 214 88% 15%; /* Dark professional blue */
-    
-    /* Professional muted */
-    --muted: 214 20% 95%;
-    --muted-foreground: 215 25% 27%;
-    
-    /* Professional status colors */
-    --success: 142 76% 36%;
-    --success-glow: 142 76% 36% / 0.2;
-    --success-foreground: 0 0% 100%;
-    
-    --warning: 38 92% 50%;
-    --warning-glow: 38 92% 50% / 0.2;
-    --warning-foreground: 0 0% 100%;
-    
-    --destructive: 0 84% 60%;
-    --destructive-glow: 0 84% 60% / 0.2;
-    --destructive-foreground: 0 0% 100%;
-    
-    /* Professional match indicators */
-    --match-excellent: 142 76% 36%;
-    --match-good: 45 93% 47%;
-    --match-fair: 25 95% 53%;
-    --match-poor: 0 84% 60%;
-    
-    /* Professional tag system */
-    --tag-blue: 214 88% 88%;
-    --tag-blue-text: 214 88% 15%;
-    --tag-blue-glow: 214 88% 27% / 0.1;
-    
-    --tag-purple: 213 94% 88%;
-    --tag-purple-text: 213 94% 20%;
-    --tag-purple-glow: 213 94% 34% / 0.1;
-    
-    --tag-green: 197 100% 85%;
-    --tag-green-text: 197 100% 25%;
-    --tag-green-glow: 197 100% 47% / 0.1;
-    
-    /* Professional form elements */
-    --border: 214 20% 85%;
-    --input: 210 30% 99%;
-    --input-border: 214 20% 85%;
-    --ring: 214 88% 27%;
-    
-    /* Professional gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
-    --gradient-card: linear-gradient(145deg, hsl(var(--card)), hsl(214 20% 95%));
-    --gradient-glass: linear-gradient(145deg, hsl(var(--glass)), hsl(210 30% 97% / 0.7));
-    --gradient-sidebar: linear-gradient(180deg, hsl(var(--sidebar-bg)), hsl(210 30% 96% / 0.9));
-    
-    /* Enhanced professional shadows */
-    --shadow-sm: 0 1px 2px 0 hsl(var(--glass-shadow));
-    --shadow-md: 0 4px 6px -1px hsl(var(--glass-shadow)), 0 2px 4px -2px hsl(var(--glass-shadow));
-    --shadow-lg: 0 10px 15px -3px hsl(var(--glass-shadow)), 0 4px 6px -4px hsl(var(--glass-shadow));
-    --shadow-xl: 0 20px 25px -5px hsl(var(--glass-shadow)), 0 8px 10px -6px hsl(var(--glass-shadow));
-    --shadow-glow: 0 0 0 1px hsl(var(--primary) / 0.08), 0 0 25px hsl(var(--primary) / 0.15);
-  }
+  .theme-midnight.dark {
 
   .theme-midnight.dark {
     /* Professional dark theme */
@@ -1588,6 +1489,107 @@
   .text-sm { font-size: 0.875rem; line-height: 1.25rem; } /* 14px - Base size */
   .text-base { font-size: 1rem; line-height: 1.5rem; } /* 16px - Headers */
   .text-lg { font-size: 1.125rem; line-height: 1.75rem; } /* 18px */
+
+  /* Midnight Theme - Professional Dark Blue */
+  .theme-midnight {
+    /* Base surfaces with sophisticated blues */
+    --background: 210 30% 98%; /* Cool light background */
+    --foreground: 222 84% 5%; /* Near-black text */
+    
+    /* Professional blue gradient system */
+    --primary: 214 88% 27%; /* Deep blue #1e40af */
+    --primary-glow: 213 94% 34%; /* Indigo #3730a3 */
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 214 88% 32%;
+    
+    /* Enhanced glassmorphism with blue tints */
+    --glass: 210 30% 99% / 0.85;
+    --glass-border: 214 20% 90% / 0.3;
+    --glass-shadow: 222 84% 5% / 0.12;
+    
+    /* Professional sidebar */
+    --sidebar-bg: 210 30% 98% / 0.95;
+    --sidebar-border: 214 20% 88% / 0.4;
+    --sidebar-text: 215 25% 27%;
+    --sidebar-text-active: 222 84% 5%;
+    --sidebar-hover: 214 20% 92% / 0.8;
+    --sidebar-accent: 214 88% 27% / 0.1;
+    
+    /* Professional cards */
+    --card: 210 30% 99%;
+    --card-foreground: 222 84% 5%;
+    --card-border: 214 20% 88% / 0.4;
+    --card-shadow: 222 84% 5% / 0.08;
+    --card-hover: 214 88% 27% / 0.03;
+    
+    /* Professional popovers */
+    --popover: 210 30% 97%;
+    --popover-foreground: 222 84% 5%;
+    
+    /* Professional accents */
+    --accent: 214 20% 95%;
+    --accent-foreground: 214 88% 20%;
+    --accent-glow: 214 88% 27% / 0.15;
+    
+    /* Professional secondary */
+    --secondary: 214 88% 92%; /* Light professional blue */
+    --secondary-foreground: 214 88% 15%; /* Dark professional blue */
+    
+    /* Professional muted */
+    --muted: 214 20% 95%;
+    --muted-foreground: 215 25% 27%;
+    
+    /* Professional status colors */
+    --success: 142 76% 36%;
+    --success-glow: 142 76% 36% / 0.2;
+    --success-foreground: 0 0% 100%;
+    
+    --warning: 38 92% 50%;
+    --warning-glow: 38 92% 50% / 0.2;
+    --warning-foreground: 0 0% 100%;
+    
+    --destructive: 0 84% 60%;
+    --destructive-glow: 0 84% 60% / 0.2;
+    --destructive-foreground: 0 0% 100%;
+    
+    /* Professional match indicators */
+    --match-excellent: 142 76% 36%;
+    --match-good: 45 93% 47%;
+    --match-fair: 25 95% 53%;
+    --match-poor: 0 84% 60%;
+    
+    /* Professional tag system */
+    --tag-blue: 214 88% 88%;
+    --tag-blue-text: 214 88% 15%;
+    --tag-blue-glow: 214 88% 27% / 0.1;
+    
+    --tag-purple: 213 94% 88%;
+    --tag-purple-text: 213 94% 20%;
+    --tag-purple-glow: 213 94% 34% / 0.1;
+    
+    --tag-green: 197 100% 85%;
+    --tag-green-text: 197 100% 25%;
+    --tag-green-glow: 197 100% 47% / 0.1;
+    
+    /* Professional form elements */
+    --border: 214 20% 85%;
+    --input: 210 30% 99%;
+    --input-border: 214 20% 85%;
+    --ring: 214 88% 27%;
+    
+    /* Professional gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    --gradient-card: linear-gradient(145deg, hsl(var(--card)), hsl(214 20% 95%));
+    --gradient-glass: linear-gradient(145deg, hsl(var(--glass)), hsl(210 30% 97% / 0.7));
+    --gradient-sidebar: linear-gradient(180deg, hsl(var(--sidebar-bg)), hsl(210 30% 96% / 0.9));
+    
+    /* Enhanced professional shadows */
+    --shadow-sm: 0 1px 2px 0 hsl(var(--glass-shadow));
+    --shadow-md: 0 4px 6px -1px hsl(var(--glass-shadow)), 0 2px 4px -2px hsl(var(--glass-shadow));
+    --shadow-lg: 0 10px 15px -3px hsl(var(--glass-shadow)), 0 4px 6px -4px hsl(var(--glass-shadow));
+    --shadow-xl: 0 20px 25px -5px hsl(var(--glass-shadow)), 0 8px 10px -6px hsl(var(--glass-shadow));
+    --shadow-glow: 0 0 0 1px hsl(var(--primary) / 0.08), 0 0 25px hsl(var(--primary) / 0.15);
+  }
 }
 
 /* Theme transition class for smooth color changes */
