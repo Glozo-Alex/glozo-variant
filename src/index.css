@@ -1692,9 +1692,10 @@
   .tag-glow:hover::before {
     @apply opacity-10;
   }
+  }
 }
 
-@layer utilities {
+/* Theme transition class for smooth color changes */
   /* Enhanced color utilities */
   .text-contrast { color: hsl(var(--foreground)); }
   .text-muted { color: hsl(var(--muted-foreground)); }
