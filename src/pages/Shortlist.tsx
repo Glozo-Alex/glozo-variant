@@ -15,6 +15,9 @@ import { useToast } from "@/hooks/use-toast";
 import { ContactInfo } from "@/components/ContactInfo";
 import { CandidateProfile } from "@/components/CandidateProfile";
 import ShortlistProjectSelector from "@/components/ShortlistProjectSelector";
+import { ShortlistSequenceDialog } from "@/components/ShortlistSequenceDialog";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 
 type ViewMode = 'cards' | 'table';
 
@@ -31,8 +34,25 @@ const Shortlist = () => {
     const saved = localStorage.getItem('shortlist-view-mode');
     return (saved as ViewMode) || 'cards';
   });
+  const [sequenceDialogOpen, setSequenceDialogOpen] = useState(false);
   
-  // No need for filter states on Shortlist page
+  // Fetch global templates for sequence creation
+  const { data: globalTemplates = [] } = useQuery({
+    queryKey: ['globalTemplates'],
+    queryFn: async () => {
+      const { data: userRes, error: userErr } = await supabase.auth.getUser();
+      if (userErr || !userRes.user) throw new Error("Not authenticated");
+
+      const { data, error } = await supabase
+        .from("global_templates")
+        .select("id, name, description")
+        .eq("user_id", userRes.user.id)
+        .order("name");
+
+      if (error) throw error;
+      return data || [];
+    }
+  });
   
   const project = projects.find(p => p.id === projectId);
 
@@ -258,6 +278,16 @@ const Shortlist = () => {
                 <List className="h-4 w-4" />
               </Button>
             </div>
+            
+            {shortlistedCandidates.length > 0 && (
+              <Button 
+                onClick={() => setSequenceDialogOpen(true)}
+                className="gap-2"
+              >
+                <Mail className="h-4 w-4" />
+                Create Email Sequence
+              </Button>
+            )}
             
             <div className="text-right">
               <p className="text-2xl font-bold text-primary">{shortlistedCandidates.length}</p>
@@ -579,6 +609,16 @@ const Shortlist = () => {
           </CardContent>
         </Card>
       )}
+
+      {/* Sequence Creation Dialog */}
+      <ShortlistSequenceDialog
+        open={sequenceDialogOpen}
+        onOpenChange={setSequenceDialogOpen}
+        projectId={projectId || ''}
+        projectName={project?.name || ''}
+        candidatesCount={shortlistedCandidates.length}
+        globalTemplates={globalTemplates}
+      />
     </div>
   );
 };
