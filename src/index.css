@@ -1088,6 +1088,207 @@
     --gradient-sidebar: linear-gradient(180deg, hsl(var(--sidebar-bg)), hsl(0 0% 2%));
   }
 
+  /* Cyberpunk Theme - Neon Purple & Cyan */
+  .theme-cyberpunk {
+    /* Future tech base - dark by default */
+    --background: 224 71% 4%; /* Deep dark blue */
+    --foreground: 280 100% 90%; /* Bright neon text */
+    
+    /* Neon cyberpunk system */
+    --primary: 280 100% 70%; /* Neon purple #c084fc */
+    --primary-glow: 187 100% 75%; /* Neon cyan #22d3ee */
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 280 100% 75%;
+    
+    /* Cyberpunk glassmorphism */
+    --glass: 224 71% 2% / 0.95;
+    --glass-border: 280 100% 70% / 0.15;
+    --glass-shadow: 280 100% 70% / 0.2;
+    
+    /* Cyberpunk sidebar */
+    --sidebar-bg: 224 71% 2% / 0.98;
+    --sidebar-border: 280 100% 70% / 0.2;
+    --sidebar-text: 280 30% 80%;
+    --sidebar-text-active: 280 100% 90%;
+    --sidebar-hover: 280 100% 70% / 0.1;
+    --sidebar-accent: 280 100% 70% / 0.3;
+    
+    /* Cyberpunk cards */
+    --card: 224 71% 3%;
+    --card-foreground: 280 100% 90%;
+    --card-border: 280 100% 70% / 0.2;
+    --card-shadow: 280 100% 70% / 0.1;
+    --card-hover: 280 100% 70% / 0.15;
+    
+    /* Cyberpunk popovers */
+    --popover: 224 71% 2%;
+    --popover-foreground: 280 100% 90%;
+    
+    /* Cyberpunk accents */
+    --accent: 224 71% 5%;
+    --accent-foreground: 187 100% 75%;
+    --accent-glow: 187 100% 75% / 0.4;
+    
+    /* Cyberpunk secondary */
+    --secondary: 280 100% 15%; /* Dark neon purple */
+    --secondary-foreground: 280 100% 85%; /* Light neon purple */
+    
+    /* Cyberpunk muted */
+    --muted: 224 71% 6%;
+    --muted-foreground: 280 30% 70%;
+    
+    /* Cyberpunk status colors */
+    --success: 166 100% 45%; /* Neon green */
+    --success-glow: 166 100% 45% / 0.4;
+    --success-foreground: 0 0% 100%;
+    
+    --warning: 48 100% 67%; /* Neon yellow */
+    --warning-glow: 48 100% 67% / 0.4;
+    --warning-foreground: 0 0% 100%;
+    
+    --destructive: 0 100% 67%; /* Neon red */
+    --destructive-glow: 0 100% 67% / 0.4;
+    --destructive-foreground: 0 0% 100%;
+    
+    /* Cyberpunk match indicators */
+    --match-excellent: 166 100% 45%;
+    --match-good: 48 100% 67%;
+    --match-fair: 25 100% 60%;
+    --match-poor: 0 100% 67%;
+    
+    /* Cyberpunk tag system */
+    --tag-blue: 280 100% 15%;
+    --tag-blue-text: 280 100% 85%;
+    --tag-blue-glow: 280 100% 70% / 0.3;
+    
+    --tag-purple: 187 100% 15%;
+    --tag-purple-text: 187 100% 85%;
+    --tag-purple-glow: 187 100% 75% / 0.3;
+    
+    --tag-green: 166 100% 15%;
+    --tag-green-text: 166 100% 85%;
+    --tag-green-glow: 166 100% 45% / 0.3;
+    
+    /* Cyberpunk form elements */
+    --border: 280 100% 70% / 0.2;
+    --input: 224 71% 3%;
+    --input-border: 280 100% 70% / 0.3;
+    --ring: 280 100% 70%;
+    
+    /* Cyberpunk gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    --gradient-card: linear-gradient(145deg, hsl(var(--card)), hsl(224 71% 5%));
+    --gradient-glass: linear-gradient(145deg, hsl(var(--glass)), hsl(224 71% 1% / 0.95));
+    --gradient-sidebar: linear-gradient(180deg, hsl(var(--sidebar-bg)), hsl(224 71% 1%));
+    
+    /* Cyberpunk shadows with glow */
+    --shadow-sm: 0 1px 2px 0 hsl(var(--glass-shadow));
+    --shadow-md: 0 4px 6px -1px hsl(var(--glass-shadow)), 0 2px 4px -2px hsl(var(--glass-shadow));
+    --shadow-lg: 0 10px 15px -3px hsl(var(--glass-shadow)), 0 4px 6px -4px hsl(var(--glass-shadow));
+    --shadow-xl: 0 20px 25px -5px hsl(var(--glass-shadow)), 0 8px 10px -6px hsl(var(--glass-shadow));
+    --shadow-glow: 0 0 0 1px hsl(var(--primary) / 0.3), 0 0 40px hsl(var(--primary) / 0.4), 0 0 80px hsl(var(--primary-glow) / 0.2);
+  }
+
+  .theme-cyberpunk.dark {
+    /* Enhanced cyberpunk dark mode (already quite dark) */
+    --background: 224 71% 2%; /* Even darker */
+    --foreground: 280 100% 95%; /* Brighter neon text */
+    
+    /* Enhanced neon colors */
+    --primary: 280 100% 80%; /* Brighter neon purple */
+    --primary-glow: 187 100% 85%; /* Brighter neon cyan */
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 280 100% 85%;
+    
+    /* Enhanced dark cyberpunk glassmorphism */
+    --glass: 224 71% 1% / 0.98;
+    --glass-border: 280 100% 80% / 0.2;
+    --glass-shadow: 280 100% 80% / 0.3;
+    
+    /* Enhanced cyberpunk sidebar */
+    --sidebar-bg: 224 71% 1% / 0.99;
+    --sidebar-border: 280 100% 80% / 0.25;
+    --sidebar-text: 280 30% 85%;
+    --sidebar-text-active: 280 100% 95%;
+    --sidebar-hover: 280 100% 80% / 0.15;
+    --sidebar-accent: 280 100% 80% / 0.4;
+    
+    /* Enhanced cyberpunk cards */
+    --card: 224 71% 2%;
+    --card-foreground: 280 100% 95%;
+    --card-border: 280 100% 80% / 0.25;
+    --card-shadow: 280 100% 80% / 0.15;
+    --card-hover: 280 100% 80% / 0.2;
+    
+    /* Enhanced cyberpunk popovers */
+    --popover: 224 71% 1%;
+    --popover-foreground: 280 100% 95%;
+    
+    /* Enhanced cyberpunk accents */
+    --accent: 224 71% 3%;
+    --accent-foreground: 187 100% 85%;
+    --accent-glow: 187 100% 85% / 0.5;
+    
+    /* Enhanced cyberpunk secondary */
+    --secondary: 280 100% 10%; /* Darker neon purple */
+    --secondary-foreground: 280 100% 90%; /* Brighter neon purple */
+    
+    /* Enhanced cyberpunk muted */
+    --muted: 224 71% 4%;
+    --muted-foreground: 280 30% 75%;
+    
+    /* Enhanced cyberpunk status colors */
+    --success: 166 100% 55%; /* Brighter neon green */
+    --success-glow: 166 100% 55% / 0.5;
+    --success-foreground: 0 0% 100%;
+    
+    --warning: 48 100% 75%; /* Brighter neon yellow */
+    --warning-glow: 48 100% 75% / 0.5;
+    --warning-foreground: 0 0% 100%;
+    
+    --destructive: 0 100% 75%; /* Brighter neon red */
+    --destructive-glow: 0 100% 75% / 0.5;
+    --destructive-foreground: 0 0% 100%;
+    
+    /* Enhanced cyberpunk match indicators */
+    --match-excellent: 166 100% 55%;
+    --match-good: 48 100% 75%;
+    --match-fair: 25 100% 70%;
+    --match-poor: 0 100% 75%;
+    
+    /* Enhanced cyberpunk tag system */
+    --tag-blue: 280 100% 8%;
+    --tag-blue-text: 280 100% 90%;
+    --tag-blue-glow: 280 100% 80% / 0.4;
+    
+    --tag-purple: 187 100% 8%;
+    --tag-purple-text: 187 100% 90%;
+    --tag-purple-glow: 187 100% 85% / 0.4;
+    
+    --tag-green: 166 100% 8%;
+    --tag-green-text: 166 100% 90%;
+    --tag-green-glow: 166 100% 55% / 0.4;
+    
+    /* Enhanced cyberpunk form elements */
+    --border: 280 100% 80% / 0.25;
+    --input: 224 71% 2%;
+    --input-border: 280 100% 80% / 0.4;
+    --ring: 280 100% 80%;
+    
+    /* Enhanced cyberpunk gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    --gradient-card: linear-gradient(145deg, hsl(var(--card)), hsl(224 71% 3%));
+    --gradient-glass: linear-gradient(145deg, hsl(var(--glass)), hsl(224 71% 0% / 0.98));
+    --gradient-sidebar: linear-gradient(180deg, hsl(var(--sidebar-bg)), hsl(224 71% 0%));
+    
+    /* Enhanced cyberpunk shadows with intense glow */
+    --shadow-sm: 0 1px 2px 0 hsl(var(--glass-shadow));
+    --shadow-md: 0 4px 6px -1px hsl(var(--glass-shadow)), 0 2px 4px -2px hsl(var(--glass-shadow));
+    --shadow-lg: 0 10px 15px -3px hsl(var(--glass-shadow)), 0 4px 6px -4px hsl(var(--glass-shadow));
+    --shadow-xl: 0 20px 25px -5px hsl(var(--glass-shadow)), 0 8px 10px -6px hsl(var(--glass-shadow));
+    --shadow-glow: 0 0 0 1px hsl(var(--primary) / 0.4), 0 0 60px hsl(var(--primary) / 0.6), 0 0 120px hsl(var(--primary-glow) / 0.3);
+  }
+
   /* Warm Theme - Cozy Brown & Cream */
   .theme-warm {
     /* Warm, cozy base */
