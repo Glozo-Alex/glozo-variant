@@ -173,8 +173,8 @@ const CandidateCard = ({
             key={index}
             className={`px-3 py-1 rounded-full text-xs font-medium ${
               skill.type === 'primary'
-                ? "bg-tag-blue text-tag-blue-text"
-                : "bg-muted text-muted-foreground"
+                ? "bg-primary text-primary-foreground"
+                : "bg-secondary text-secondary-foreground"
             }`}
           >
             {skill.name}
