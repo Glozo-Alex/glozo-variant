@@ -78,13 +78,13 @@ const EmailSequences: React.FC = () => {
   return (
     <>
       <Helmet>
-        <title>Email Sequences – Candidate Outreach</title>
-        <meta name="description" content="Create and manage email sequences for candidate outreach." />
+        <title>Outreach – Candidate Management</title>
+        <meta name="description" content="Create and manage outreach sequences for candidate engagement." />
         <link rel="canonical" href={canonical} />
       </Helmet>
 
       <header className="px-6 pt-4">
-        <h1 className="text-2xl font-semibold tracking-tight">Email Sequences</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">Outreach</h1>
         <p className="text-sm text-muted-foreground mt-1">Create, manage, and track multi-step outreach campaigns.</p>
       </header>
 

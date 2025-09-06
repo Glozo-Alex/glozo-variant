@@ -106,12 +106,12 @@ const Sidebar = () => {
                     <Mail className="h-5 w-5" />
                   </div>
                 </TooltipTrigger>
-                <TooltipContent side="right">Email Sequences</TooltipContent>
+                <TooltipContent side="right">Outreach</TooltipContent>
               </Tooltip>
             ) : (
               <>
                 <Mail className="h-5 w-5" />
-                <span>Email Sequences</span>
+                <span>Outreach</span>
               </>
             )}
           </NavLink>
