@@ -277,18 +277,18 @@
     --match-fair: 25 95% 53%; /* Orange for 50-69% */
     --match-poor: 0 84% 60%; /* Red for <50% */
     
-    /* Same tag system as default */
-    --tag-blue: 187 85% 92%; /* Teal light */
-    --tag-blue-text: 187 85% 35%; /* Teal dark */
-    --tag-blue-glow: 187 85% 53% / 0.1;
+    /* Ocean themed tag system */
+    --tag-blue: 217 91% 90%; /* Ocean blue light */
+    --tag-blue-text: 217 91% 25%; /* Ocean blue dark */
+    --tag-blue-glow: 217 91% 60% / 0.1;
     
-    --tag-purple: 168 50% 92%; /* Sage light */
-    --tag-purple-text: 168 76% 30%; /* Emerald dark */
-    --tag-purple-glow: 168 76% 42% / 0.1;
+    --tag-purple: 262 83% 90%; /* Ocean purple light */
+    --tag-purple-text: 262 83% 30%; /* Ocean purple dark */
+    --tag-purple-glow: 262 83% 58% / 0.1;
     
-    --tag-green: 142 76% 92%; /* Green light */
-    --tag-green-text: 142 76% 28%; /* Green dark */
-    --tag-green-glow: 142 76% 36% / 0.1;
+    --tag-green: 187 85% 90%; /* Ocean teal light */
+    --tag-green-text: 187 85% 28%; /* Ocean teal dark */
+    --tag-green-glow: 187 85% 53% / 0.1;
     
     /* Same form elements as default */
     --border: 168 15% 88%; /* Sage border */
@@ -471,18 +471,18 @@
     --match-fair: 25 95% 53%; /* Orange for 50-69% */
     --match-poor: 0 84% 60%; /* Red for <50% */
     
-    /* Same tag system as default */
-    --tag-blue: 187 85% 92%; /* Teal light */
-    --tag-blue-text: 187 85% 35%; /* Teal dark */
-    --tag-blue-glow: 187 85% 53% / 0.1;
+    /* Sunset themed tag system */
+    --tag-blue: 330 81% 90%; /* Sunset pink light */
+    --tag-blue-text: 330 81% 30%; /* Sunset pink dark */
+    --tag-blue-glow: 330 81% 60% / 0.1;
     
-    --tag-purple: 168 50% 92%; /* Sage light */
-    --tag-purple-text: 168 76% 30%; /* Emerald dark */
-    --tag-purple-glow: 168 76% 42% / 0.1;
+    --tag-purple: 347 77% 90%; /* Sunset red light */
+    --tag-purple-text: 347 77% 25%; /* Sunset red dark */
+    --tag-purple-glow: 347 77% 50% / 0.1;
     
-    --tag-green: 142 76% 92%; /* Green light */
-    --tag-green-text: 142 76% 28%; /* Green dark */
-    --tag-green-glow: 142 76% 36% / 0.1;
+    --tag-green: 38 92% 85%; /* Sunset orange light */
+    --tag-green-text: 38 92% 35%; /* Sunset orange dark */
+    --tag-green-glow: 38 92% 50% / 0.1;
     
     /* Same form elements as default */
     --border: 168 15% 88%; /* Sage border */
@@ -665,18 +665,18 @@
     --match-fair: 25 95% 53%; /* Orange for 50-69% */
     --match-poor: 0 84% 60%; /* Red for <50% */
     
-    /* Same tag system as default */
-    --tag-blue: 187 85% 92%; /* Teal light */
-    --tag-blue-text: 187 85% 35%; /* Teal dark */
-    --tag-blue-glow: 187 85% 53% / 0.1;
+    /* Forest themed tag system */
+    --tag-blue: 160 84% 88%; /* Forest teal light */
+    --tag-blue-text: 160 84% 25%; /* Forest teal dark */
+    --tag-blue-glow: 160 84% 39% / 0.1;
     
-    --tag-purple: 168 50% 92%; /* Sage light */
-    --tag-purple-text: 168 76% 30%; /* Emerald dark */
-    --tag-purple-glow: 168 76% 42% / 0.1;
+    --tag-purple: 142 71% 88%; /* Forest green light */
+    --tag-purple-text: 142 71% 20%; /* Forest green dark */
+    --tag-purple-glow: 142 71% 45% / 0.1;
     
-    --tag-green: 142 76% 92%; /* Green light */
-    --tag-green-text: 142 76% 28%; /* Green dark */
-    --tag-green-glow: 142 76% 36% / 0.1;
+    --tag-green: 65 92% 88%; /* Forest lime light */
+    --tag-green-text: 65 92% 25%; /* Forest lime dark */
+    --tag-green-glow: 65 92% 50% / 0.1;
     
     /* Same form elements as default */
     --border: 168 15% 88%; /* Sage border */
