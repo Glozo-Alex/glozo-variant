@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Edit, Plus, Play, Pause, Trash2, Users, Clock } from "lucide-react";
+import { ArrowLeft, Edit, Plus, Play, Pause, Trash2, Users, Clock, Send } from "lucide-react";
 import EmailTemplateBuilder from "@/components/EmailSequences/EmailTemplateBuilder";
 
 interface EmailSequence {
@@ -131,6 +131,22 @@ const EmailSequenceDetails: React.FC = () => {
     },
     onError: (err: any) => {
       toast({ title: "Failed to update template", description: err.message, variant: "destructive" });
+    },
+  });
+
+  const sendTestMutation = useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.functions.invoke('send-sequence-test', {
+        body: { sequenceId }
+      });
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      toast({ title: "Test email sent", description: "Delivered to alex@glozo.com" });
+    },
+    onError: (err: any) => {
+      toast({ title: "Failed to send test email", description: err.message, variant: "destructive" });
     },
   });
 
@@ -261,10 +277,21 @@ const EmailSequenceDetails: React.FC = () => {
                     <CardTitle className="text-lg">Email Templates</CardTitle>
                     <CardDescription>Configure the sequence of emails that will be sent to candidates.</CardDescription>
                   </div>
-                  <Button size="sm" onClick={() => setShowTemplateBuilder(true)}>
-                    <Plus className="mr-2 h-4 w-4" />
-                    Add Template
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => sendTestMutation.mutate()}
+                      disabled={templatesLoading || templates.length === 0 || sendTestMutation.isPending}
+                    >
+                      <Send className="mr-2 h-4 w-4" />
+                      {sendTestMutation.isPending ? "Sending..." : "Send Test"}
+                    </Button>
+                    <Button size="sm" onClick={() => setShowTemplateBuilder(true)}>
+                      <Plus className="mr-2 h-4 w-4" />
+                      Add Template
+                    </Button>
+                  </div>
                 </CardHeader>
                 <Separator />
                 <CardContent>
