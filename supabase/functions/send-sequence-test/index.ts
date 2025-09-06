@@ -100,8 +100,8 @@ serve(async (req) => {
       return new Response('Template not found', { status: 404, headers: corsHeaders });
     }
 
-    // Prepare email
-    const toEmails = 'alex@glozo.com,michael@glozo.com'; // Test mode targets
+    // Prepare email - using authorized recipients for sandbox
+    const toEmails = 'alex@glozo.com'; // Only alex@glozo.com is authorized in Mailgun sandbox
     const subject = template.subject || `${sequence.name} – Test Email`;
     const html = template.content || '<p>(empty content)</p>';
 
@@ -137,7 +137,7 @@ serve(async (req) => {
       });
     }
 
-    return new Response(JSON.stringify({ success: true, message: 'Test email sent to alex@glozo.com and michael@glozo.com' }), {
+    return new Response(JSON.stringify({ success: true, message: 'Test email sent to alex@glozo.com' }), {
       status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
