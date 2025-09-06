@@ -150,7 +150,7 @@ const App = () => (
                   }
                 />
                 <Route
-                  path="/analytics"
+                  path="/outreach/analytics"
                   element={
                     <ProtectedRoute>
                       <Layout>

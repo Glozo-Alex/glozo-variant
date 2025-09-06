@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
-import { LayoutDashboard, Search, Kanban, Users, BarChart3, Plug, Settings, ChevronLeft, ChevronRight, List, Plus, FolderOpen, LogOut, User, Mail, FileText } from "lucide-react";
+import { NavLink, useLocation } from "react-router-dom";
+import { LayoutDashboard, Search, Kanban, Users, BarChart3, Plug, Settings, ChevronLeft, ChevronRight, List, Plus, FolderOpen, LogOut, User, Mail, FileText, ChevronDown, ChevronUp } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -12,9 +12,11 @@ import ColorSchemeSelector from "./ColorSchemeSelector";
 
 const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
+  const [outreachExpanded, setOutreachExpanded] = useState(true);
   const { activeProject } = useProject();
   const { user, signOut } = useAuth();
   const { profile, displayName } = useProfile();
+  const location = useLocation();
 
   const getInitials = (name: string) => {
     return name
@@ -28,6 +30,10 @@ const Sidebar = () => {
   const avatarUrl = profile?.avatar_url || user?.user_metadata?.avatar_url;
 
   const navCls = "flex items-center gap-3 px-3 py-2 rounded-md text-sm text-sidebar-text hover:bg-sidebar-hover hover:text-sidebar-text-active transition-all duration-300 hover-scale";
+  const subNavCls = "flex items-center gap-3 px-3 py-2 ml-6 rounded-md text-sm text-sidebar-text hover:bg-sidebar-hover hover:text-sidebar-text-active transition-all duration-300 hover-scale";
+
+  // Check if any outreach route is active
+  const isOutreachActive = location.pathname.startsWith('/email-sequences') || location.pathname.startsWith('/outreach');
 
   return (
     <TooltipProvider>
@@ -98,41 +104,56 @@ const Sidebar = () => {
             )}
           </NavLink>
 
-          <NavLink to="/email-sequences" className={({ isActive }) => `${navCls} ${isActive ? 'bg-sidebar-accent text-sidebar-text-active' : ''}`}>
-            {collapsed ? (
-              <Tooltip>
-                <TooltipTrigger asChild>
+          {/* Outreach Section */}
+          {collapsed ? (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <NavLink to="/email-sequences" className={({ isActive }) => `${navCls} ${isOutreachActive ? 'bg-sidebar-accent text-sidebar-text-active' : ''}`}>
                   <div className="flex items-center justify-center">
                     <Mail className="h-5 w-5" />
                   </div>
-                </TooltipTrigger>
-                <TooltipContent side="right">Outreach</TooltipContent>
-              </Tooltip>
-            ) : (
-              <>
-                <Mail className="h-5 w-5" />
-                <span>Outreach</span>
-              </>
-            )}
-          </NavLink>
-
-          <NavLink to="/outreach/templates" className={({ isActive }) => `${navCls} ${isActive ? 'bg-sidebar-accent text-sidebar-text-active' : ''}`}>
-            {collapsed ? (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="flex items-center justify-center">
-                    <FileText className="h-5 w-5" />
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent side="right">Global Templates</TooltipContent>
-              </Tooltip>
-            ) : (
-              <>
-                <FileText className="h-5 w-5" />
-                <span>Global Templates</span>
-              </>
-            )}
-          </NavLink>
+                </NavLink>
+              </TooltipTrigger>
+              <TooltipContent side="right">
+                <div className="space-y-1">
+                  <div className="font-medium">Outreach</div>
+                  <div className="text-xs">Sequences • Templates • Analytics</div>
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          ) : (
+            <div className="space-y-1">
+              <button
+                onClick={() => setOutreachExpanded(!outreachExpanded)}
+                className={`${navCls} w-full justify-between ${isOutreachActive ? 'bg-sidebar-accent text-sidebar-text-active' : ''}`}
+              >
+                <div className="flex items-center gap-3">
+                  <Mail className="h-5 w-5" />
+                  <span>Outreach</span>
+                </div>
+                {outreachExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+              </button>
+              
+              {outreachExpanded && (
+                <div className="space-y-1">
+                  <NavLink to="/email-sequences" className={({ isActive }) => `${subNavCls} ${isActive ? 'bg-sidebar-accent text-sidebar-text-active' : ''}`}>
+                    <Mail className="h-4 w-4" />
+                    <span>Sequences</span>
+                  </NavLink>
+                  
+                  <NavLink to="/outreach/templates" className={({ isActive }) => `${subNavCls} ${isActive ? 'bg-sidebar-accent text-sidebar-text-active' : ''}`}>
+                    <FileText className="h-4 w-4" />
+                    <span>Global Templates</span>
+                  </NavLink>
+                  
+                  <NavLink to="/outreach/analytics" className={({ isActive }) => `${subNavCls} ${isActive ? 'bg-sidebar-accent text-sidebar-text-active' : ''}`}>
+                    <BarChart3 className="h-4 w-4" />
+                    <span>Analytics</span>
+                  </NavLink>
+                </div>
+              )}
+            </div>
+          )}
         </nav>
 
         {/* Project section - Dynamic */}
@@ -175,23 +196,6 @@ const Sidebar = () => {
             )}
           </NavLink>
 
-          <NavLink to="/analytics" className={({ isActive }) => `${navCls} ${isActive ? 'bg-sidebar-accent text-sidebar-text-active' : ''}`}>
-            {collapsed ? (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="flex items-center justify-center">
-                    <BarChart3 className="h-5 w-5" />
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent side="right">Analytics</TooltipContent>
-              </Tooltip>
-            ) : (
-              <>
-                <BarChart3 className="h-5 w-5" />
-                <span>Analytics</span>
-              </>
-            )}
-          </NavLink>
         </nav>
 
         {/* System navigation */}
