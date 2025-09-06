@@ -1757,3 +1757,20 @@
 .theme-transition *:after {
   transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, fill 0.3s ease, stroke 0.3s ease !important;
 }
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Typography scale for data interfaces */
+  .text-xs { font-size: 0.75rem; line-height: 1rem; } /* 12px */
+  .text-sm { font-size: 0.875rem; line-height: 1.25rem; } /* 14px - Base size */
+  .text-base { font-size: 1rem; line-height: 1.5rem; } /* 16px - Headers */
+  .text-lg { font-size: 1.125rem; line-height: 1.75rem; } /* 18px */
+}
