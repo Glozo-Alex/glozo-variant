@@ -143,7 +143,11 @@ const EmailSequences: React.FC = () => {
                   </TableHeader>
                   <TableBody>
                     {sequences.map((seq) => (
-                      <TableRow key={seq.id} className="hover:bg-muted/50">
+                      <TableRow 
+                        key={seq.id} 
+                        className="hover:bg-muted/50 cursor-pointer"
+                        onClick={() => window.location.href = `/email-sequences/${seq.id}`}
+                      >
                         <TableCell className="font-medium">{seq.name}</TableCell>
                         <TableCell>
                           {seq.is_active ? (

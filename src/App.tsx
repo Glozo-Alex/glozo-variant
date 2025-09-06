@@ -24,6 +24,7 @@ import Auth from "./pages/Auth";
 import Projects from "./pages/Projects";
 import TestCandidateDetails from "./pages/TestCandidateDetails";
 import EmailSequences from "./pages/EmailSequences";
+import EmailSequenceDetails from "./pages/EmailSequenceDetails";
 import { HelmetProvider } from "react-helmet-async";
 
 const queryClient = new QueryClient();
@@ -102,6 +103,16 @@ const App = () => (
                     <ProtectedRoute>
                       <Layout>
                         <EmailSequences />
+                      </Layout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/email-sequences/:sequenceId"
+                  element={
+                    <ProtectedRoute>
+                      <Layout>
+                        <EmailSequenceDetails />
                       </Layout>
                     </ProtectedRoute>
                   }
