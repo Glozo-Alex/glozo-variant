@@ -68,24 +68,6 @@ const Sidebar = () => {
             )}
           </NavLink>
 
-          <NavLink to="/projects" className={({ isActive }) => `${navCls} ${isActive ? 'bg-sidebar-accent text-sidebar-text-active' : ''}`}>
-            {collapsed ? (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="flex items-center justify-center">
-                    <FolderOpen className="h-5 w-5" />
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent side="right">Projects</TooltipContent>
-              </Tooltip>
-            ) : (
-              <>
-                <FolderOpen className="h-5 w-5" />
-                <span>Projects</span>
-              </>
-            )}
-          </NavLink>
-
           <NavLink to="/new-search" className={({ isActive }) => `${navCls} ${isActive ? 'bg-sidebar-accent text-sidebar-text-active' : ''}`}>
             {collapsed ? (
               <Tooltip>
@@ -100,6 +82,44 @@ const Sidebar = () => {
               <>
                 <Plus className="h-5 w-5" />
                 <span>New Search</span>
+              </>
+            )}
+          </NavLink>
+
+          {/* Current Project section - appears right after New Search */}
+          {activeProject && !collapsed && (
+            <div className="space-y-1 mt-4">
+              <div className="text-xs font-medium text-sidebar-text uppercase tracking-wider mb-2 px-3">
+                Current Project
+              </div>
+              <div className="space-y-1 px-3">
+                <ProjectSelector />
+                
+                <NavLink 
+                  to={`/project/${activeProject.id}/shortlist`} 
+                  className={({ isActive }) => `${navCls} ${isActive ? 'bg-sidebar-accent text-sidebar-text-active' : ''}`}
+                >
+                  <List className="h-5 w-5" />
+                  <span>Shortlist ({activeProject.shortlistCount || 0})</span>
+                </NavLink>
+              </div>
+            </div>
+          )}
+
+          <NavLink to="/projects" className={({ isActive }) => `${navCls} ${isActive ? 'bg-sidebar-accent text-sidebar-text-active' : ''}`}>
+            {collapsed ? (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center justify-center">
+                    <FolderOpen className="h-5 w-5" />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="right">Projects</TooltipContent>
+              </Tooltip>
+            ) : (
+              <>
+                <FolderOpen className="h-5 w-5" />
+                <span>Projects</span>
               </>
             )}
           </NavLink>
@@ -156,25 +176,10 @@ const Sidebar = () => {
           )}
         </nav>
 
-        {/* Project section - Dynamic */}
-        {activeProject && !collapsed && (
-          <div className="px-3 mt-6">
-            <div className="text-xs font-medium text-sidebar-text uppercase tracking-wider mb-2">
-              Current Project
-            </div>
-            <div className="space-y-1">
-              <ProjectSelector />
-              
-              <NavLink 
-                to={`/project/${activeProject.id}/shortlist`} 
-                className={({ isActive }) => `${navCls} ${isActive ? 'bg-sidebar-accent text-sidebar-text-active' : ''}`}
-              >
-                <List className="h-5 w-5" />
-                <span>Shortlist ({activeProject.shortlistCount || 0})</span>
-              </NavLink>
-            </div>
-          </div>
-        )}
+        {/* Separator before Pipeline/Analytics */}
+        <div className="px-3 mt-6">
+          <div className="h-px bg-sidebar-border/50"></div>
+        </div>
 
         {/* Bottom navigation */}
         <nav className="px-3 mt-6 space-y-1">
