@@ -101,7 +101,7 @@ serve(async (req) => {
     }
 
     // Prepare email
-    const toEmail = 'alex@glozo.com'; // Test mode target
+    const toEmails = 'alex@glozo.com,michael@glozo.com'; // Test mode targets
     const subject = template.subject || `${sequence.name} – Test Email`;
     const html = template.content || '<p>(empty content)</p>';
 
@@ -110,7 +110,7 @@ serve(async (req) => {
     console.log('Mailgun endpoint', endpoint);
     const params = new URLSearchParams();
     params.append('from', mgFrom);
-    params.append('to', toEmail);
+    params.append('to', toEmails);
     params.append('subject', subject);
     params.append('html', html);
 
@@ -137,7 +137,7 @@ serve(async (req) => {
       });
     }
 
-    return new Response(JSON.stringify({ success: true, message: 'Test email sent to alex@glozo.com' }), {
+    return new Response(JSON.stringify({ success: true, message: 'Test email sent to alex@glozo.com and michael@glozo.com' }), {
       status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });

@@ -12,6 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Edit, Plus, Play, Pause, Trash2, Users, Clock, Send } from "lucide-react";
 import EmailTemplateBuilder from "@/components/EmailSequences/EmailTemplateBuilder";
+import { ContactInfo } from "@/components/ContactInfo";
 
 interface EmailSequence {
   id: string;
@@ -43,6 +44,7 @@ interface SequenceRecipient {
   enrolled_at: string;
   next_send_at: string | null;
   completed_at: string | null;
+  candidate_snapshot?: any;
 }
 
 const useEmailSequence = (sequenceId: string) => {
@@ -85,7 +87,25 @@ const useSequenceRecipients = (sequenceId: string) => {
         .eq("sequence_id", sequenceId)
         .order("enrolled_at", { ascending: false });
       if (error) throw error;
-      return data ?? [];
+      
+      // Get candidate snapshots for each recipient
+      const enrichedData = await Promise.all(
+        (data ?? []).map(async (recipient) => {
+          const { data: shortlistData } = await supabase
+            .from("project_shortlist")
+            .select("candidate_snapshot")
+            .eq("candidate_id", recipient.candidate_id)
+            .eq("project_id", recipient.project_id)
+            .single();
+          
+          return {
+            ...recipient,
+            candidate_snapshot: shortlistData?.candidate_snapshot
+          } as SequenceRecipient;
+        })
+      );
+      
+      return enrichedData;
     },
   });
 };
@@ -169,7 +189,7 @@ const EmailSequenceDetails: React.FC = () => {
       return data;
     },
     onSuccess: () => {
-      toast({ title: "Test email sent", description: "Delivered to alex@glozo.com" });
+      toast({ title: "Test email sent", description: "Delivered to alex@glozo.com and michael@glozo.com" });
     },
     onError: (err: any) => {
       toast({ title: "Failed to send test email", description: err.message, variant: "destructive" });
@@ -215,6 +235,14 @@ const EmailSequenceDetails: React.FC = () => {
     if (days === 0) return `${hours}h`;
     if (hours === 0) return `${days}d`;
     return `${days}d ${hours}h`;
+  };
+
+  const formatShortDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const day = date.getDate();
+    const month = date.toLocaleDateString('en-US', { month: 'short' });
+    const year = date.getFullYear();
+    return `${day} ${month} ${year}`;
   };
 
   const getStatusBadge = (status: string) => {
@@ -407,7 +435,8 @@ const EmailSequenceDetails: React.FC = () => {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Candidate ID</TableHead>
+                        <TableHead>Candidate</TableHead>
+                        <TableHead>Contact</TableHead>
                         <TableHead>Status</TableHead>
                         <TableHead>Current Step</TableHead>
                         <TableHead>Enrolled</TableHead>
@@ -418,23 +447,31 @@ const EmailSequenceDetails: React.FC = () => {
                     <TableBody>
                       {recipients.map((recipient) => (
                         <TableRow key={recipient.id}>
-                          <TableCell className="font-medium">{recipient.candidate_id}</TableCell>
+                          <TableCell className="font-medium">
+                            {recipient.candidate_snapshot?.name || recipient.candidate_id}
+                          </TableCell>
+                          <TableCell>
+                            <ContactInfo 
+                              candidate={recipient.candidate_snapshot || {}} 
+                              size="sm" 
+                            />
+                          </TableCell>
                           <TableCell>{getStatusBadge(recipient.status)}</TableCell>
                           <TableCell>
                             {recipient.current_template_index + 1} / {templates.length}
                           </TableCell>
                           <TableCell>
-                            {new Date(recipient.enrolled_at).toLocaleDateString()}
+                            {formatShortDate(recipient.enrolled_at)}
                           </TableCell>
                           <TableCell>
                             {recipient.next_send_at 
-                              ? new Date(recipient.next_send_at).toLocaleDateString()
+                              ? formatShortDate(recipient.next_send_at)
                               : '-'
                             }
                           </TableCell>
                           <TableCell>
                             {recipient.completed_at 
-                              ? new Date(recipient.completed_at).toLocaleDateString()
+                              ? formatShortDate(recipient.completed_at)
                               : '-'
                             }
                           </TableCell>
