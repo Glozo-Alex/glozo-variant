@@ -43,107 +43,101 @@ const CandidateList = () => {
   const [availableFilters, setAvailableFilters] = useState<Record<string, any>>({});
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
 
+  const fetchLatestSearch = useCallback(async () => {
+    if (!projectId) return;
+    
+    try {
+      console.log('🔍 CandidateList: Fetching search results for projectId:', projectId);
+      
+      const { data, error } = await supabase
+        .from("searches")
+        .select("id, status, raw_response, candidate_count, created_at")
+        .eq("project_id", projectId)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      console.log('📊 CandidateList: Search data received:', data);
+
+      if (error) throw error;
+
+      if (!data) {
+        console.log('🚫 CandidateList: No search data found');
+        setStatus("idle");
+        setCandidates([]);
+        setCandidateCount(0);
+        setAvailableFilters({});
+        return;
+      }
+
+      const st = (data.status as any) ?? "pending";
+      const raw = data.raw_response as any;
+      
+      // For candidates display, only show results from completed searches
+      const fromArray = (st === 'completed' && Array.isArray(raw?.candidates)) ? raw.candidates : [];
+      const count = Array.isArray(fromArray) ? fromArray.length : (data.candidate_count ?? 0);
+
+      console.log('👥 CandidateList: Candidates array length:', fromArray.length, 'Status:', st);
+
+      // Extract filters from raw response
+      const filters = raw?.filters || {};
+      const processedFilters = extractFiltersFromResponse(filters, fromArray);
+
+      setStatus(st);
+      setCandidates(fromArray);
+      setCandidateCount(count);
+      setAvailableFilters(processedFilters);
+      
+      // Load shortlist status for candidates
+      if (fromArray.length > 0) {
+        try {
+          const candidateIds = fromArray.map((c: APICandidate) => String(c.id || ''));
+          const shortlistMap = await getShortlistStatus(projectId, candidateIds);
+          setShortlistStatus(shortlistMap);
+        } catch (error) {
+          console.error('Failed to load shortlist status:', error);
+        }
+      }
+    } catch (e: any) {
+      setError(e?.message ?? "Failed to load search results");
+    } finally {
+      setLoading(false);
+    }
+  }, [projectId]);
+
   useEffect(() => {
     if (!projectId) return;
 
     let cancelled = false;
     let timer: number | undefined;
 
-    const fetchLatestSearch = async () => {
-      try {
-        console.log('🔍 CandidateList: Fetching search results for projectId:', projectId);
-        
-        const { data, error } = await supabase
-          .from("searches")
-          .select("id, status, raw_response, candidate_count, created_at")
-          .eq("project_id", projectId)
-          .order("created_at", { ascending: false })
-          .limit(1)
-          .maybeSingle();
-
-        console.log('📊 CandidateList: Search data received:', data);
-        console.log('❗ CandidateList: Search error:', error);
-
-        if (error) throw error;
-
-        if (!data) {
-          console.log('🚫 CandidateList: No search data found');
-          if (!cancelled) {
-            setStatus("idle");
-            setCandidates([]);
-            setCandidateCount(0);
-            setAvailableFilters({});
-          }
-          return;
-        }
-
-        const st = (data.status as any) ?? "pending";
-        const raw = data.raw_response as any;
-        console.log('📝 CandidateList: Raw response structure:', raw);
-        
-        // For candidates display, only show results from completed searches
-        const fromArray = (st === 'completed' && Array.isArray(raw?.candidates)) ? raw.candidates : [];
-        const count = Array.isArray(fromArray) ? fromArray.length : (data.candidate_count ?? 0);
-
-        console.log('👥 CandidateList: Candidates array length:', fromArray.length, 'Status:', st);
-
-        // Extract filters from raw response
-        const filters = raw?.filters || {};
-        console.log('🔧 CandidateList: Raw filters data:', JSON.stringify(filters, null, 2));
-        const processedFilters = extractFiltersFromResponse(filters, fromArray);
-        console.log('✅ CandidateList: Processed filters:', JSON.stringify(processedFilters, null, 2));
-
-        if (!cancelled) {
-          setStatus(st);
-          setCandidates(fromArray);
-          setCandidateCount(count);
-          setAvailableFilters(processedFilters);
-          
-          // Load shortlist status for candidates
-          if (fromArray.length > 0 && projectId) {
-            try {
-              const candidateIds = fromArray.map((c: APICandidate) => String(c.id || ''));
-              const shortlistMap = await getShortlistStatus(projectId, candidateIds);
-              setShortlistStatus(shortlistMap);
-            } catch (error) {
-              console.error('Failed to load shortlist status:', error);
-            }
-          }
-        }
-      } catch (e: any) {
-        if (!cancelled) {
-          setError(e?.message ?? "Failed to load search results");
-        }
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    };
-
-    // Initial fetch and polling optimization
+    // Initial fetch
     fetchLatestSearch();
     
-    // Only poll if status is pending or we haven't determined status yet
-    const shouldPoll = () => {
-      return status === "pending" || status === "idle";
-    };
-    
-    if (shouldPoll()) {
+    // Set up polling only if needed
+    const setupPolling = () => {
       timer = setInterval(() => {
-        // Re-check if we should still poll before making the request
-        if (shouldPoll()) {
-          fetchLatestSearch();
-        } else {
-          // Stop polling if status is completed
-          if (timer) clearInterval(timer);
-        }
+        if (cancelled) return;
+        fetchLatestSearch();
       }, 3000) as unknown as number;
+    };
+
+    // Start polling if status is pending or idle
+    if (status === "pending" || status === "idle") {
+      setupPolling();
     }
 
     return () => {
       cancelled = true;
       if (timer) clearInterval(timer);
     };
-  }, [projectId]);
+  }, [projectId, fetchLatestSearch]);
+
+  // Stop polling when status changes to completed
+  useEffect(() => {
+    // This effect will run when status changes
+    // No need to do anything here as the cleanup in the main useEffect handles stopping
+  }, [status]);
 
   // Extract filters from API response
   const extractFiltersFromResponse = (filters: any, candidates: APICandidate[]) => {

@@ -40,13 +40,6 @@ export const CandidateProfile = React.memo(function CandidateProfile({ children,
     return name.split(' ').map(part => part[0]).join('').toUpperCase().slice(0, 2);
   }, []);
 
-  console.log('CandidateProfile render:', { 
-    candidateData, 
-    candidateDetail, 
-    loading, 
-    error,
-    displayDataName: displayData?.name 
-  });
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
