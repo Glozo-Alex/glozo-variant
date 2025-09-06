@@ -986,6 +986,207 @@
     --gradient-glass: linear-gradient(145deg, hsl(var(--glass)), hsl(0 0% 2% / 0.9));
     --gradient-sidebar: linear-gradient(180deg, hsl(var(--sidebar-bg)), hsl(0 0% 2%));
   }
+
+  /* Warm Theme - Cozy Brown & Cream */
+  .theme-warm {
+    /* Warm, cozy base */
+    --background: 30 40% 98%; /* Warm cream */
+    --foreground: 20 14% 8%; /* Dark brown */
+    
+    /* Warm earth tones system */
+    --primary: 45 95% 31%; /* Warm amber #a16207 */
+    --primary-glow: 32 95% 44%; /* Orange #d97706 */
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 45 95% 36%;
+    
+    /* Warm glassmorphism */
+    --glass: 30 40% 99% / 0.9;
+    --glass-border: 30 20% 88% / 0.4;
+    --glass-shadow: 20 14% 8% / 0.1;
+    
+    /* Cozy sidebar */
+    --sidebar-bg: 30 40% 98% / 0.95;
+    --sidebar-border: 30 20% 85% / 0.5;
+    --sidebar-text: 25 20% 35%;
+    --sidebar-text-active: 20 14% 8%;
+    --sidebar-hover: 30 30% 92%;
+    --sidebar-accent: 45 95% 31% / 0.08;
+    
+    /* Warm cards */
+    --card: 30 40% 99%;
+    --card-foreground: 20 14% 8%;
+    --card-border: 30 20% 85% / 0.4;
+    --card-shadow: 20 14% 8% / 0.06;
+    --card-hover: 45 95% 31% / 0.03;
+    
+    /* Warm popovers */
+    --popover: 30 40% 97%;
+    --popover-foreground: 20 14% 8%;
+    
+    /* Warm accents */
+    --accent: 30 30% 94%;
+    --accent-foreground: 45 95% 25%;
+    --accent-glow: 45 95% 31% / 0.12;
+    
+    /* Warm secondary */
+    --secondary: 45 95% 88%; /* Light warm amber */
+    --secondary-foreground: 45 95% 20%; /* Dark warm amber */
+    
+    /* Warm muted */
+    --muted: 30 30% 94%;
+    --muted-foreground: 25 20% 35%;
+    
+    /* Status colors (same as default) */
+    --success: 142 76% 36%;
+    --success-glow: 142 76% 36% / 0.2;
+    --success-foreground: 0 0% 100%;
+    
+    --warning: 38 92% 50%;
+    --warning-glow: 38 92% 50% / 0.2;
+    --warning-foreground: 0 0% 100%;
+    
+    --destructive: 0 84% 60%;
+    --destructive-glow: 0 84% 60% / 0.2;
+    --destructive-foreground: 0 0% 100%;
+    
+    /* Match indicators */
+    --match-excellent: 142 76% 36%;
+    --match-good: 45 93% 47%;
+    --match-fair: 25 95% 53%;
+    --match-poor: 0 84% 60%;
+    
+    /* Tag system with warm colors */
+    --tag-blue: 32 95% 85%;
+    --tag-blue-text: 32 95% 25%;
+    --tag-blue-glow: 32 95% 44% / 0.1;
+    
+    --tag-purple: 45 95% 85%;
+    --tag-purple-text: 45 95% 18%;
+    --tag-purple-glow: 45 95% 31% / 0.1;
+    
+    --tag-green: 17 88% 85%;
+    --tag-green-text: 17 88% 25%;
+    --tag-green-glow: 17 88% 40% / 0.1;
+    
+    /* Form elements */
+    --border: 30 20% 82%;
+    --input: 30 40% 99%;
+    --input-border: 30 20% 82%;
+    --ring: 45 95% 31%;
+    
+    /* Warm gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    --gradient-card: linear-gradient(145deg, hsl(var(--card)), hsl(30 30% 94%));
+    --gradient-glass: linear-gradient(145deg, hsl(var(--glass)), hsl(30 40% 97% / 0.8));
+    --gradient-sidebar: linear-gradient(180deg, hsl(var(--sidebar-bg)), hsl(30 35% 96%));
+    
+    /* Warm shadows */
+    --shadow-sm: 0 1px 2px 0 hsl(var(--glass-shadow));
+    --shadow-md: 0 4px 6px -1px hsl(var(--glass-shadow)), 0 2px 4px -2px hsl(var(--glass-shadow));
+    --shadow-lg: 0 10px 15px -3px hsl(var(--glass-shadow)), 0 4px 6px -4px hsl(var(--glass-shadow));
+    --shadow-xl: 0 20px 25px -5px hsl(var(--glass-shadow)), 0 8px 10px -6px hsl(var(--glass-shadow));
+    --shadow-glow: 0 0 0 1px hsl(var(--primary) / 0.06), 0 0 20px hsl(var(--primary) / 0.12);
+  }
+
+  .theme-warm.dark {
+    /* Dark warm theme */
+    --background: 20 14% 4%;
+    --foreground: 30 40% 98%;
+    
+    /* Enhanced warm dark colors */
+    --primary: 45 95% 50%;
+    --primary-glow: 32 95% 60%;
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 45 95% 55%;
+    
+    /* Dark warm glassmorphism */
+    --glass: 20 14% 2% / 0.95;
+    --glass-border: 30 40% 98% / 0.08;
+    --glass-shadow: 0 0% 0% / 0.4;
+    
+    /* Dark warm sidebar */
+    --sidebar-bg: 20 14% 2% / 0.98;
+    --sidebar-border: 25 20% 15% / 0.6;
+    --sidebar-text: 25 20% 70%;
+    --sidebar-text-active: 30 40% 98%;
+    --sidebar-hover: 25 20% 15% / 0.8;
+    --sidebar-accent: 45 95% 50% / 0.2;
+    
+    /* Dark warm cards */
+    --card: 20 14% 4%;
+    --card-foreground: 30 40% 98%;
+    --card-border: 25 20% 15%;
+    --card-shadow: 0 0% 0% / 0.3;
+    --card-hover: 45 95% 50% / 0.08;
+    
+    /* Dark warm popovers */
+    --popover: 20 14% 3%;
+    --popover-foreground: 30 40% 98%;
+    
+    /* Dark warm accents */
+    --accent: 20 14% 6%;
+    --accent-foreground: 30 30% 90%;
+    --accent-glow: 45 95% 50% / 0.25;
+    
+    /* Dark warm secondary */
+    --secondary: 45 95% 12%;
+    --secondary-foreground: 45 95% 85%;
+    
+    /* Dark warm muted */
+    --muted: 25 20% 8%;
+    --muted-foreground: 25 20% 70%;
+    
+    /* Enhanced dark status colors */
+    --success: 142 76% 55%;
+    --success-glow: 142 76% 55% / 0.4;
+    --success-foreground: 0 0% 100%;
+    
+    --warning: 38 92% 65%;
+    --warning-glow: 38 92% 65% / 0.4;
+    --warning-foreground: 0 0% 100%;
+    
+    --destructive: 0 84% 75%;
+    --destructive-glow: 0 84% 75% / 0.4;
+    --destructive-foreground: 0 0% 100%;
+    
+    /* Dark warm match indicators */
+    --match-excellent: 142 76% 55%;
+    --match-good: 45 93% 65%;
+    --match-fair: 25 95% 70%;
+    --match-poor: 0 84% 75%;
+    
+    /* Dark warm tag system */
+    --tag-blue: 32 95% 12%;
+    --tag-blue-text: 32 95% 85%;
+    --tag-blue-glow: 32 95% 44% / 0.2;
+    
+    --tag-purple: 45 95% 12%;
+    --tag-purple-text: 45 95% 85%;
+    --tag-purple-glow: 45 95% 50% / 0.2;
+    
+    --tag-green: 17 88% 12%;
+    --tag-green-text: 17 88% 85%;
+    --tag-green-glow: 17 88% 40% / 0.2;
+    
+    /* Dark warm form elements */
+    --border: 25 20% 15%;
+    --input: 20 14% 4%;
+    --input-border: 25 20% 15%;
+    --ring: 45 95% 50%;
+    
+    /* Dark warm gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    --gradient-card: linear-gradient(145deg, hsl(var(--card)), hsl(20 14% 6%));
+    --gradient-glass: linear-gradient(145deg, hsl(var(--glass)), hsl(20 14% 2% / 0.9));
+    --gradient-sidebar: linear-gradient(180deg, hsl(var(--sidebar-bg)), hsl(20 14% 2%));
+    
+    /* Dark warm shadows */
+    --shadow-sm: 0 1px 2px 0 hsl(var(--glass-shadow));
+    --shadow-md: 0 4px 6px -1px hsl(var(--glass-shadow)), 0 2px 4px -2px hsl(var(--glass-shadow));
+    --shadow-lg: 0 10px 15px -3px hsl(var(--glass-shadow)), 0 4px 6px -4px hsl(var(--glass-shadow));
+    --shadow-xl: 0 20px 25px -5px hsl(var(--glass-shadow)), 0 8px 10px -6px hsl(var(--glass-shadow));
+    --shadow-glow: 0 0 0 1px hsl(var(--primary) / 0.08), 0 0 20px hsl(var(--primary) / 0.15);
+  }
 }
 
 /* Theme transition class for smooth color changes */
