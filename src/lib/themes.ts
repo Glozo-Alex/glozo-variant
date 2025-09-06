@@ -125,8 +125,25 @@ export const applyColorScheme = (scheme: ColorScheme) => {
     const backgroundColor = computedStyle.getPropertyValue('--background').trim();
     
     console.log('🎨 Theme applied:', theme.name);
+    console.log('  --primary:', primaryColor);
+    console.log('  --background:', backgroundColor);
     console.log('  --secondary:', computedStyle.getPropertyValue('--secondary').trim());
     console.log('  --secondary-foreground:', computedStyle.getPropertyValue('--secondary-foreground').trim());
+    console.log('  Classes on root:', Array.from(root.classList).filter(c => c.startsWith('theme-')));
+    
+    // Check if CSS rules exist for this theme
+    const sheets = Array.from(document.styleSheets);
+    const rules = sheets.flatMap(sheet => {
+      try {
+        return Array.from(sheet.cssRules || []);
+      } catch {
+        return [];
+      }
+    });
+    const themeRule = rules.find(rule => 
+      (rule as CSSStyleRule).selectorText && (rule as CSSStyleRule).selectorText.includes(`.theme-${scheme}`)
+    );
+    console.log('🔍 CSS rule found for theme:', !!themeRule, (themeRule as CSSStyleRule)?.selectorText);
     
     // Dispatch event to notify components
     const event = new CustomEvent('themeChanged', { 
