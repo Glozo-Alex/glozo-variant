@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Edit, Plus, Play, Pause, Trash2, Users, Clock, Send } from "lucide-react";
+import { ArrowLeft, Edit, Plus, Play, Pause, Trash2, Users, Clock } from "lucide-react";
 import { SequenceTemplateBuilder } from "@/components/EmailSequences/SequenceTemplateBuilder";
 import { ContactInfo } from "@/components/ContactInfo";
 
@@ -174,43 +174,6 @@ const EmailSequenceDetails: React.FC = () => {
     },
   });
 
-  const sendTestMutation = useMutation({
-    mutationFn: async () => {
-      const { data, error } = await supabase.functions.invoke('send-sequence-test', {
-        body: { sequenceId }
-      });
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: () => {
-      toast({ title: "Test email sent", description: "Delivered to alex@glozo.com and michael@glozo.com" });
-    },
-    onError: (err: any) => {
-      toast({ title: "Failed to send test email", description: err.message, variant: "destructive" });
-    },
-  });
-
-  const mailgunTestMutation = useMutation({
-    mutationFn: async () => {
-      const { data, error } = await supabase.functions.invoke('mailgun-smoke-test', {
-        body: {
-          from: `Mailgun Sandbox <postmaster@glozo.com>`,
-          to: `Alexey Vavilov <alex@glozo.com>`,
-          subject: `Hello Alexey Vavilov`,
-          text: `Congratulations Alexey Vavilov, you just sent an email with Mailgun! You are truly awesome!`,
-        },
-      });
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: (data: any) => {
-      toast({ title: "Mailgun test requested", description: "Проверьте события в Mailgun. Ответ также записан в консоль." });
-      console.log('Mailgun smoke test response', data);
-    },
-    onError: (err: any) => {
-      toast({ title: "Mailgun test failed", description: err.message, variant: "destructive" });
-    },
-  });
 
   const toggleSequenceStatus = useMutation({
     mutationFn: async (isActive: boolean) => {
@@ -363,25 +326,6 @@ const EmailSequenceDetails: React.FC = () => {
                     <CardDescription>Configure the sequence of emails that will be sent to candidates.</CardDescription>
                   </div>
                     <div className="flex items-center gap-2">
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        onClick={() => sendTestMutation.mutate()}
-                        disabled={templatesLoading || templates.length === 0 || sendTestMutation.isPending}
-                      >
-                        <Send className="mr-2 h-4 w-4" />
-                        {sendTestMutation.isPending ? "Sending..." : "Send Test"}
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => mailgunTestMutation.mutate()}
-                        disabled={mailgunTestMutation.isPending}
-                        title="Sends a simple test via Mailgun directly"
-                      >
-                        <Send className="mr-2 h-4 w-4" />
-                        {mailgunTestMutation.isPending ? "Testing..." : "Mailgun Test"}
-                      </Button>
                       <Button size="sm" onClick={() => setShowTemplateBuilder(true)}>
                         <Edit className="mr-2 h-4 w-4" />
                         Edit Templates
