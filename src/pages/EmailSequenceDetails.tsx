@@ -11,7 +11,7 @@ import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Edit, Plus, Play, Pause, Trash2, Users, Clock, Send } from "lucide-react";
-import EmailTemplateBuilder from "@/components/EmailSequences/EmailTemplateBuilder";
+import { SequenceTemplateBuilder } from "@/components/EmailSequences/SequenceTemplateBuilder";
 import { ContactInfo } from "@/components/ContactInfo";
 
 interface EmailSequence {
@@ -119,7 +119,6 @@ const EmailSequenceDetails: React.FC = () => {
   const queryClient = useQueryClient();
 
   const [showTemplateBuilder, setShowTemplateBuilder] = useState(false);
-  const [editingTemplate, setEditingTemplate] = useState<EmailTemplate | null>(null);
 
   if (!sequenceId) {
     navigate('/email-sequences');
@@ -130,53 +129,48 @@ const EmailSequenceDetails: React.FC = () => {
   const { data: templates = [], isLoading: templatesLoading } = useEmailTemplates(sequenceId);
   const { data: recipients = [], isLoading: recipientsLoading } = useSequenceRecipients(sequenceId);
 
-  const createTemplateMutation = useMutation({
-    mutationFn: async (templateData: Omit<EmailTemplate, 'id' | 'sequence_id' | 'created_at' | 'updated_at'>) => {
+  const saveTemplatesMutation = useMutation({
+    mutationFn: async (emails: EmailTemplate[]) => {
       const { data: userRes, error: userErr } = await supabase.auth.getUser();
       if (userErr || !userRes.user) throw new Error("Not authenticated");
       
-      const { data, error } = await supabase
+      // Delete existing templates for this sequence
+      const { error: deleteError } = await supabase
         .from("email_templates")
-        .insert([{ 
-          ...templateData, 
-          sequence_id: sequenceId,
-          user_id: userRes.user.id,
-          order_index: templates.length 
-        }])
-        .select("*")
-        .single();
-      if (error) throw error;
-      return data as EmailTemplate;
-    },
-    onSuccess: () => {
-      toast({ title: "Template created", description: "Email template has been added to the sequence." });
-      setShowTemplateBuilder(false);
-      queryClient.invalidateQueries({ queryKey: ["email_templates", sequenceId] });
-    },
-    onError: (err: any) => {
-      toast({ title: "Failed to create template", description: err.message, variant: "destructive" });
-    },
-  });
+        .delete()
+        .eq("sequence_id", sequenceId);
+      if (deleteError) throw deleteError;
 
-  const updateTemplateMutation = useMutation({
-    mutationFn: async ({ templateId, templateData }: { templateId: string, templateData: Partial<EmailTemplate> }) => {
-      const { data, error } = await supabase
-        .from("email_templates")
-        .update(templateData)
-        .eq("id", templateId)
-        .select("*")
-        .single();
-      if (error) throw error;
-      return data as EmailTemplate;
+      // Insert new templates
+      if (emails.length > 0) {
+        const templateData = emails.map(email => ({
+          user_id: userRes.user.id,
+          sequence_id: sequenceId,
+          name: email.name,
+          subject: email.subject,
+          content: email.content,
+          delay_days: email.delay_days,
+          delay_hours: email.delay_hours,
+          order_index: email.order_index,
+          schedule_type: 'delay',
+          schedule_config: {}
+        }));
+
+        const { error: insertError } = await supabase
+          .from("email_templates")
+          .insert(templateData);
+        if (insertError) throw insertError;
+      }
+
+      return emails;
     },
     onSuccess: () => {
-      toast({ title: "Template updated", description: "Email template has been updated successfully." });
+      toast({ title: "Templates saved", description: "Email templates have been updated successfully." });
       setShowTemplateBuilder(false);
-      setEditingTemplate(null);
       queryClient.invalidateQueries({ queryKey: ["email_templates", sequenceId] });
     },
     onError: (err: any) => {
-      toast({ title: "Failed to update template", description: err.message, variant: "destructive" });
+      toast({ title: "Failed to save templates", description: err.message, variant: "destructive" });
     },
   });
 
@@ -219,15 +213,12 @@ const EmailSequenceDetails: React.FC = () => {
     },
   });
 
-  const handleSaveTemplate = (templateData: Omit<EmailTemplate, 'id' | 'sequence_id' | 'created_at' | 'updated_at'>) => {
-    if (editingTemplate) {
-      updateTemplateMutation.mutate({ 
-        templateId: editingTemplate.id, 
-        templateData 
-      });
-    } else {
-      createTemplateMutation.mutate(templateData);
-    }
+  const handleSaveTemplates = async (data: { emails: any[] }) => {
+    const emailTemplates = data.emails.map(email => ({
+      ...email,
+      id: undefined, // Remove id to force new creation
+    }));
+    await saveTemplatesMutation.mutateAsync(emailTemplates);
   };
 
   const formatDelay = (days: number, hours: number) => {
@@ -324,19 +315,24 @@ const EmailSequenceDetails: React.FC = () => {
 
           <TabsContent value="templates" className="space-y-6">
             {showTemplateBuilder ? (
-              <Card>
-                <CardContent className="pt-6">
-                  <EmailTemplateBuilder
-                    template={editingTemplate || undefined}
-                    onSave={handleSaveTemplate}
-                    onCancel={() => {
-                      setShowTemplateBuilder(false);
-                      setEditingTemplate(null);
-                    }}
-                    isLoading={createTemplateMutation.isPending || updateTemplateMutation.isPending}
-                  />
-                </CardContent>
-              </Card>
+              <SequenceTemplateBuilder
+                sequenceId={sequenceId}
+                sequenceName={sequence.name}
+                initialData={{
+                  emails: templates.map(t => ({
+                    id: t.id,
+                    name: t.name,
+                    subject: t.subject,
+                    content: t.content,
+                    order_index: t.order_index,
+                    delay_days: t.delay_days,
+                    delay_hours: t.delay_hours,
+                  }))
+                }}
+                onSave={handleSaveTemplates}
+                onCancel={() => setShowTemplateBuilder(false)}
+                isLoading={saveTemplatesMutation.isPending}
+              />
             ) : (
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0">
@@ -355,8 +351,8 @@ const EmailSequenceDetails: React.FC = () => {
                       {sendTestMutation.isPending ? "Sending..." : "Send Test"}
                     </Button>
                     <Button size="sm" onClick={() => setShowTemplateBuilder(true)}>
-                      <Plus className="mr-2 h-4 w-4" />
-                      Add Template
+                      <Edit className="mr-2 h-4 w-4" />
+                      Edit Templates
                     </Button>
                   </div>
                 </CardHeader>
@@ -366,7 +362,7 @@ const EmailSequenceDetails: React.FC = () => {
                     <div className="py-10 text-center text-muted-foreground">Loading templates...</div>
                   ) : templates.length === 0 ? (
                     <div className="py-10 text-center text-muted-foreground">
-                      No templates yet. Add your first email template to get started.
+                      No templates yet. Click "Edit Templates" to get started.
                     </div>
                   ) : (
                     <Table>
@@ -376,7 +372,6 @@ const EmailSequenceDetails: React.FC = () => {
                           <TableHead>Template Name</TableHead>
                           <TableHead>Subject</TableHead>
                           <TableHead>Delay</TableHead>
-                          <TableHead className="w-24">Actions</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -390,18 +385,6 @@ const EmailSequenceDetails: React.FC = () => {
                                 <Clock className="h-3 w-3" />
                                 {formatDelay(template.delay_days, template.delay_hours)}
                               </div>
-                            </TableCell>
-                            <TableCell>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => {
-                                  setEditingTemplate(template);
-                                  setShowTemplateBuilder(true);
-                                }}
-                              >
-                                <Edit className="h-4 w-4" />
-                              </Button>
                             </TableCell>
                           </TableRow>
                         ))}

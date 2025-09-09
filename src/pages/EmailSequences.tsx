@@ -146,14 +146,16 @@ useEffect(() => { setFilterProjectId(activeProject?.id ?? 'all'); }, [activeProj
 
       return sequence as EmailSequence;
     },
-    onSuccess: () => {
-      toast({ title: "Sequence created", description: "You can now add templates and recipients." });
+    onSuccess: (sequence) => {
+      toast({ title: "Sequence created", description: "Configure your email templates now." });
       setOpen(false);
       setName("");
       setDescription("");
       setSelectedTemplateId("scratch");
       setSelectedProjectId(activeProject?.id ?? 'none');
       queryClient.invalidateQueries({ queryKey: ["email_sequences"] });
+      // Navigate to sequence details to edit templates
+      navigate(`/email-sequences/${sequence.id}`);
     },
     onError: (err: any) => {
       toast({ title: "Failed to create sequence", description: err.message ?? "Please try again.", variant: "destructive" });
