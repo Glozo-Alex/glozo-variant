@@ -100,8 +100,9 @@ serve(async (req) => {
       return new Response('Template not found', { status: 404, headers: corsHeaders });
     }
 
-    // Prepare email - using authorized recipients for sandbox
-    const toEmails = 'alex@glozo.com'; // Only alex@glozo.com is authorized in Mailgun sandbox
+    // Prepare email - using authorized recipients
+    const authorizedRecipients = Deno.env.get('MAILGUN_AUTHORIZED_RECIPIENTS');
+    const toEmails = authorizedRecipients || 'alex@glozo.com';
     const subject = template.subject || `${sequence.name} – Test Email`;
     const html = template.content || '<p>(empty content)</p>';
 
