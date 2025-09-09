@@ -190,6 +190,28 @@ const EmailSequenceDetails: React.FC = () => {
     },
   });
 
+  const mailgunTestMutation = useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.functions.invoke('mailgun-smoke-test', {
+        body: {
+          from: `Mailgun Sandbox <postmaster@glozo.com>`,
+          to: `Alexey Vavilov <alex@glozo.com>`,
+          subject: `Hello Alexey Vavilov`,
+          text: `Congratulations Alexey Vavilov, you just sent an email with Mailgun! You are truly awesome!`,
+        },
+      });
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data: any) => {
+      toast({ title: "Mailgun test requested", description: "Проверьте события в Mailgun. Ответ также записан в консоль." });
+      console.log('Mailgun smoke test response', data);
+    },
+    onError: (err: any) => {
+      toast({ title: "Mailgun test failed", description: err.message, variant: "destructive" });
+    },
+  });
+
   const toggleSequenceStatus = useMutation({
     mutationFn: async (isActive: boolean) => {
       const { data, error } = await supabase
@@ -340,21 +362,31 @@ const EmailSequenceDetails: React.FC = () => {
                     <CardTitle className="text-lg">Email Templates</CardTitle>
                     <CardDescription>Configure the sequence of emails that will be sent to candidates.</CardDescription>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      onClick={() => sendTestMutation.mutate()}
-                      disabled={templatesLoading || templates.length === 0 || sendTestMutation.isPending}
-                    >
-                      <Send className="mr-2 h-4 w-4" />
-                      {sendTestMutation.isPending ? "Sending..." : "Send Test"}
-                    </Button>
-                    <Button size="sm" onClick={() => setShowTemplateBuilder(true)}>
-                      <Edit className="mr-2 h-4 w-4" />
-                      Edit Templates
-                    </Button>
-                  </div>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => sendTestMutation.mutate()}
+                        disabled={templatesLoading || templates.length === 0 || sendTestMutation.isPending}
+                      >
+                        <Send className="mr-2 h-4 w-4" />
+                        {sendTestMutation.isPending ? "Sending..." : "Send Test"}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => mailgunTestMutation.mutate()}
+                        disabled={mailgunTestMutation.isPending}
+                        title="Sends a simple test via Mailgun directly"
+                      >
+                        <Send className="mr-2 h-4 w-4" />
+                        {mailgunTestMutation.isPending ? "Testing..." : "Mailgun Test"}
+                      </Button>
+                      <Button size="sm" onClick={() => setShowTemplateBuilder(true)}>
+                        <Edit className="mr-2 h-4 w-4" />
+                        Edit Templates
+                      </Button>
+                    </div>
                 </CardHeader>
                 <Separator />
                 <CardContent>
