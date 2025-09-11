@@ -26,7 +26,6 @@ interface CandidateCardProps {
   onShortlistToggle?: (candidateId: string, isShortlisted: boolean) => void;
   socialLinks?: SocialLink[];
   fullCandidateData?: any;
-  compact?: boolean;
 }
 
 const LinkChunk = ({ children }: { children: React.ReactNode }) => (
@@ -48,7 +47,6 @@ const CandidateCard = ({
   onShortlistToggle,
   socialLinks = [],
   fullCandidateData,
-  compact = false,
 }: CandidateCardProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
@@ -94,106 +92,8 @@ const CandidateCard = ({
       setIsLoading(false);
     }
   }, [candidateId, projectId, name, title, location, experience, matchPercentage, description, skills, openToOffers, isShortlisted, onShortlistToggle, toast]);
-  
-  const cardClasses = compact 
-    ? "glass-card rounded-lg p-3 animate-fade-in hover:shadow-elegant hover:border-primary/30 transition-all duration-300 hover-lift"
-    : "glass-card rounded-xl p-5 space-y-3 animate-fade-in hover:shadow-elegant hover:border-primary/30 transition-all duration-300 hover-lift";
-  
-  if (compact) {
-    return (
-      <article className={cardClasses}>
-        <div className="flex items-center gap-4 h-full">
-          {/* Left section - Primary info */}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1">
-              <h3 className="text-sm font-semibold text-card-foreground truncate">{name}</h3>
-              <div className="flex items-center gap-1 text-muted-foreground">
-                <CandidateProfile candidateData={fullCandidateData} socialLinks={socialLinks} projectId={projectId}>
-                  <ArrowUpRight className="h-3 w-3 cursor-pointer hover:text-primary transition-colors" />
-                </CandidateProfile>
-                {socialLinks.slice(0, 2).map((link, index) => {
-                  const IconComponent = getSocialIcon(link.platform);
-                  return (
-                    <IconComponent
-                      key={index}
-                      className="h-3 w-3 cursor-pointer hover:text-primary transition-colors"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        window.open(link.url, '_blank');
-                      }}
-                    />
-                  );
-                })}
-              </div>
-              <span className="inline-flex items-center gap-1 text-xs font-semibold text-success ml-auto">
-                <CheckCircle className="h-3 w-3" /> {matchPercentage}%
-              </span>
-            </div>
-            <div className="text-muted-foreground text-xs">
-              <span className="font-medium">{title}</span>
-              <span className="mx-1">•</span>
-              <span className="font-medium">{location}</span>
-              <span className="mx-1">•</span>
-              <span className="font-medium">{experience}</span>
-            </div>
-          </div>
-          
-          {/* Right section - Secondary info and actions */}
-          <div className="flex items-center gap-3 flex-shrink-0">
-            {openToOffers && (
-              <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full" style={{ backgroundColor: 'hsl(142 76% 95%)', color: 'hsl(142 76% 30%)' }}>
-                Open to offers
-              </span>
-            )}
-            <div className="flex flex-wrap gap-1 max-w-32">
-              {skills.slice(0, 3).map((skill, index) => (
-                <span
-                  key={index}
-                  className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                    skill.type === 'primary'
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-secondary text-secondary-foreground"
-                  }`}
-                >
-                  {skill.name}
-                </span>
-              ))}
-              {skills.length > 3 && (
-                <CandidateProfile candidateData={fullCandidateData} socialLinks={socialLinks} projectId={projectId}>
-                  <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-muted text-muted-foreground cursor-pointer hover:bg-muted/80 transition-colors">
-                    +{skills.length - 3}
-                  </span>
-                </CandidateProfile>
-              )}
-            </div>
-            <div className="flex items-center gap-1">
-              <Button variant="outline" size="sm" className="h-7 px-2 text-xs text-card-foreground border-card-border bg-card-hover hover:bg-card-hover/70 transition-all duration-300 hover-scale">
-                <MessageSquare className="h-3 w-3 mr-1" />
-                Message
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="h-7 px-2 text-xs text-card-foreground border-card-border bg-card-hover hover:bg-card-hover/70 transition-all duration-300 hover-scale"
-                onClick={handleShortlistClick}
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <Loader2 className="h-3 w-3 mr-1 animate-spin" />
-                ) : (
-                  <Star className={`h-3 w-3 mr-1 ${isShortlisted ? 'fill-current' : ''}`} />
-                )}
-                {isShortlisted ? 'Shortlisted' : 'Shortlist'}
-              </Button>
-            </div>
-          </div>
-        </div>
-      </article>
-    );
-  }
-
   return (
-    <article className={cardClasses}>
+    <article className="glass-card rounded-xl p-5 space-y-3 animate-fade-in hover:shadow-elegant hover:border-primary/30 transition-all duration-300 hover-lift">
       {/* Header */}
       <header className="flex items-start justify-between">
           <div className="flex items-center gap-3 flex-wrap">

@@ -9,17 +9,13 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
 import ProjectSelector from "./ProjectSelector";
 import ColorSchemeSelector from "./ColorSchemeSelector";
-import { UIDensityToggle } from "./UIDensityToggle";
-import { useColorScheme } from "@/contexts/ThemeContext";
-import { useSidebarState } from "@/hooks/useSidebarState";
 
 const Sidebar = () => {
-  const { collapsed, toggleCollapsed } = useSidebarState();
+  const [collapsed, setCollapsed] = useState(false);
   const [outreachExpanded, setOutreachExpanded] = useState(true);
   const { activeProject } = useProject();
   const { user, signOut } = useAuth();
   const { profile, displayName } = useProfile();
-  const { uiDensity } = useColorScheme();
   const location = useLocation();
 
   const getInitials = (name: string) => {
@@ -33,21 +29,21 @@ const Sidebar = () => {
 
   const avatarUrl = profile?.avatar_url || user?.user_metadata?.avatar_url;
 
-  const navCls = "flex items-center gap-[var(--ui-spacing-sm)] px-[var(--ui-spacing-sm)] py-[var(--ui-spacing-xs)] rounded-[var(--ui-border-radius-sm)] text-sm text-sidebar-text hover:bg-sidebar-hover hover:text-sidebar-text-active transition-all duration-300 hover-scale";
-  const subNavCls = "flex items-center gap-[var(--ui-spacing-sm)] px-[var(--ui-spacing-sm)] py-[var(--ui-spacing-xs)] ml-6 rounded-[var(--ui-border-radius-sm)] text-sm text-sidebar-text hover:bg-sidebar-hover hover:text-sidebar-text-active transition-all duration-300 hover-scale";
+  const navCls = "flex items-center gap-3 px-3 py-2 rounded-md text-sm text-sidebar-text hover:bg-sidebar-hover hover:text-sidebar-text-active transition-all duration-300 hover-scale";
+  const subNavCls = "flex items-center gap-3 px-3 py-2 ml-6 rounded-md text-sm text-sidebar-text hover:bg-sidebar-hover hover:text-sidebar-text-active transition-all duration-300 hover-scale";
 
   // Check if any outreach route is active
   const isOutreachActive = location.pathname.startsWith('/email-sequences') || location.pathname.startsWith('/outreach');
 
   return (
     <TooltipProvider>
-      <aside className={`${collapsed ? "w-16" : "w-64"} ${uiDensity === 'compact' ? 'bg-background border-r border-border' : 'glass-sidebar'} h-screen flex flex-col transition-[width] duration-200 animate-slide-in-left`}>
+      <aside className={`${collapsed ? "w-20" : "w-64"} glass-sidebar h-screen flex flex-col transition-[width] duration-200 animate-slide-in-left`}>
         {/* Header with centered logo */}
         <div className="h-14 flex items-center justify-center px-2">
           <img
             src={collapsed ? "/lovable-uploads/3958ba4b-ab9f-4bc4-9677-5bc99ead0c0a.png" : "/lovable-uploads/fc31fa24-db3f-423a-b235-da6a49bb2bdd.png"}
             alt={collapsed ? "GLOZO mark logo (orange FC5B26)" : "GLOZO logo (orange FC5B26)"}
-            className={`${collapsed ? "h-6 w-6" : "h-8 w-auto"} object-contain`}
+            className={`${collapsed ? "h-8 w-8" : "h-8 w-auto"} object-contain`}
             loading="lazy"
           />
         </div>
@@ -59,14 +55,14 @@ const Sidebar = () => {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div className="flex items-center justify-center">
-                     <LayoutDashboard className="h-[var(--ui-icon-md)] w-[var(--ui-icon-md)]" />
+                    <LayoutDashboard className="h-5 w-5" />
                   </div>
                 </TooltipTrigger>
                 <TooltipContent side="right">Dashboard</TooltipContent>
               </Tooltip>
             ) : (
               <>
-                <LayoutDashboard className="h-[var(--ui-icon-md)] w-[var(--ui-icon-md)]" />
+                <LayoutDashboard className="h-5 w-5" />
                 <span>Dashboard</span>
               </>
             )}
@@ -284,16 +280,13 @@ const Sidebar = () => {
 
         {/* Collapse button at bottom */}
         <div className="mt-auto p-4 space-y-3">
-          {/* Theme Controls */}
-          <div className={`flex ${collapsed ? 'flex-col space-y-2' : 'gap-2'}`}>
-            <ColorSchemeSelector collapsed={collapsed} />
-            {!collapsed && <UIDensityToggle />}
-          </div>
+          {/* Color Scheme Selector */}
+          <ColorSchemeSelector collapsed={collapsed} />
           
           <button
             aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
             className="w-full h-10 rounded-lg bg-sidebar-hover text-sidebar-text hover:bg-sidebar-accent hover:text-sidebar-text-active flex items-center justify-center transition-all duration-300 hover-scale"
-            onClick={toggleCollapsed}
+            onClick={() => setCollapsed((v) => !v)}
           >
             {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
           </button>

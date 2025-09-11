@@ -2,16 +2,11 @@ import { useEffect, useMemo, useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import CandidateCard from "./CandidateCard";
-import CandidateTable from "./CandidateTable";
 import CandidateFilters from "./CandidateFilters";
-import CompactFilters from "./CompactFilters";
-import { ViewToggle } from "./ViewToggle";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { getShortlistStatus } from "@/services/shortlist";
 import { useProject } from "@/contexts/ProjectContext";
-import { useColorScheme } from "@/contexts/ThemeContext";
-import { useViewPreference } from "@/hooks/useViewPreference";
 
 interface APICandidate {
   id?: number | string;
@@ -39,11 +34,7 @@ interface APICandidate {
 const CandidateList = () => {
   const { projectId } = useParams();
   const { updateShortlistCount } = useProject();
-  const { uiDensity } = useColorScheme();
-  const { view } = useViewPreference();
   const [status, setStatus] = useState<"pending" | "completed" | "failed" | "idle">("idle");
-  const [sortColumn, setSortColumn] = useState<string>('match');
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   const [candidates, setCandidates] = useState<APICandidate[]>([]);
   const [candidateCount, setCandidateCount] = useState<number>(0);
   const [loading, setLoading] = useState(true);
@@ -255,56 +246,6 @@ const CandidateList = () => {
     }
   }, [projectId, updateShortlistCount]);
 
-  const handleSort = useCallback((column: string) => {
-    if (sortColumn === column) {
-      setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortColumn(column);
-      setSortDirection('desc');
-    }
-  }, [sortColumn]);
-
-  const sortedCandidates = useMemo(() => {
-    if (!sortColumn) return filteredCandidates;
-    
-    return [...filteredCandidates].sort((a, b) => {
-      let aValue, bValue;
-      
-      switch (sortColumn) {
-        case 'name':
-          aValue = a.name || '';
-          bValue = b.name || '';
-          break;
-        case 'title':
-          aValue = a.title || a.role || '';
-          bValue = b.title || b.role || '';
-          break;
-        case 'location':
-          aValue = a.location || '';
-          bValue = b.location || '';
-          break;
-        case 'experience':
-          aValue = parseInt(a.years_of_experience || a.average_years_of_experience || '0');
-          bValue = parseInt(b.years_of_experience || b.average_years_of_experience || '0');
-          break;
-        case 'match':
-          aValue = a.match_score || a.match_percentage || 0;
-          bValue = b.match_score || b.match_percentage || 0;
-          break;
-        default:
-          return 0;
-      }
-      
-      if (typeof aValue === 'string' && typeof bValue === 'string') {
-        const comparison = aValue.localeCompare(bValue);
-        return sortDirection === 'asc' ? comparison : -comparison;
-      } else {
-        const comparison = (aValue as number) - (bValue as number);
-        return sortDirection === 'asc' ? comparison : -comparison;
-      }
-    });
-  }, [filteredCandidates, sortColumn, sortDirection]);
-
   const headerText = useMemo(() => {
     if (loading) return "Loading candidates...";
     if (error) return "Failed to load candidates";
@@ -317,68 +258,20 @@ const CandidateList = () => {
       : `Found Candidates (${totalCount})`;
   }, [loading, error, status, candidateCount, filteredCandidates.length]);
 
-  const isCompactUI = uiDensity === 'compact';
-
-  // Prepare data for table view
-  const tableData = sortedCandidates.map((c, idx) => {
-    const flatSkills: string[] = (c.skills ?? [])
-      .flatMap((s) => s.skills ?? [])
-      .filter(Boolean)
-      .slice(0, 8);
-
-    const socialLinks = (c.social ?? []).map((social: any) => ({
-      platform: social.platform || 'globe',
-      url: social.url || '#'
-    }));
-
-    return {
-      candidateId: String(c.id || idx),
-      projectId: projectId || '',
-      name: c.name || "Unnamed",
-      title: c.title || c.role || "Unknown role",
-      location: c.location || "Unknown location",
-      experience: c.years_of_experience || c.average_years_of_experience || "—",
-      matchPercentage: Math.round((c.match_score ?? c.match_percentage ?? 0) as number),
-      description: c.standout || c.ai_summary || "",
-      skills: flatSkills.map((s) => ({ name: s, type: "primary" as const })),
-      openToOffers: Boolean(c.open_to_offers),
-      isShortlisted: shortlistStatus[String(c.id || idx)] || false,
-      onShortlistToggle: handleShortlistToggle,
-      socialLinks,
-      fullCandidateData: c,
-    };
-  });
-
   return (
-    <main className={`flex-1 ${isCompactUI ? 'bg-background' : 'glass-surface'} flex flex-col animate-fade-in`}>
+    <main className="flex-1 glass-surface flex flex-col animate-fade-in">
       {/* Header */}
-      <div className={`${isCompactUI ? 'h-10 px-4 border-b border-border bg-background' : 'h-14 px-6'} flex items-center justify-between`}>
-        <h1 className={`${isCompactUI ? 'text-sm' : 'text-lg'} font-semibold text-card-foreground`}>{headerText}</h1>
-        {!loading && !error && candidates.length > 0 && (
-          <div className="flex items-center gap-4">
-            <ViewToggle />
-            {!isCompactUI && (
-              <CandidateFilters
-                availableFilters={availableFilters}
-                selectedFilters={selectedFilters}
-                onFiltersChange={setSelectedFilters}
-              />
-            )}
-          </div>
-        )}
-      </div>
-
-      {/* Compact Filters */}
-      {isCompactUI && !loading && !error && candidates.length > 0 && (
-        <CompactFilters
+      <div className="h-14 px-6 flex items-center justify-between">
+        <h1 className="text-lg font-semibold text-card-foreground">{headerText}</h1>
+        <CandidateFilters
           availableFilters={availableFilters}
           selectedFilters={selectedFilters}
           onFiltersChange={setSelectedFilters}
         />
-      )}
+      </div>
 
       {/* Content */}
-      <div className={`flex-1 overflow-auto ${isCompactUI ? '' : 'p-6 space-y-2'}`}>
+      <div className="flex-1 overflow-auto p-6 space-y-2">
         {error && (
           <div className="text-destructive">{error}</div>
         )}
@@ -391,80 +284,61 @@ const CandidateList = () => {
           <div className="text-muted-foreground">No candidates match the selected filters.</div>
         )}
 
-        {view === 'table' ? (
-          <CandidateTable 
-            candidates={tableData}
-            onSort={handleSort}
-            sortColumn={sortColumn}
-            sortDirection={sortDirection}
-          />
-        ) : (
-          <div className={`grid gap-4 mb-8 ${
-            isCompactUI 
-              ? 'grid-cols-1' 
-              : 'grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3'
-          } ${isCompactUI ? 'p-4' : ''}`}>
-            {sortedCandidates.map((c, idx) => {
-              const flatSkills: string[] = (c.skills ?? [])
-                .flatMap((s) => s.skills ?? [])
-                .filter(Boolean)
-                .slice(0, 8);
+        {filteredCandidates.map((c, idx) => {
+          const flatSkills: string[] = (c.skills ?? [])
+            .flatMap((s) => s.skills ?? [])
+            .filter(Boolean)
+            .slice(0, 8);
 
-              // Extract social links from candidate data
-              const socialLinks = (c.social ?? []).map((social: any) => ({
-                platform: social.platform || 'globe',
-                url: social.url || '#'
-              }));
+          // Extract social links from candidate data
+          const socialLinks = (c.social ?? []).map((social: any) => ({
+            platform: social.platform || 'globe',
+            url: social.url || '#'
+          }));
 
-              return (
-                <CandidateCard
-                  key={`${c.id ?? idx}`}
-                  candidateId={String(c.id || idx)}
-                  projectId={projectId || ''}
-                  name={c.name || "Unnamed"}
-                  title={c.title || c.role || "Unknown role"}
-                  location={c.location || "Unknown location"}
-                  experience={c.years_of_experience || c.average_years_of_experience || "—"}
-                  matchPercentage={Math.round((c.match_score ?? c.match_percentage ?? 0) as number)}
-                  description={c.standout || c.ai_summary || ""}
-                  skills={flatSkills.map((s) => ({ name: s, type: "primary" as const }))}
-                  openToOffers={Boolean(c.open_to_offers)}
-                  isShortlisted={shortlistStatus[String(c.id || idx)] || false}
-                  onShortlistToggle={handleShortlistToggle}
-                  socialLinks={socialLinks}
-                  fullCandidateData={c}
-                />
-              );
-            })}
-          </div>
-        )}
+          return (
+            <CandidateCard
+              key={`${c.id ?? idx}`}
+              candidateId={String(c.id || idx)}
+              projectId={projectId || ''}
+              name={c.name || "Unnamed"}
+              title={c.title || c.role || "Unknown role"}
+              location={c.location || "Unknown location"}
+              experience={c.years_of_experience || c.average_years_of_experience || "—"}
+              matchPercentage={Math.round((c.match_score ?? c.match_percentage ?? 0) as number)}
+              description={c.standout || c.ai_summary || ""}
+              skills={flatSkills.map((s) => ({ name: s, type: "primary" as const }))}
+              openToOffers={Boolean(c.open_to_offers)}
+              isShortlisted={shortlistStatus[String(c.id || idx)] || false}
+              onShortlistToggle={handleShortlistToggle}
+              socialLinks={socialLinks}
+              fullCandidateData={c}
+            />
+          );
+        })}
       </div>
 
       {/* Footer */}
-      <div className={`${isCompactUI ? 'h-8 px-4 border-t border-border bg-background' : 'h-14 px-6 glass-surface'} flex items-center justify-between`}>
-        <span className={`${isCompactUI ? 'text-xs' : 'text-sm'} text-muted-foreground`}>
+      <div className="h-14 px-6 glass-surface flex items-center justify-between">
+        <span className="text-sm text-muted-foreground">
           {candidateCount > 0 ? (
-            sortedCandidates.length !== candidateCount 
-              ? `${sortedCandidates.length} of ${candidateCount} candidates`
+            filteredCandidates.length !== candidateCount 
+              ? `${filteredCandidates.length} of ${candidateCount} candidates`
               : `${candidateCount} candidates`
           ) : ""}
         </span>
 
-        {!isCompactUI && view === 'grid' && (
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" className="hover-scale border-card-border bg-card-hover text-card-foreground hover:bg-card-hover/70"><ChevronLeft className="h-4 w-4" /></Button>
-            <Button variant="outline" size="sm" className="bg-primary text-primary-foreground hover-scale border-primary/50">1</Button>
-            <Button variant="outline" size="sm" className="hover-scale border-card-border bg-card-hover text-card-foreground hover:bg-card-hover/70">2</Button>
-            <Button variant="outline" size="sm" className="hover-scale border-card-border bg-card-hover text-card-foreground hover:bg-card-hover/70">3</Button>
-            <span className="text-muted-foreground">...</span>
-            <Button variant="outline" size="sm" className="hover-scale border-card-border bg-card-hover text-card-foreground hover:bg-card-hover/70">24</Button>
-            <Button variant="outline" size="sm" className="hover-scale border-card-border bg-card-hover text-card-foreground hover:bg-card-hover/70"><ChevronRight className="h-4 w-4" /></Button>
-          </div>
-        )}
-
-        <div className={`${isCompactUI ? 'text-xs' : 'text-sm'} text-muted-foreground`}>
-          {isCompactUI ? '50/page' : '20 per page'}
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" className="hover-scale border-card-border bg-card-hover text-card-foreground hover:bg-card-hover/70"><ChevronLeft className="h-4 w-4" /></Button>
+          <Button variant="outline" size="sm" className="bg-primary text-primary-foreground hover-scale border-primary/50">1</Button>
+          <Button variant="outline" size="sm" className="hover-scale border-card-border bg-card-hover text-card-foreground hover:bg-card-hover/70">2</Button>
+          <Button variant="outline" size="sm" className="hover-scale border-card-border bg-card-hover text-card-foreground hover:bg-card-hover/70">3</Button>
+          <span className="text-muted-foreground">...</span>
+          <Button variant="outline" size="sm" className="hover-scale border-card-border bg-card-hover text-card-foreground hover:bg-card-hover/70">24</Button>
+          <Button variant="outline" size="sm" className="hover-scale border-card-border bg-card-hover text-card-foreground hover:bg-card-hover/70"><ChevronRight className="h-4 w-4" /></Button>
         </div>
+
+        <div className="text-sm text-muted-foreground">20 per page</div>
       </div>
     </main>
   );

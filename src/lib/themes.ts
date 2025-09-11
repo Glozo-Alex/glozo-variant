@@ -1,5 +1,4 @@
 export type ColorScheme = 'default' | 'ocean' | 'sunset' | 'forest';
-export type UIDensity = 'default' | 'compact';
 
 export interface ThemeConfig {
   id: ColorScheme;
@@ -53,37 +52,6 @@ export const THEMES: Record<ColorScheme, ThemeConfig> = {
       accent: '#84cc16'
     }
   }
-};
-
-export const applyUIDensity = (density: UIDensity) => {
-  const root = document.documentElement;
-  
-  console.log('🎨 Applying UI density:', density);
-  
-  // Add transition class for smooth changes
-  root.classList.add('ui-transition');
-  
-  // Remove existing density classes
-  root.classList.remove('ui-default', 'ui-compact');
-  
-  // Add new density class
-  root.classList.add(`ui-${density}`);
-  console.log('✅ Applied UI density class:', `ui-${density}`);
-  
-  // Store in localStorage
-  localStorage.setItem('ui-density', density);
-  
-  // Dispatch event to notify components
-  const event = new CustomEvent('uiDensityChanged', { 
-    detail: { density } 
-  });
-  document.dispatchEvent(event);
-  console.log('📡 Dispatched uiDensityChanged event');
-  
-  // Remove transition class after animation completes
-  setTimeout(() => {
-    root.classList.remove('ui-transition');
-  }, 300);
 };
 
 export const applyColorScheme = (scheme: ColorScheme) => {
