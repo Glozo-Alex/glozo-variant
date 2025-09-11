@@ -7,7 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Search, Grid, List, Users, Filter } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Search, Grid, List, Users, Filter, BrainCircuit, CheckCircle, ArrowUpRight, Mail, Phone, MapPin, Calendar } from "lucide-react";
 import CandidateProfile from "@/components/CandidateProfile";
 import { getSocialIcon } from "@/utils/socialIcons";
 
@@ -148,57 +150,54 @@ const Candidates = () => {
     // Get job title and company info, avoiding redundancy
     const title = snapshot?.title || snapshot?.role || 'Unknown Title';
     const company = snapshot?.employer || snapshot?.company;
-    const titleCompanyText = company ? `${title} at ${company}` : title;
-
-    // Get contact information
-    const hasEmail = snapshot?.contacts?.emails?.length > 0;
-    const hasPhone = snapshot?.contacts?.phones?.length > 0;
-    const hasContact = hasEmail || hasPhone;
+    const location = snapshot?.location || 'Unknown Location';
+    const experience = snapshot?.experience || 'Experience not specified';
+    
+    // Get skills in the right format
+    const skills = snapshot?.skills?.flatMap((s: any) => s.skills || []) || [];
+    const skillsFormatted = skills.map((skill: string) => ({ name: skill, type: 'primary' as const }));
+    
+    // Get description/summary
+    const description = snapshot?.standout || snapshot?.summary || snapshot?.description || 'No summary available.';
 
     return (
-      <article className="glass-card rounded-xl p-4 space-y-3 animate-fade-in hover:shadow-elegant hover:border-primary/30 transition-all duration-300 hover-lift">
-        {/* Header with name and social links */}
+      <article className="glass-card rounded-xl p-5 space-y-3 animate-fade-in hover:shadow-elegant hover:border-primary/30 transition-all duration-300 hover-lift">
+        {/* Header */}
         <header className="flex items-start justify-between">
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-1 flex-wrap">
-              <CandidateProfile
-                candidateData={snapshot}
-                socialLinks={socialLinks}
-                projectId={candidate.projectId}
-              >
-                <h3 className="text-base font-semibold text-card-foreground cursor-pointer hover:text-primary transition-colors">
-                  {snapshot?.name || 'Unknown Name'}
-                </h3>
+          <div className="flex items-center gap-3 flex-wrap">
+            <CandidateProfile
+              candidateData={snapshot}
+              socialLinks={socialLinks}
+              projectId={candidate.projectId}
+            >
+              <h3 className="text-base font-semibold text-card-foreground cursor-pointer hover:text-primary transition-colors">
+                {snapshot?.name || 'Unknown Name'}
+              </h3>
+            </CandidateProfile>
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <CandidateProfile candidateData={snapshot} socialLinks={socialLinks} projectId={candidate.projectId}>
+                <ArrowUpRight className="h-4 w-4 cursor-pointer hover:text-primary transition-colors" />
               </CandidateProfile>
-              
-              {/* Show first 3 social links */}
               {socialLinks.slice(0, 3).map((link: any, index: number) => {
                 const IconComponent = getSocialIcon(link.platform);
                 return (
                   <IconComponent
                     key={index}
-                    className="h-4 w-4 cursor-pointer hover:text-primary transition-colors text-muted-foreground"
+                    className="h-4 w-4 cursor-pointer hover:text-primary transition-colors"
                     onClick={(e) => {
                       e.stopPropagation();
-                      window.open(link.url, '_blank', 'noopener,noreferrer');
+                      window.open(link.url, '_blank');
                     }}
                   />
                 );
               })}
             </div>
-            
-            {/* Title and company */}
-            <p className="text-sm text-muted-foreground mb-1 font-medium">
-              {titleCompanyText}
-            </p>
-            
-            {/* Location */}
-            <p className="text-xs text-muted-foreground">
-              {snapshot?.location || 'Unknown Location'}
-            </p>
+            {snapshot?.open_to_offers && (
+              <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full" style={{ backgroundColor: 'hsl(142 76% 95%)', color: 'hsl(142 76% 30%)' }}>
+                Open to offers
+              </span>
+            )}
           </div>
-          
-          {/* Status badges */}
           <div className="flex flex-col items-end gap-1">
             {candidate.sequenceStatus && (
               <Badge 
@@ -208,50 +207,212 @@ const Candidates = () => {
                 {candidate.sequenceStatus}
               </Badge>
             )}
-            {snapshot?.open_to_offers && (
-              <span className="inline-flex items-center text-xs font-medium px-2 py-1 rounded-full bg-success/10 text-success">
-                Open to offers
-              </span>
-            )}
-            {hasContact && (
-              <Badge variant="outline" className="text-xs bg-card-hover">
-                Contact available
-              </Badge>
-            )}
           </div>
         </header>
 
-        {/* Project and timeline info */}
-        <div className="flex justify-between items-center text-xs text-muted-foreground bg-card-hover/50 rounded-lg px-3 py-2">
-          <span className="font-medium">Project: {candidate.projectName}</span>
-          <span>Added: {new Date(candidate.addedAt).toLocaleDateString()}</span>
+        {/* Meta */}
+        <div className="text-muted-foreground text-sm">
+          <span className="font-medium">{title}</span>
+          <span className="mx-1">•</span>
+          <span className="font-medium">{location}</span>
+          <span className="mx-1">•</span>
+          <span className="font-medium">{experience}</span>
         </div>
-        
+
+        {/* Description with link-like highlights */}
+        <div className="flex items-start gap-2">
+          <div className="w-6 h-6 bg-card-hover rounded flex items-center justify-center mt-1">
+            <BrainCircuit className="h-4 w-4 text-muted-foreground" />
+          </div>
+          <p className="text-sm text-card-foreground leading-relaxed">
+            {description}
+          </p>
+        </div>
+
         {/* Skills */}
-        {snapshot?.skills && (
-          <div className="flex flex-wrap gap-1">
-            {snapshot.skills.flatMap((s: any) => s.skills || []).slice(0, 4).map((skill: string, index: number) => (
-              <span
-                key={index}
-                className="px-2 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary"
-              >
-                {skill}
+        <div className="flex flex-wrap gap-2">
+          {skillsFormatted.slice(0, 6).map((skill, index) => (
+            <span
+              key={index}
+              className={`px-3 py-1 rounded-full text-xs font-medium ${
+                skill.type === 'primary'
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-secondary text-secondary-foreground"
+              }`}
+            >
+              {skill.name}
+            </span>
+          ))}
+          {skillsFormatted.length > 6 && (
+            <CandidateProfile candidateData={snapshot} socialLinks={socialLinks} projectId={candidate.projectId}>
+              <span className="px-3 py-1 rounded-full text-xs font-medium bg-muted text-muted-foreground cursor-pointer hover:bg-muted/80 transition-colors">
+                + {skillsFormatted.length - 6} more skills
               </span>
-            ))}
-            {snapshot.skills.flatMap((s: any) => s.skills || []).length > 4 && (
-              <CandidateProfile
-                candidateData={snapshot}
-                socialLinks={socialLinks}
-                projectId={candidate.projectId}
-              >
-                <span className="px-2 py-1 rounded-full text-xs font-medium bg-muted text-muted-foreground cursor-pointer hover:bg-muted/80 transition-colors">
-                  +{snapshot.skills.flatMap((s: any) => s.skills || []).length - 4} more
-                </span>
-              </CandidateProfile>
+            </CandidateProfile>
+          )}
+        </div>
+
+        {/* Project and Contact Info */}
+        <div className="pt-3 border-t border-border/50 space-y-2">
+          <div className="flex justify-between items-center text-xs text-muted-foreground">
+            <span className="font-medium">Project: {candidate.projectName}</span>
+            <div className="flex items-center gap-2">
+              <Calendar className="h-3 w-3" />
+              Added {new Date(candidate.addedAt).toLocaleDateString()}
+            </div>
+          </div>
+          
+          {/* Contact indicators */}
+          <div className="flex items-center gap-3">
+            {snapshot?.contacts?.emails?.length > 0 && (
+              <div className="flex items-center gap-1 text-xs text-success">
+                <Mail className="h-3 w-3" />
+                Email available
+              </div>
+            )}
+            {snapshot?.contacts?.phones?.length > 0 && (
+              <div className="flex items-center gap-1 text-xs text-success">
+                <Phone className="h-3 w-3" />
+                Phone available
+              </div>
             )}
           </div>
-        )}
+        </div>
       </article>
+    );
+  };
+
+  const TableView = () => {
+    return (
+      <div className="rounded-lg border bg-card overflow-hidden">
+        <Table>
+          <TableHeader>
+            <TableRow className="h-10">
+              <TableHead className="w-[200px]">Candidate</TableHead>
+              <TableHead className="w-[180px]">Company/Project</TableHead>
+              <TableHead className="w-[120px]">Sequence Status</TableHead>
+              <TableHead className="w-[150px]">Skills</TableHead>
+              <TableHead className="w-20 text-center">Contact</TableHead>
+              <TableHead className="w-24 text-center">Added</TableHead>
+              <TableHead className="w-24 text-center">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredCandidates.map((candidate) => {
+              const snapshot = candidate.candidateSnapshot;
+              const socialLinks = snapshot?.social?.map((social: any) => ({
+                platform: social.platform || 'globe',
+                url: social.url || '#'
+              })) || [];
+              
+              const title = snapshot?.title || snapshot?.role || 'Unknown Title';
+              const company = snapshot?.employer || snapshot?.company || 'Unknown Company';
+              const skills = snapshot?.skills?.flatMap((s: any) => s.skills || []) || [];
+              const initials = snapshot?.name?.split(' ').map((n: string) => n[0]).join('').toUpperCase() || 'UK';
+
+              return (
+                <TableRow key={candidate.id} className="h-12 group hover:bg-muted/50">
+                  <TableCell className="p-2">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <Avatar className="w-8 h-8 flex-shrink-0">
+                        <AvatarFallback className="bg-muted text-muted-foreground text-xs">
+                          {initials}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="min-w-0 flex-1">
+                        <CandidateProfile
+                          candidateData={snapshot}
+                          socialLinks={socialLinks}
+                          projectId={candidate.projectId}
+                        >
+                          <div className="font-medium text-sm truncate cursor-pointer hover:text-primary transition-colors" title={snapshot?.name}>
+                            {snapshot?.name || 'Unknown Name'}
+                          </div>
+                        </CandidateProfile>
+                        <div className="text-xs text-muted-foreground truncate" title={title}>
+                          {title}
+                        </div>
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell className="p-2">
+                    <div className="min-w-0">
+                      <div className="font-medium text-sm truncate" title={company}>
+                        {company}
+                      </div>
+                      <div className="text-xs text-muted-foreground truncate" title={candidate.projectName}>
+                        <span className="font-medium">Project:</span> {candidate.projectName}
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell className="p-2">
+                    {candidate.sequenceStatus ? (
+                      <Badge 
+                        variant={candidate.sequenceStatus === 'active' ? 'default' : 'secondary'}
+                        className="text-xs"
+                      >
+                        {candidate.sequenceStatus}
+                      </Badge>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">-</span>
+                    )}
+                  </TableCell>
+                  <TableCell className="p-2">
+                    <div className="flex gap-1 overflow-hidden">
+                      {skills.slice(0, 2).map((skill: string) => (
+                        <Badge key={skill} variant="secondary" className="text-xs whitespace-nowrap" title={skill}>
+                          {skill.length > 8 ? `${skill.substring(0, 8)}...` : skill}
+                        </Badge>
+                      ))}
+                      {skills.length > 2 && (
+                        <CandidateProfile 
+                          candidateData={snapshot}
+                          socialLinks={socialLinks}
+                          projectId={candidate.projectId}
+                        >
+                          <Badge variant="outline" className="text-xs cursor-pointer hover:bg-muted whitespace-nowrap">
+                            +{skills.length - 2}
+                          </Badge>
+                        </CandidateProfile>
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell className="p-2 text-center">
+                    <div className="flex justify-center gap-1">
+                      {snapshot?.contacts?.emails?.length > 0 && (
+                        <Button variant="ghost" size="sm" className="h-6 w-6 p-0" title="Email available">
+                          <Mail className="h-3 w-3" />
+                        </Button>
+                      )}
+                      {snapshot?.contacts?.phones?.length > 0 && (
+                        <Button variant="ghost" size="sm" className="h-6 w-6 p-0" title="Phone available">
+                          <Phone className="h-3 w-3" />
+                        </Button>
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell className="p-2 text-center">
+                    <div className="text-xs text-muted-foreground">
+                      {new Date(candidate.addedAt).toLocaleDateString()}
+                    </div>
+                  </TableCell>
+                  <TableCell className="p-2 text-center">
+                    <CandidateProfile 
+                      candidateData={snapshot}
+                      socialLinks={socialLinks}
+                      projectId={candidate.projectId}
+                    >
+                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0" title="View Profile">
+                        <Users className="h-3 w-3" />
+                      </Button>
+                    </CandidateProfile>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      </div>
     );
   };
 
@@ -347,14 +508,15 @@ const Candidates = () => {
               </p>
             </div>
           ) : (
-            <div className={viewMode === 'grid' 
-              ? "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4" 
-              : "space-y-4"
-            }>
-              {filteredCandidates.map((candidate) => (
-                <CandidateCard key={candidate.id} candidate={candidate} />
-              ))}
-            </div>
+            viewMode === 'grid' ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                {filteredCandidates.map((candidate) => (
+                  <CandidateCard key={candidate.id} candidate={candidate} />
+                ))}
+              </div>
+            ) : (
+              <TableView />
+            )
           )}
         </div>
 
