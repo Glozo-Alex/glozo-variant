@@ -10,6 +10,7 @@ import { useProfile } from "@/hooks/useProfile";
 import ProjectSelector from "./ProjectSelector";
 import ColorSchemeSelector from "./ColorSchemeSelector";
 import { UIDensityToggle } from "./UIDensityToggle";
+import { useColorScheme } from "@/contexts/ThemeContext";
 
 const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
@@ -17,7 +18,9 @@ const Sidebar = () => {
   const { activeProject } = useProject();
   const { user, signOut } = useAuth();
   const { profile, displayName } = useProfile();
+  const { uiDensity } = useColorScheme();
   const location = useLocation();
+  const isCompact = uiDensity === 'compact';
 
   const getInitials = (name: string) => {
     return name
@@ -38,21 +41,21 @@ const Sidebar = () => {
 
   return (
     <TooltipProvider>
-      <aside className={`${collapsed ? "w-20" : "w-64"} glass-sidebar h-screen flex flex-col transition-[width] duration-200 animate-slide-in-left`}>
+      <aside className={`${collapsed || isCompact ? "w-16" : "w-64"} ${isCompact ? 'bg-background border-r border-border' : 'glass-sidebar'} h-screen flex flex-col transition-[width] duration-200 animate-slide-in-left`}>
         {/* Header with centered logo */}
-        <div className="h-14 flex items-center justify-center px-2">
+        <div className={`${isCompact ? 'h-10' : 'h-14'} flex items-center justify-center px-2`}>
           <img
-            src={collapsed ? "/lovable-uploads/3958ba4b-ab9f-4bc4-9677-5bc99ead0c0a.png" : "/lovable-uploads/fc31fa24-db3f-423a-b235-da6a49bb2bdd.png"}
-            alt={collapsed ? "GLOZO mark logo (orange FC5B26)" : "GLOZO logo (orange FC5B26)"}
-            className={`${collapsed ? "h-8 w-8" : "h-8 w-auto"} object-contain`}
+            src={(collapsed || isCompact) ? "/lovable-uploads/3958ba4b-ab9f-4bc4-9677-5bc99ead0c0a.png" : "/lovable-uploads/fc31fa24-db3f-423a-b235-da6a49bb2bdd.png"}
+            alt={(collapsed || isCompact) ? "GLOZO mark logo (orange FC5B26)" : "GLOZO logo (orange FC5B26)"}
+            className={`${(collapsed || isCompact) ? "h-6 w-6" : "h-8 w-auto"} object-contain`}
             loading="lazy"
           />
         </div>
 
         {/* Primary nav - Top section */}
-        <nav className="px-3 pt-3 space-y-1">
+        <nav className={`px-${isCompact ? '2' : '3'} pt-${isCompact ? '2' : '3'} space-y-${isCompact ? '0.5' : '1'}`}>
           <NavLink to="/" className={({ isActive }) => `${navCls} ${isActive ? 'bg-sidebar-accent text-sidebar-text-active' : ''}`}>
-            {collapsed ? (
+            {(collapsed || isCompact) ? (
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div className="flex items-center justify-center">
@@ -70,7 +73,7 @@ const Sidebar = () => {
           </NavLink>
 
           <NavLink to="/new-search" className={({ isActive }) => `${navCls} ${isActive ? 'bg-sidebar-accent text-sidebar-text-active' : ''}`}>
-            {collapsed ? (
+            {(collapsed || isCompact) ? (
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div className="flex items-center justify-center">
@@ -88,7 +91,7 @@ const Sidebar = () => {
           </NavLink>
 
           {/* Current Project section - appears right after New Search */}
-          {activeProject && !collapsed && (
+          {activeProject && !collapsed && !isCompact && (
             <div className="space-y-1 mt-4">
               <div className="text-xs font-medium text-sidebar-text uppercase tracking-wider mb-2 px-3">
                 Current Project
@@ -108,7 +111,7 @@ const Sidebar = () => {
           )}
 
           <NavLink to="/projects" className={({ isActive }) => `${navCls} ${isActive ? 'bg-sidebar-accent text-sidebar-text-active' : ''}`}>
-            {collapsed ? (
+            {(collapsed || isCompact) ? (
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div className="flex items-center justify-center">
@@ -126,7 +129,7 @@ const Sidebar = () => {
           </NavLink>
 
           {/* Outreach Section */}
-          {collapsed ? (
+          {(collapsed || isCompact) ? (
             <Tooltip>
               <TooltipTrigger asChild>
                 <div className={`${navCls} ${isOutreachActive ? 'bg-sidebar-accent text-sidebar-text-active' : ''}`}>
@@ -178,14 +181,16 @@ const Sidebar = () => {
         </nav>
 
         {/* Separator before Pipeline/Analytics */}
-        <div className="px-3 mt-6">
-          <div className="h-px bg-sidebar-border/50"></div>
-        </div>
+        {!isCompact && (
+          <div className="px-3 mt-6">
+            <div className="h-px bg-sidebar-border/50"></div>
+          </div>
+        )}
 
         {/* Bottom navigation */}
-        <nav className="px-3 mt-6 space-y-1">
+        <nav className={`px-${isCompact ? '2' : '3'} mt-${isCompact ? '3' : '6'} space-y-${isCompact ? '0.5' : '1'}`}>
           <NavLink to="/pipeline" className={({ isActive }) => `${navCls} ${isActive ? 'bg-sidebar-accent text-sidebar-text-active' : ''}`}>
-            {collapsed ? (
+            {(collapsed || isCompact) ? (
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div className="flex items-center justify-center">
@@ -203,7 +208,7 @@ const Sidebar = () => {
           </NavLink>
 
           <NavLink to="/analytics" className={({ isActive }) => `${navCls} ${isActive ? 'bg-sidebar-accent text-sidebar-text-active' : ''}`}>
-            {collapsed ? (
+            {(collapsed || isCompact) ? (
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div className="flex items-center justify-center">
@@ -223,9 +228,9 @@ const Sidebar = () => {
         </nav>
 
         {/* System navigation */}
-        <nav className="px-3 mt-6 space-y-1">
+        <nav className={`px-${isCompact ? '2' : '3'} mt-${isCompact ? '3' : '6'} space-y-${isCompact ? '0.5' : '1'}`}>
           <NavLink to="/team" className={({ isActive }) => `${navCls} ${isActive ? 'bg-sidebar-accent text-sidebar-text-active' : ''}`}>
-            {collapsed ? (
+            {(collapsed || isCompact) ? (
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div className="flex items-center justify-center">
@@ -243,7 +248,7 @@ const Sidebar = () => {
           </NavLink>
 
           <NavLink to="/integrations" className={({ isActive }) => `${navCls} ${isActive ? 'bg-sidebar-accent text-sidebar-text-active' : ''}`}>
-            {collapsed ? (
+            {(collapsed || isCompact) ? (
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div className="flex items-center justify-center">
@@ -261,7 +266,7 @@ const Sidebar = () => {
           </NavLink>
 
           <NavLink to="/settings" className={({ isActive }) => `${navCls} ${isActive ? 'bg-sidebar-accent text-sidebar-text-active' : ''}`}>
-            {collapsed ? (
+            {(collapsed || isCompact) ? (
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div className="flex items-center justify-center">
@@ -280,23 +285,25 @@ const Sidebar = () => {
         </nav>
 
         {/* Collapse button at bottom */}
-        <div className="mt-auto p-4 space-y-3">
+        <div className={`mt-auto p-${isCompact ? '2' : '4'} space-y-${isCompact ? '2' : '3'}`}>
           {/* Theme Controls */}
-          <div className={`flex ${collapsed ? 'flex-col space-y-2' : 'gap-2'}`}>
-            <ColorSchemeSelector collapsed={collapsed} />
-            {!collapsed && <UIDensityToggle />}
+          <div className={`flex ${(collapsed || isCompact) ? 'flex-col space-y-2' : 'gap-2'}`}>
+            <ColorSchemeSelector collapsed={collapsed || isCompact} />
+            {!collapsed && !isCompact && <UIDensityToggle />}
           </div>
           
-          <button
-            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-            className="w-full h-10 rounded-lg bg-sidebar-hover text-sidebar-text hover:bg-sidebar-accent hover:text-sidebar-text-active flex items-center justify-center transition-all duration-300 hover-scale"
-            onClick={() => setCollapsed((v) => !v)}
-          >
-            {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-          </button>
+          {!isCompact && (
+            <button
+              aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+              className="w-full h-10 rounded-lg bg-sidebar-hover text-sidebar-text hover:bg-sidebar-accent hover:text-sidebar-text-active flex items-center justify-center transition-all duration-300 hover-scale"
+              onClick={() => setCollapsed((v) => !v)}
+            >
+              {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+            </button>
+          )}
           
           {/* User Profile Section */}
-          {user && (
+          {user && !isCompact && (
             <div className={`rounded-lg border border-sidebar-border glass-card ${collapsed ? "p-2" : "p-3"}`}>
               {collapsed ? (
                 <Tooltip>
