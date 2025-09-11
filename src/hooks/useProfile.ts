@@ -14,6 +14,8 @@ export type ProfileRow = {
   avatar_url: string | null;
   theme_preference: string | null;
   ui_density_preference: string | null;
+  sidebar_collapsed: boolean | null;
+  candidate_view_preference: string | null;
   created_at: string;
   updated_at: string;
 };

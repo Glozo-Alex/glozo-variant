@@ -26,6 +26,7 @@ interface CandidateCardProps {
   onShortlistToggle?: (candidateId: string, isShortlisted: boolean) => void;
   socialLinks?: SocialLink[];
   fullCandidateData?: any;
+  compact?: boolean;
 }
 
 const LinkChunk = ({ children }: { children: React.ReactNode }) => (
@@ -47,6 +48,7 @@ const CandidateCard = ({
   onShortlistToggle,
   socialLinks = [],
   fullCandidateData,
+  compact = false,
 }: CandidateCardProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
@@ -92,8 +94,13 @@ const CandidateCard = ({
       setIsLoading(false);
     }
   }, [candidateId, projectId, name, title, location, experience, matchPercentage, description, skills, openToOffers, isShortlisted, onShortlistToggle, toast]);
+  
+  const cardClasses = compact 
+    ? "glass-card rounded-lg p-3 space-y-2 animate-fade-in hover:shadow-elegant hover:border-primary/30 transition-all duration-300 hover-lift"
+    : "glass-card rounded-xl p-5 space-y-3 animate-fade-in hover:shadow-elegant hover:border-primary/30 transition-all duration-300 hover-lift";
+  
   return (
-    <article className="glass-card rounded-xl p-5 space-y-3 animate-fade-in hover:shadow-elegant hover:border-primary/30 transition-all duration-300 hover-lift">
+    <article className={cardClasses}>
       {/* Header */}
       <header className="flex items-start justify-between">
           <div className="flex items-center gap-3 flex-wrap">

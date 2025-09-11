@@ -342,12 +342,14 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          candidate_view_preference: string | null
           company: string | null
           created_at: string
           full_name: string | null
           id: string
           job_title: string | null
           phone: string | null
+          sidebar_collapsed: boolean | null
           theme_preference: string | null
           timezone: string | null
           ui_density_preference: string | null
@@ -355,12 +357,14 @@ export type Database = {
         }
         Insert: {
           avatar_url?: string | null
+          candidate_view_preference?: string | null
           company?: string | null
           created_at?: string
           full_name?: string | null
           id: string
           job_title?: string | null
           phone?: string | null
+          sidebar_collapsed?: boolean | null
           theme_preference?: string | null
           timezone?: string | null
           ui_density_preference?: string | null
@@ -368,12 +372,14 @@ export type Database = {
         }
         Update: {
           avatar_url?: string | null
+          candidate_view_preference?: string | null
           company?: string | null
           created_at?: string
           full_name?: string | null
           id?: string
           job_title?: string | null
           phone?: string | null
+          sidebar_collapsed?: boolean | null
           theme_preference?: string | null
           timezone?: string | null
           ui_density_preference?: string | null

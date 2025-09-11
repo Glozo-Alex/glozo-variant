@@ -5,11 +5,13 @@ import CandidateCard from "./CandidateCard";
 import CandidateTable from "./CandidateTable";
 import CandidateFilters from "./CandidateFilters";
 import CompactFilters from "./CompactFilters";
+import { ViewToggle } from "./ViewToggle";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { getShortlistStatus } from "@/services/shortlist";
 import { useProject } from "@/contexts/ProjectContext";
 import { useColorScheme } from "@/contexts/ThemeContext";
+import { useViewPreference } from "@/hooks/useViewPreference";
 
 interface APICandidate {
   id?: number | string;
@@ -38,6 +40,7 @@ const CandidateList = () => {
   const { projectId } = useParams();
   const { updateShortlistCount } = useProject();
   const { uiDensity } = useColorScheme();
+  const { view } = useViewPreference();
   const [status, setStatus] = useState<"pending" | "completed" | "failed" | "idle">("idle");
   const [sortColumn, setSortColumn] = useState<string>('match');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
@@ -314,7 +317,7 @@ const CandidateList = () => {
       : `Found Candidates (${totalCount})`;
   }, [loading, error, status, candidateCount, filteredCandidates.length]);
 
-  const isCompactMode = uiDensity === 'compact';
+  const isCompactUI = uiDensity === 'compact';
 
   // Prepare data for table view
   const tableData = sortedCandidates.map((c, idx) => {
@@ -347,35 +350,35 @@ const CandidateList = () => {
   });
 
   return (
-    <main className={`flex-1 ${isCompactMode ? 'bg-background' : 'glass-surface'} flex flex-col animate-fade-in`}>
+    <main className={`flex-1 ${isCompactUI ? 'bg-background' : 'glass-surface'} flex flex-col animate-fade-in`}>
       {/* Header */}
-      {!isCompactMode && (
-        <div className="h-14 px-6 flex items-center justify-between">
-          <h1 className="text-lg font-semibold text-card-foreground">{headerText}</h1>
-          <CandidateFilters
-            availableFilters={availableFilters}
-            selectedFilters={selectedFilters}
-            onFiltersChange={setSelectedFilters}
-          />
-        </div>
-      )}
-
-      {/* Compact Header */}
-      {isCompactMode && (
-        <div className="border-b border-border bg-background">
-          <div className="h-10 px-4 flex items-center justify-between">
-            <h1 className="text-sm font-medium text-foreground">{headerText}</h1>
+      <div className={`${isCompactUI ? 'h-10 px-4 border-b border-border bg-background' : 'h-14 px-6'} flex items-center justify-between`}>
+        <h1 className={`${isCompactUI ? 'text-sm' : 'text-lg'} font-semibold text-card-foreground`}>{headerText}</h1>
+        {!loading && !error && candidates.length > 0 && (
+          <div className="flex items-center gap-4">
+            <ViewToggle />
+            {!isCompactUI && (
+              <CandidateFilters
+                availableFilters={availableFilters}
+                selectedFilters={selectedFilters}
+                onFiltersChange={setSelectedFilters}
+              />
+            )}
           </div>
-          <CompactFilters
-            availableFilters={availableFilters}
-            selectedFilters={selectedFilters}
-            onFiltersChange={setSelectedFilters}
-          />
-        </div>
+        )}
+      </div>
+
+      {/* Compact Filters */}
+      {isCompactUI && !loading && !error && candidates.length > 0 && (
+        <CompactFilters
+          availableFilters={availableFilters}
+          selectedFilters={selectedFilters}
+          onFiltersChange={setSelectedFilters}
+        />
       )}
 
       {/* Content */}
-      <div className={`flex-1 overflow-auto ${isCompactMode ? '' : 'p-6 space-y-2'}`}>
+      <div className={`flex-1 overflow-auto ${isCompactUI ? '' : 'p-6 space-y-2'}`}>
         {error && (
           <div className="text-destructive">{error}</div>
         )}
@@ -388,7 +391,7 @@ const CandidateList = () => {
           <div className="text-muted-foreground">No candidates match the selected filters.</div>
         )}
 
-        {isCompactMode ? (
+        {view === 'table' ? (
           <CandidateTable 
             candidates={tableData}
             onSort={handleSort}
@@ -396,7 +399,11 @@ const CandidateList = () => {
             sortDirection={sortDirection}
           />
         ) : (
-          <>
+          <div className={`grid gap-6 mb-8 ${
+            isCompactUI 
+              ? 'grid-cols-1 xl:grid-cols-2 2xl:grid-cols-4' 
+              : 'grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3'
+          } ${isCompactUI ? 'p-4' : ''}`}>
             {sortedCandidates.map((c, idx) => {
               const flatSkills: string[] = (c.skills ?? [])
                 .flatMap((s) => s.skills ?? [])
@@ -429,13 +436,13 @@ const CandidateList = () => {
                 />
               );
             })}
-          </>
+          </div>
         )}
       </div>
 
       {/* Footer */}
-      <div className={`${isCompactMode ? 'h-8 px-4 border-t border-border bg-background' : 'h-14 px-6 glass-surface'} flex items-center justify-between`}>
-        <span className={`${isCompactMode ? 'text-xs' : 'text-sm'} text-muted-foreground`}>
+      <div className={`${isCompactUI ? 'h-8 px-4 border-t border-border bg-background' : 'h-14 px-6 glass-surface'} flex items-center justify-between`}>
+        <span className={`${isCompactUI ? 'text-xs' : 'text-sm'} text-muted-foreground`}>
           {candidateCount > 0 ? (
             sortedCandidates.length !== candidateCount 
               ? `${sortedCandidates.length} of ${candidateCount} candidates`
@@ -443,7 +450,7 @@ const CandidateList = () => {
           ) : ""}
         </span>
 
-        {!isCompactMode && (
+        {!isCompactUI && view === 'grid' && (
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" className="hover-scale border-card-border bg-card-hover text-card-foreground hover:bg-card-hover/70"><ChevronLeft className="h-4 w-4" /></Button>
             <Button variant="outline" size="sm" className="bg-primary text-primary-foreground hover-scale border-primary/50">1</Button>
@@ -455,8 +462,8 @@ const CandidateList = () => {
           </div>
         )}
 
-        <div className={`${isCompactMode ? 'text-xs' : 'text-sm'} text-muted-foreground`}>
-          {isCompactMode ? '50/page' : '20 per page'}
+        <div className={`${isCompactUI ? 'text-xs' : 'text-sm'} text-muted-foreground`}>
+          {isCompactUI ? '50/page' : '20 per page'}
         </div>
       </div>
     </main>
