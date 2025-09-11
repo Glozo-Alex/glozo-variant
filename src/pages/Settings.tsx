@@ -20,11 +20,14 @@ import {
   Sun,
   Globe,
   Mail,
-  Smartphone
+  Smartphone,
+  Layout
 } from "lucide-react";
 
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
+import { UIDensitySelector } from "@/components/UIDensitySelector";
+import ColorSchemeSelector from "@/components/ColorSchemeSelector";
 
 const Settings = () => {
   const [darkMode, setDarkMode] = useState(false);
@@ -372,20 +375,7 @@ const Settings = () => {
                 
                 <div className="space-y-3">
                   <p className="font-medium">Color Scheme</p>
-                  <div className="grid grid-cols-3 gap-3">
-                    <div className="p-3 rounded-lg border-2 border-primary bg-accent cursor-pointer">
-                      <div className="w-full h-8 rounded bg-gradient-to-r from-emerald-500 to-teal-500"></div>
-                      <p className="text-xs mt-2 text-center">Default</p>
-                    </div>
-                    <div className="p-3 rounded-lg border border-border bg-card cursor-pointer hover:border-primary/50">
-                      <div className="w-full h-8 rounded bg-gradient-to-r from-blue-500 to-purple-500"></div>
-                      <p className="text-xs mt-2 text-center">Blue</p>
-                    </div>
-                    <div className="p-3 rounded-lg border border-border bg-card cursor-pointer hover:border-primary/50">
-                      <div className="w-full h-8 rounded bg-gradient-to-r from-rose-500 to-pink-500"></div>
-                      <p className="text-xs mt-2 text-center">Rose</p>
-                    </div>
-                  </div>
+                  <ColorSchemeSelector collapsed={false} />
                 </div>
               </CardContent>
             </Card>
@@ -415,19 +405,7 @@ const Settings = () => {
                 
                 <Separator />
                 
-                <div className="space-y-3">
-                  <p className="font-medium">Density</p>
-                  <div className="space-y-2">
-                    <label className="flex items-center space-x-2">
-                      <input type="radio" name="density" value="comfortable" defaultChecked />
-                      <span className="text-sm">Comfortable</span>
-                    </label>
-                    <label className="flex items-center space-x-2">
-                      <input type="radio" name="density" value="compact" />
-                      <span className="text-sm">Compact</span>
-                    </label>
-                  </div>
-                </div>
+                <UIDensitySelector showPreview={false} />
               </CardContent>
             </Card>
           </div>

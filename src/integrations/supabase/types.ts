@@ -350,6 +350,7 @@ export type Database = {
           phone: string | null
           theme_preference: string | null
           timezone: string | null
+          ui_density_preference: string | null
           updated_at: string
         }
         Insert: {
@@ -362,6 +363,7 @@ export type Database = {
           phone?: string | null
           theme_preference?: string | null
           timezone?: string | null
+          ui_density_preference?: string | null
           updated_at?: string
         }
         Update: {
@@ -374,6 +376,7 @@ export type Database = {
           phone?: string | null
           theme_preference?: string | null
           timezone?: string | null
+          ui_density_preference?: string | null
           updated_at?: string
         }
         Relationships: []

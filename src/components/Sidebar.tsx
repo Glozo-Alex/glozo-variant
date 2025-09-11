@@ -9,6 +9,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
 import ProjectSelector from "./ProjectSelector";
 import ColorSchemeSelector from "./ColorSchemeSelector";
+import { UIDensityToggle } from "./UIDensityToggle";
 
 const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
@@ -29,8 +30,8 @@ const Sidebar = () => {
 
   const avatarUrl = profile?.avatar_url || user?.user_metadata?.avatar_url;
 
-  const navCls = "flex items-center gap-3 px-3 py-2 rounded-md text-sm text-sidebar-text hover:bg-sidebar-hover hover:text-sidebar-text-active transition-all duration-300 hover-scale";
-  const subNavCls = "flex items-center gap-3 px-3 py-2 ml-6 rounded-md text-sm text-sidebar-text hover:bg-sidebar-hover hover:text-sidebar-text-active transition-all duration-300 hover-scale";
+  const navCls = "flex items-center gap-[var(--ui-spacing-sm)] px-[var(--ui-spacing-sm)] py-[var(--ui-spacing-xs)] rounded-[var(--ui-border-radius-sm)] text-sm text-sidebar-text hover:bg-sidebar-hover hover:text-sidebar-text-active transition-all duration-300 hover-scale";
+  const subNavCls = "flex items-center gap-[var(--ui-spacing-sm)] px-[var(--ui-spacing-sm)] py-[var(--ui-spacing-xs)] ml-6 rounded-[var(--ui-border-radius-sm)] text-sm text-sidebar-text hover:bg-sidebar-hover hover:text-sidebar-text-active transition-all duration-300 hover-scale";
 
   // Check if any outreach route is active
   const isOutreachActive = location.pathname.startsWith('/email-sequences') || location.pathname.startsWith('/outreach');
@@ -55,14 +56,14 @@ const Sidebar = () => {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div className="flex items-center justify-center">
-                    <LayoutDashboard className="h-5 w-5" />
+                     <LayoutDashboard className="h-[var(--ui-icon-md)] w-[var(--ui-icon-md)]" />
                   </div>
                 </TooltipTrigger>
                 <TooltipContent side="right">Dashboard</TooltipContent>
               </Tooltip>
             ) : (
               <>
-                <LayoutDashboard className="h-5 w-5" />
+                <LayoutDashboard className="h-[var(--ui-icon-md)] w-[var(--ui-icon-md)]" />
                 <span>Dashboard</span>
               </>
             )}
@@ -280,8 +281,11 @@ const Sidebar = () => {
 
         {/* Collapse button at bottom */}
         <div className="mt-auto p-4 space-y-3">
-          {/* Color Scheme Selector */}
-          <ColorSchemeSelector collapsed={collapsed} />
+          {/* Theme Controls */}
+          <div className={`flex ${collapsed ? 'flex-col space-y-2' : 'gap-2'}`}>
+            <ColorSchemeSelector collapsed={collapsed} />
+            {!collapsed && <UIDensityToggle />}
+          </div>
           
           <button
             aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}

@@ -13,6 +13,7 @@ export type ProfileRow = {
   timezone: string | null;
   avatar_url: string | null;
   theme_preference: string | null;
+  ui_density_preference: string | null;
   created_at: string;
   updated_at: string;
 };
