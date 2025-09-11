@@ -100,7 +100,7 @@ serve(async (req) => {
     if (candidatesNeedingUpdate.length > 0) {
       console.log('Calling external API for candidates:', candidatesNeedingUpdate);
       
-      const apiUrl = 'http://34.75.197.68:8888/api/get-candidates-by-ids';
+      const apiUrl = 'http://35.193.171.159:8888/api/get-candidates-by-ids';
       const requestBody = {
         ids: candidatesNeedingUpdate
       };

@@ -136,7 +136,7 @@ serve(async (req) => {
       project_id: projectId
     };
 
-    const apiUrl = 'http://34.75.197.68:8888/api/get-candidates-by-chat';
+    const apiUrl = 'http://35.193.171.159:8888/api/get-candidates-by-chat';
 
     console.log('API URL:', apiUrl);
     console.log('API request body:', JSON.stringify(requestBody));
