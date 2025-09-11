@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { LayoutDashboard, Search, Kanban, Users, BarChart3, Plug, Settings, ChevronLeft, ChevronRight, List, Plus, FolderOpen, LogOut, User, Mail, FileText, ChevronDown, ChevronUp } from "lucide-react";
+import { LayoutDashboard, Search, Kanban, Users, BarChart3, Plug, Settings, ChevronLeft, ChevronRight, List, Plus, FolderOpen, LogOut, User, Mail, FileText, ChevronDown, ChevronUp, UserCheck } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -86,7 +86,25 @@ const Sidebar = () => {
             )}
           </NavLink>
 
-          {/* Current Project section - appears right after New Search */}
+          <NavLink to="/candidates" className={({ isActive }) => `${navCls} ${isActive ? 'bg-sidebar-accent text-sidebar-text-active' : ''}`}>
+            {collapsed ? (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center justify-center">
+                    <UserCheck className="h-5 w-5" />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="right">Candidates</TooltipContent>
+              </Tooltip>
+            ) : (
+              <>
+                <UserCheck className="h-5 w-5" />
+                <span>Candidates</span>
+              </>
+            )}
+          </NavLink>
+
+          {/* Current Project section - appears right after Candidates */}
           {activeProject && !collapsed && (
             <div className="space-y-1 mt-4">
               <div className="text-xs font-medium text-sidebar-text uppercase tracking-wider mb-2 px-3">
