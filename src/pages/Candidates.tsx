@@ -145,89 +145,113 @@ const Candidates = () => {
       url: social.url || '#'
     })) || [];
 
+    // Get job title and company info, avoiding redundancy
+    const title = snapshot?.title || snapshot?.role || 'Unknown Title';
+    const company = snapshot?.employer || snapshot?.company;
+    const titleCompanyText = company ? `${title} at ${company}` : title;
+
+    // Get contact information
+    const hasEmail = snapshot?.contacts?.emails?.length > 0;
+    const hasPhone = snapshot?.contacts?.phones?.length > 0;
+    const hasContact = hasEmail || hasPhone;
+
     return (
-      <Card className="hover:shadow-lg transition-all duration-300 hover-scale">
-        <CardContent className="p-4">
-          <div className="flex items-start justify-between mb-3">
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-1">
-                <h3 className="font-semibold text-card-foreground">
+      <article className="glass-card rounded-xl p-4 space-y-3 animate-fade-in hover:shadow-elegant hover:border-primary/30 transition-all duration-300 hover-lift">
+        {/* Header with name and social links */}
+        <header className="flex items-start justify-between">
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-1 flex-wrap">
+              <CandidateProfile
+                candidateData={snapshot}
+                socialLinks={socialLinks}
+                projectId={candidate.projectId}
+              >
+                <h3 className="text-base font-semibold text-card-foreground cursor-pointer hover:text-primary transition-colors">
                   {snapshot?.name || 'Unknown Name'}
                 </h3>
-                {socialLinks.map((link: any, index: number) => {
-                  const IconComponent = getSocialIcon(link.platform);
-                  return (
-                    <a
-                      key={index}
-                      href={link.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-muted-foreground hover:text-primary transition-colors"
-                    >
-                      <IconComponent className="h-4 w-4" />
-                    </a>
-                  );
-                })}
-              </div>
-              <p className="text-sm text-muted-foreground mb-1">
-                {snapshot?.title || 'Unknown Title'} at {snapshot?.employer || 'Unknown Company'}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                {snapshot?.location || 'Unknown Location'}
-              </p>
-            </div>
-            <div className="text-right">
-              {snapshot?.match_percentage && (
-                <Badge variant="outline" className="mb-1">
-                  {Math.round(snapshot.match_percentage)}% match
-                </Badge>
-              )}
-              {candidate.sequenceStatus && (
-                <Badge 
-                  variant={candidate.sequenceStatus === 'active' ? 'default' : 'secondary'}
-                  className="text-xs"
-                >
-                  {candidate.sequenceStatus}
-                </Badge>
-              )}
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <div className="flex justify-between text-xs text-muted-foreground">
-              <span>Project: {candidate.projectName}</span>
-              <span>Added: {new Date(candidate.addedAt).toLocaleDateString()}</span>
+              </CandidateProfile>
+              
+              {/* Show first 3 social links */}
+              {socialLinks.slice(0, 3).map((link: any, index: number) => {
+                const IconComponent = getSocialIcon(link.platform);
+                return (
+                  <IconComponent
+                    key={index}
+                    className="h-4 w-4 cursor-pointer hover:text-primary transition-colors text-muted-foreground"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      window.open(link.url, '_blank', 'noopener,noreferrer');
+                    }}
+                  />
+                );
+              })}
             </div>
             
-            {snapshot?.skills && (
-              <div className="flex flex-wrap gap-1">
-                {snapshot.skills.flatMap((s: any) => s.skills || []).slice(0, 4).map((skill: string, index: number) => (
-                  <Badge key={index} variant="secondary" className="text-xs">
-                    {skill}
-                  </Badge>
-                ))}
-                {snapshot.skills.flatMap((s: any) => s.skills || []).length > 4 && (
-                  <Badge variant="outline" className="text-xs">
-                    +{snapshot.skills.flatMap((s: any) => s.skills || []).length - 4} more
-                  </Badge>
-                )}
-              </div>
+            {/* Title and company */}
+            <p className="text-sm text-muted-foreground mb-1 font-medium">
+              {titleCompanyText}
+            </p>
+            
+            {/* Location */}
+            <p className="text-xs text-muted-foreground">
+              {snapshot?.location || 'Unknown Location'}
+            </p>
+          </div>
+          
+          {/* Status badges */}
+          <div className="flex flex-col items-end gap-1">
+            {candidate.sequenceStatus && (
+              <Badge 
+                variant={candidate.sequenceStatus === 'active' ? 'default' : 'secondary'}
+                className="text-xs"
+              >
+                {candidate.sequenceStatus}
+              </Badge>
+            )}
+            {snapshot?.open_to_offers && (
+              <span className="inline-flex items-center text-xs font-medium px-2 py-1 rounded-full bg-success/10 text-success">
+                Open to offers
+              </span>
+            )}
+            {hasContact && (
+              <Badge variant="outline" className="text-xs bg-card-hover">
+                Contact available
+              </Badge>
             )}
           </div>
+        </header>
 
-          <div className="mt-3 pt-3 border-t">
-            <CandidateProfile
-              candidateData={snapshot}
-              socialLinks={socialLinks}
-              projectId={candidate.projectId}
-            >
-              <Button variant="outline" size="sm" className="w-full">
-                View Details
-              </Button>
-            </CandidateProfile>
+        {/* Project and timeline info */}
+        <div className="flex justify-between items-center text-xs text-muted-foreground bg-card-hover/50 rounded-lg px-3 py-2">
+          <span className="font-medium">Project: {candidate.projectName}</span>
+          <span>Added: {new Date(candidate.addedAt).toLocaleDateString()}</span>
+        </div>
+        
+        {/* Skills */}
+        {snapshot?.skills && (
+          <div className="flex flex-wrap gap-1">
+            {snapshot.skills.flatMap((s: any) => s.skills || []).slice(0, 4).map((skill: string, index: number) => (
+              <span
+                key={index}
+                className="px-2 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary"
+              >
+                {skill}
+              </span>
+            ))}
+            {snapshot.skills.flatMap((s: any) => s.skills || []).length > 4 && (
+              <CandidateProfile
+                candidateData={snapshot}
+                socialLinks={socialLinks}
+                projectId={candidate.projectId}
+              >
+                <span className="px-2 py-1 rounded-full text-xs font-medium bg-muted text-muted-foreground cursor-pointer hover:bg-muted/80 transition-colors">
+                  +{snapshot.skills.flatMap((s: any) => s.skills || []).length - 4} more
+                </span>
+              </CandidateProfile>
+            )}
           </div>
-        </CardContent>
-      </Card>
+        )}
+      </article>
     );
   };
 
