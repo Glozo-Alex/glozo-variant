@@ -399,9 +399,9 @@ const CandidateList = () => {
             sortDirection={sortDirection}
           />
         ) : (
-          <div className={`grid gap-6 mb-8 ${
+          <div className={`grid gap-4 mb-8 ${
             isCompactUI 
-              ? 'grid-cols-1 xl:grid-cols-2 2xl:grid-cols-4' 
+              ? 'grid-cols-1' 
               : 'grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3'
           } ${isCompactUI ? 'p-4' : ''}`}>
             {sortedCandidates.map((c, idx) => {

@@ -103,141 +103,131 @@ const CandidateTable = ({ candidates, onSort, sortColumn, sortDirection }: Candi
         <TableHeader>
           <TableRow className="border-b border-border hover:bg-transparent">
             <TableHead 
-              className="h-8 px-2 text-xs font-medium text-muted-foreground cursor-pointer hover:text-foreground"
+              className="h-8 px-2 text-xs font-medium text-muted-foreground cursor-pointer hover:text-foreground w-3/5"
               onClick={() => handleSort('name')}
             >
-              Name {getSortIcon('name')}
+              Candidate {getSortIcon('name')}
             </TableHead>
-            <TableHead 
-              className="h-8 px-2 text-xs font-medium text-muted-foreground cursor-pointer hover:text-foreground"
-              onClick={() => handleSort('title')}
-            >
-              Title {getSortIcon('title')}
+            <TableHead className="h-8 px-2 text-xs font-medium text-muted-foreground w-2/5">
+              Details & Actions
             </TableHead>
-            <TableHead 
-              className="h-8 px-2 text-xs font-medium text-muted-foreground cursor-pointer hover:text-foreground"
-              onClick={() => handleSort('location')}
-            >
-              Location {getSortIcon('location')}
-            </TableHead>
-            <TableHead 
-              className="h-8 px-2 text-xs font-medium text-muted-foreground cursor-pointer hover:text-foreground"
-              onClick={() => handleSort('experience')}
-            >
-              Exp {getSortIcon('experience')}
-            </TableHead>
-            <TableHead 
-              className="h-8 px-2 text-xs font-medium text-muted-foreground cursor-pointer hover:text-foreground"
-              onClick={() => handleSort('match')}
-            >
-              Match {getSortIcon('match')}
-            </TableHead>
-            <TableHead className="h-8 px-2 text-xs font-medium text-muted-foreground">Skills</TableHead>
-            <TableHead className="h-8 px-2 text-xs font-medium text-muted-foreground w-12">Status</TableHead>
-            <TableHead className="h-8 px-2 text-xs font-medium text-muted-foreground w-20">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {candidates.map((candidate, index) => (
             <TableRow
               key={candidate.candidateId}
-              className="border-b border-border hover:bg-muted/30 transition-none group"
+              className="border-b border-border hover:bg-muted/30 transition-none group h-16"
             >
-              <TableCell className="p-2 text-xs">
-                <div className="flex items-center gap-2">
-                  <span className="font-medium text-foreground">{candidate.name}</span>
-                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <CandidateProfile 
-                      candidateData={candidate.fullCandidateData} 
-                      socialLinks={candidate.socialLinks} 
-                      projectId={candidate.projectId}
-                    >
-                      <ExternalLink className="h-3 w-3 text-muted-foreground hover:text-primary cursor-pointer" />
-                    </CandidateProfile>
-                    {candidate.socialLinks?.slice(0, 2).map((link, idx) => {
-                      const IconComponent = getSocialIcon(link.platform);
-                      return (
-                        <IconComponent
-                          key={idx}
-                          className="h-3 w-3 text-muted-foreground hover:text-primary cursor-pointer"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            window.open(link.url, '_blank');
-                          }}
-                        />
-                      );
-                    })}
+              {/* Left column - Candidate info */}
+              <TableCell className="p-2 text-xs w-3/5">
+                <div className="grid grid-rows-2 h-full">
+                  {/* Top row - Name and Match Score */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium text-foreground">{candidate.name}</span>
+                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <CandidateProfile 
+                          candidateData={candidate.fullCandidateData} 
+                          socialLinks={candidate.socialLinks} 
+                          projectId={candidate.projectId}
+                        >
+                          <ExternalLink className="h-3 w-3 text-muted-foreground hover:text-primary cursor-pointer" />
+                        </CandidateProfile>
+                        {candidate.socialLinks?.slice(0, 2).map((link, idx) => {
+                          const IconComponent = getSocialIcon(link.platform);
+                          return (
+                            <IconComponent
+                              key={idx}
+                              className="h-3 w-3 text-muted-foreground hover:text-primary cursor-pointer"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                window.open(link.url, '_blank');
+                              }}
+                            />
+                          );
+                        })}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <CheckCircle className="h-3 w-3 text-success" />
+                      <span className="font-medium text-success">{candidate.matchPercentage}%</span>
+                    </div>
+                  </div>
+                  {/* Bottom row - Title, Location, Experience */}
+                  <div className="flex items-center text-muted-foreground">
+                    <span className="font-medium truncate max-w-48">{candidate.title}</span>
+                    <span className="mx-1">•</span>
+                    <span className="font-medium truncate max-w-32">{candidate.location}</span>
+                    <span className="mx-1">•</span>
+                    <span className="font-medium">{candidate.experience}</span>
                   </div>
                 </div>
               </TableCell>
-              <TableCell className="p-2 text-xs text-muted-foreground max-w-32 truncate">
-                {candidate.title}
-              </TableCell>
-              <TableCell className="p-2 text-xs text-muted-foreground max-w-24 truncate">
-                {candidate.location}
-              </TableCell>
-              <TableCell className="p-2 text-xs text-muted-foreground">
-                {candidate.experience}
-              </TableCell>
-              <TableCell className="p-2 text-xs">
-                <div className="flex items-center gap-1">
-                  <CheckCircle className="h-3 w-3 text-success" />
-                  <span className="font-medium text-success">{candidate.matchPercentage}%</span>
-                </div>
-              </TableCell>
-              <TableCell className="p-2 text-xs">
-                <div className="flex gap-1">
-                  {candidate.skills.slice(0, 3).map((skill, idx) => (
-                    <Badge 
-                      key={idx} 
-                      variant="secondary" 
-                      className="text-[10px] px-1 py-0 h-4 bg-muted text-muted-foreground border-0"
-                    >
-                      {skill.name}
-                    </Badge>
-                  ))}
-                  {candidate.skills.length > 3 && (
-                    <span className="text-[10px] text-muted-foreground">+{candidate.skills.length - 3}</span>
-                  )}
-                </div>
-              </TableCell>
-              <TableCell className="p-2 text-xs">
-                {candidate.openToOffers && (
-                  <div className="w-2 h-2 bg-success rounded-full" title="Open to offers" />
-                )}
-              </TableCell>
-              <TableCell className="p-2">
-                <div className="flex items-center gap-1">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-6 w-6 p-0 hover:bg-muted/50"
-                    onClick={() => handleShortlistClick(candidate)}
-                    disabled={loadingCandidates.has(candidate.candidateId)}
-                  >
-                    {loadingCandidates.has(candidate.candidateId) ? (
-                      <Loader2 className="h-3 w-3 animate-spin" />
-                    ) : (
-                      <Star className={`h-3 w-3 ${candidate.isShortlisted ? 'fill-current text-warning' : 'text-muted-foreground'}`} />
+              
+              {/* Right column - Details and Actions */}
+              <TableCell className="p-2 text-xs w-2/5">
+                <div className="grid grid-rows-2 h-full">
+                  {/* Top row - Standout info and Open to offers status */}
+                  <div className="flex items-center justify-between">
+                    <div className="text-muted-foreground italic truncate max-w-48">
+                      {candidate.description ? candidate.description.substring(0, 50) + '...' : 'Standout information'}
+                    </div>
+                    {candidate.openToOffers && (
+                      <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full whitespace-nowrap" style={{ backgroundColor: 'hsl(142 76% 95%)', color: 'hsl(142 76% 30%)' }}>
+                        Open to offers
+                      </span>
                     )}
-                  </Button>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0 hover:bg-muted/50">
-                        <MoreHorizontal className="h-3 w-3" />
+                  </div>
+                  {/* Bottom row - Skills and Shortlist button */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex gap-1 flex-1 min-w-0 mr-2">
+                      {candidate.skills.slice(0, 3).map((skill, idx) => (
+                        <Badge 
+                          key={idx} 
+                          variant="secondary" 
+                          className="text-[10px] px-1 py-0 h-4 bg-muted text-muted-foreground border-0 truncate"
+                        >
+                          {skill.name}
+                        </Badge>
+                      ))}
+                      {candidate.skills.length > 3 && (
+                        <span className="text-[10px] text-muted-foreground whitespace-nowrap">+{candidate.skills.length - 3}</span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1 flex-shrink-0">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 w-6 p-0 hover:bg-muted/50"
+                        onClick={() => handleShortlistClick(candidate)}
+                        disabled={loadingCandidates.has(candidate.candidateId)}
+                      >
+                        {loadingCandidates.has(candidate.candidateId) ? (
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                        ) : (
+                          <Star className={`h-3 w-3 ${candidate.isShortlisted ? 'fill-current text-warning' : 'text-muted-foreground'}`} />
+                        )}
                       </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-32">
-                      <DropdownMenuItem className="text-xs">
-                        <MessageSquare className="h-3 w-3 mr-2" />
-                        Message
-                      </DropdownMenuItem>
-                      <DropdownMenuItem className="text-xs">
-                        <ExternalLink className="h-3 w-3 mr-2" />
-                        View Profile
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0 hover:bg-muted/50">
+                            <MoreHorizontal className="h-3 w-3" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-32">
+                          <DropdownMenuItem className="text-xs">
+                            <MessageSquare className="h-3 w-3 mr-2" />
+                            Message
+                          </DropdownMenuItem>
+                          <DropdownMenuItem className="text-xs">
+                            <ExternalLink className="h-3 w-3 mr-2" />
+                            View Profile
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  </div>
                 </div>
               </TableCell>
             </TableRow>
