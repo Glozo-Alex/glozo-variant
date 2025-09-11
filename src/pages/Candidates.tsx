@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Search, Grid, List, Users, Filter } from "lucide-react";
-import { CandidateProfile } from "@/components/CandidateProfile";
+import CandidateProfile from "@/components/CandidateProfile";
 import { getSocialIcon } from "@/utils/socialIcons";
 
 interface CandidateData {
