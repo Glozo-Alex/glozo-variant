@@ -103,7 +103,7 @@ export async function getSearchResults(sessionId: string) {
 
   return {
     search,
-    results: results?.map(result => result.candidate_data) || []
+    results: results || []
   };
 }
 
