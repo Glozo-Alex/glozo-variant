@@ -501,7 +501,7 @@ export type Database = {
           error_message: string | null
           id: string
           is_temporary: boolean | null
-          project_id: string
+          project_id: string | null
           prompt: string
           raw_response: Json | null
           session_id: string | null
@@ -516,7 +516,7 @@ export type Database = {
           error_message?: string | null
           id?: string
           is_temporary?: boolean | null
-          project_id: string
+          project_id?: string | null
           prompt: string
           raw_response?: Json | null
           session_id?: string | null
@@ -531,7 +531,7 @@ export type Database = {
           error_message?: string | null
           id?: string
           is_temporary?: boolean | null
-          project_id?: string
+          project_id?: string | null
           prompt?: string
           raw_response?: Json | null
           session_id?: string | null

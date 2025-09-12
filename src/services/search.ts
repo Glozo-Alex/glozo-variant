@@ -30,14 +30,13 @@ export async function createIndependentSearch({
     throw new Error('User not authenticated');
   }
 
-  // Create a temporary search record (without project_id for now)
+  // Create a temporary search record (project_id will be null for independent searches)
   const { data: search, error: searchError } = await supabase
     .from('searches')
     .insert({
       session_id: sessionId,
       prompt: message,
       user_id: user.user.id,
-      project_id: sessionId, // Use sessionId as temporary project_id
       is_temporary: true,
       status: 'pending',
       similar_roles: similarRoles
