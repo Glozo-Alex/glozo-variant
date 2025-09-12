@@ -86,11 +86,7 @@ const Sidebar = () => {
             )}
           </NavLink>
 
-          <NavLink 
-            to="/candidates" 
-            className={({ isActive }) => `${navCls} ${isActive ? 'bg-sidebar-accent text-sidebar-text-active' : ''}`}
-            style={{ border: '2px solid red' }}
-          >
+          <NavLink to="/candidates" className={({ isActive }) => `${navCls} ${isActive ? 'bg-sidebar-accent text-sidebar-text-active' : ''}`}>
             {collapsed ? (
               <Tooltip>
                 <TooltipTrigger asChild>
