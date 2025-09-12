@@ -72,7 +72,27 @@ const App = () => (
                 }
               />
               <Route
+                path="/search-results/:sessionId"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <SearchResults />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/project/:projectId/results"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <SearchResults />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/project/:projectId"
                 element={
                   <ProtectedRoute>
                     <Layout>
