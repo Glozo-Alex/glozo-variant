@@ -163,7 +163,7 @@ serve(async (req) => {
       count,
       similarRoles,
       project_id,
-      session_id: session_id || null
+      session_id: session_id === undefined ? null : session_id
     };
 
     console.log('📤 Calling external API with:', requestData);

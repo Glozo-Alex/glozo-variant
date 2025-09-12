@@ -80,7 +80,8 @@ const NewSearch = () => {
         message: fullQuery,
         count: 200,
         similarRoles,
-        projectId: tempProject.id
+        projectId: tempProject.id,
+        sessionId: ""
       });
       
       toast({
