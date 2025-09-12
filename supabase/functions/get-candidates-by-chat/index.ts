@@ -75,7 +75,7 @@ serve(async (req) => {
     let userFullName = user.user_metadata?.full_name || user.user_metadata?.name || user.email || 'Unknown User';
 
     if (isTemporary && sessionId) {
-      // For independent searches, find the search by session_id
+      // For subsequent requests, find the existing search by session_id
       const { data: searchData, error: searchError } = await supabase
         .from('searches')
         .select('id')
@@ -92,6 +92,30 @@ serve(async (req) => {
         });
       }
       searchId = searchData.id;
+    } else if (isTemporary && !sessionId) {
+      // For first independent search request, create new search record
+      const newSessionId = crypto.randomUUID();
+      const { data: newSearch, error: newSearchError } = await supabase
+        .from('searches')
+        .insert({
+          session_id: newSessionId,
+          prompt: message,
+          user_id: user.id,
+          is_temporary: true,
+          status: 'pending',
+          similar_roles: similarRoles
+        })
+        .select('id')
+        .single();
+
+      if (newSearchError || !newSearch) {
+        console.error('❌ Failed to create search record:', newSearchError);
+        return new Response(JSON.stringify({ error: 'Failed to create search record' }), {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      searchId = newSearch.id;
     } else if (projectId) {
       // For project-based searches, verify project exists and create search record
       const { data: projectData, error: projectError } = await supabase
@@ -132,7 +156,7 @@ serve(async (req) => {
       }
       searchId = newSearch.id;
     } else {
-      return new Response(JSON.stringify({ error: 'Either projectId or sessionId is required' }), {
+      return new Response(JSON.stringify({ error: 'Either projectId or valid sessionId/isTemporary is required' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
@@ -183,7 +207,7 @@ serve(async (req) => {
         await supabase
           .from('searches')
           .update({ 
-            status: 'error', 
+            status: 'failed', 
             error_message: `API Error: ${apiResponse.status} - ${errorText}`,
             completed_at: new Date().toISOString()
           })
@@ -245,21 +269,36 @@ serve(async (req) => {
 
       console.log('✅ Search completed successfully');
 
-      return new Response(JSON.stringify(apiData), {
+      // Return response with session_id for first temporary search
+      const responseData = { ...apiData };
+      if (isTemporary && !sessionId) {
+        // Get the session_id from the created search for first request
+        const { data: searchData } = await supabase
+          .from('searches')
+          .select('session_id')
+          .eq('id', searchId)
+          .single();
+        
+        if (searchData?.session_id) {
+          responseData.session_id = searchData.session_id;
+        }
+      }
+
+      return new Response(JSON.stringify(responseData), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     } catch (apiError) {
       console.error('❌ API call failed:', apiError);
       
       // Update search status to error
-      await supabase
-        .from('searches')
-        .update({ 
-          status: 'error', 
-          error_message: apiError.message || 'API call failed',
-          completed_at: new Date().toISOString()
-        })
-        .eq('id', searchId);
+        await supabase
+          .from('searches')
+          .update({ 
+            status: 'failed', 
+            error_message: apiError.message || 'API call failed',
+            completed_at: new Date().toISOString()
+          })
+          .eq('id', searchId);
 
       return new Response(JSON.stringify({ 
         error: 'Failed to connect to search service',

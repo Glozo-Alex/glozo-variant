@@ -23,54 +23,41 @@ export async function createIndependentSearch({
   count = 50,
   similarRoles = false
 }: CreateSearchParams): Promise<SearchResult> {
-  const sessionId = crypto.randomUUID();
-  
   const { data: user } = await supabase.auth.getUser();
   if (!user.user) {
     throw new Error('User not authenticated');
   }
 
-  // Create a temporary search record (project_id will be null for independent searches)
-  const { data: search, error: searchError } = await supabase
-    .from('searches')
-    .insert({
-      session_id: sessionId,
-      prompt: message,
-      user_id: user.user.id,
-      is_temporary: true,
-      status: 'pending',
-      similar_roles: similarRoles
-    })
-    .select()
-    .single();
-
-  if (searchError) {
-    throw searchError;
-  }
-
-  // Call the search function
+  // Call the search function with sessionId=null for first request
   const { data, error } = await supabase.functions.invoke('get-candidates-by-chat', {
     body: {
       message,
       count,
       similarRoles,
-      sessionId, // Pass session ID instead of project ID
+      sessionId: null, // null for first request
       isTemporary: true
     }
   });
 
   if (error) {
     console.error('Search function error:', error);
-    // Update search status to error
-    await supabase
-      .from('searches')
-      .update({ 
-        status: 'error', 
-        error_message: error.message || 'Search failed' 
-      })
-      .eq('id', search.id);
-    
     throw error;
+  }
+
+  // API should return sessionId, use it to get the created search
+  if (!data?.session_id) {
+    throw new Error('No session ID returned from API');
+  }
+
+  const { data: search, error: searchError } = await supabase
+    .from('searches')
+    .select('*')
+    .eq('session_id', data.session_id)
+    .eq('is_temporary', true)
+    .single();
+
+  if (searchError) {
+    throw searchError;
   }
 
   return search;
