@@ -157,7 +157,7 @@ serve(async (req) => {
       user_name: userFullName,
       message,
       count,
-      similar_roles: similarRoles,
+      similarRoles: similarRoles,
       project_id: projectId || null,
       session_id: sessionId || null,
       search_id: searchId
@@ -201,6 +201,26 @@ serve(async (req) => {
 
       const apiData = await apiResponse.json();
       console.log('✅ External API response received, candidates found:', apiData?.candidates?.length || 0);
+
+      // Save candidates to search_results table
+      if (apiData?.candidates && Array.isArray(apiData.candidates)) {
+        const searchResultRecords = apiData.candidates.map((candidate: any) => ({
+          search_id: searchId,
+          user_id: user.id,
+          candidate_data: candidate,
+          match_percentage: candidate.match_score || candidate.match_percentage || 0
+        }));
+
+        const { error: insertError } = await supabase
+          .from('search_results')
+          .insert(searchResultRecords);
+
+        if (insertError) {
+          console.error('❌ Failed to save search results:', insertError);
+        } else {
+          console.log('✅ Saved search results to database:', searchResultRecords.length, 'candidates');
+        }
+      }
 
       // Update search status to completed and store session_id if provided
       const updateData: any = {

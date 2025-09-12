@@ -31,7 +31,12 @@ interface APICandidate {
   time_overlap?: number;
 }
 
-const CandidateList = () => {
+interface CandidateListProps {
+  sessionId?: string;
+  candidates?: APICandidate[];
+}
+
+const CandidateList = ({ sessionId: propSessionId, candidates: propCandidates }: CandidateListProps = {}) => {
   const { projectId } = useParams();
   const { updateShortlistCount } = useProject();
   const [status, setStatus] = useState<"pending" | "completed" | "failed" | "idle">("idle");
@@ -44,6 +49,55 @@ const CandidateList = () => {
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
 
   const fetchLatestSearch = useCallback(async () => {
+    // If candidates are passed as props, use them directly
+    if (propCandidates) {
+      setCandidates(propCandidates);
+      setCandidateCount(propCandidates.length);
+      setStatus("completed");
+      setLoading(false);
+      return;
+    }
+
+    // If sessionId is provided, fetch by sessionId for independent searches
+    if (propSessionId) {
+      try {
+        console.log('🔍 CandidateList: Fetching search results for sessionId:', propSessionId);
+        
+        const { data: searchData, error: searchError } = await supabase
+          .from("searches")
+          .select("id, status, raw_response, candidate_count, created_at")
+          .eq("session_id", propSessionId)
+          .eq("is_temporary", true)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (searchError) throw searchError;
+
+        if (searchData) {
+          const st = (searchData.status as any) ?? "pending";
+          const raw = searchData.raw_response as any;
+          const fromArray = (st === 'completed' && Array.isArray(raw?.candidates)) ? raw.candidates : [];
+          const count = Array.isArray(fromArray) ? fromArray.length : (searchData.candidate_count ?? 0);
+
+          setStatus(st);
+          setCandidates(fromArray);
+          setCandidateCount(count);
+          
+          // Extract filters
+          const filters = raw?.filters || {};
+          const processedFilters = extractFiltersFromResponse(filters, fromArray);
+          setAvailableFilters(processedFilters);
+        }
+      } catch (e: any) {
+        setError(e?.message ?? "Failed to load search results");
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+
+    // Default project-based search logic
     if (!projectId) return;
     
     try {
@@ -103,9 +157,15 @@ const CandidateList = () => {
     } finally {
       setLoading(false);
     }
-  }, [projectId]);
+  }, [projectId, propSessionId, propCandidates]);
 
   useEffect(() => {
+    // Skip polling for prop-based data
+    if (propCandidates || propSessionId) {
+      fetchLatestSearch();
+      return;
+    }
+
     if (!projectId) return;
 
     let cancelled = false;
@@ -131,7 +191,7 @@ const CandidateList = () => {
       cancelled = true;
       if (timer) clearInterval(timer);
     };
-  }, [projectId, fetchLatestSearch]);
+  }, [projectId, propSessionId, propCandidates, fetchLatestSearch]);
 
   // Stop polling when status changes to completed
   useEffect(() => {

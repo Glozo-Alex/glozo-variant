@@ -110,7 +110,7 @@ const SearchResults = () => {
 
       {/* Main Content */}
       <div className="flex flex-1 overflow-hidden">
-        <CandidateList />
+        <CandidateList sessionId={sessionId} candidates={searchData.results.map((r: any) => r.candidate_data)} />
         <RightSidebar />
       </div>
 
