@@ -516,6 +516,7 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          is_temporary: boolean
           name: string
           query: string
           session_id: string | null
@@ -527,6 +528,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          is_temporary?: boolean
           name: string
           query: string
           session_id?: string | null
@@ -538,6 +540,7 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          is_temporary?: boolean
           name?: string
           query?: string
           session_id?: string | null

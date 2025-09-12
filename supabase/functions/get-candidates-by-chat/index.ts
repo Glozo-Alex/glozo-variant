@@ -13,7 +13,6 @@ interface RequestBody {
   similarRoles?: boolean;
   projectId?: string;
   sessionId?: string;
-  isTemporary?: boolean;
 }
 
 serve(async (req) => {
@@ -60,7 +59,7 @@ serve(async (req) => {
 
     // Parse request body
     const body: RequestBody = await req.json();
-    const { message, count = 50, similarRoles = false, projectId, sessionId, isTemporary = false } = body;
+    const { message, count = 50, similarRoles = false, projectId, sessionId } = body;
 
     if (!message) {
       return new Response(JSON.stringify({ error: 'Message is required' }), {
@@ -69,31 +68,53 @@ serve(async (req) => {
       });
     }
 
-    console.log('📝 Request details:', { message, count, similarRoles, projectId, sessionId, isTemporary });
+    if (!projectId) {
+      return new Response(JSON.stringify({ error: 'Project ID is required' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    console.log('📝 Request details:', { message, count, similarRoles, projectId, sessionId });
 
     let searchId: string;
     let userFullName = user.user_metadata?.full_name || user.user_metadata?.name || user.email || 'Unknown User';
 
-    if (isTemporary && sessionId && sessionId !== "") {
-      // For subsequent requests, find the existing search by session_id
+    // Check if project exists and user has access
+    const { data: projectData, error: projectError } = await supabase
+      .from('projects')
+      .select('id, session_id')
+      .eq('id', projectId)
+      .eq('user_id', user.id)
+      .single();
+
+    if (projectError || !projectData) {
+      console.error('❌ Project not found:', projectId, projectError);
+      return new Response(JSON.stringify({ error: 'Project not found or access denied' }), {
+        status: 404,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    if (sessionId && sessionId !== "") {
+      // Find existing search for this session
       const { data: searchData, error: searchError } = await supabase
         .from('searches')
         .select('id')
         .eq('session_id', sessionId)
-        .eq('user_id', user.id)
-        .eq('is_temporary', true)
+        .eq('project_id', projectId)
         .single();
 
       if (searchError || !searchData) {
         console.error('❌ Search not found for session:', sessionId, searchError);
-        return new Response(JSON.stringify({ error: 'Search session not found' }), {
+        return new Response(JSON.stringify({ error: 'Search not found' }), {
           status: 404,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       }
       searchId = searchData.id;
-    } else if (isTemporary && (!sessionId || sessionId === "")) {
-      // For first independent search request, create new search record
+    } else {
+      // Create new search for this project
       const newSessionId = crypto.randomUUID();
       const { data: newSearch, error: newSearchError } = await supabase
         .from('searches')
@@ -101,48 +122,9 @@ serve(async (req) => {
           session_id: newSessionId,
           prompt: message,
           user_id: user.id,
-          is_temporary: true,
-          status: 'pending',
-          similar_roles: similarRoles
-        })
-        .select('id')
-        .single();
-
-      if (newSearchError || !newSearch) {
-        console.error('❌ Failed to create search record:', newSearchError);
-        return new Response(JSON.stringify({ error: 'Failed to create search record' }), {
-          status: 500,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
-      }
-      searchId = newSearch.id;
-    } else if (projectId) {
-      // For project-based searches, verify project exists and create search record
-      const { data: projectData, error: projectError } = await supabase
-        .from('projects')
-        .select('id, name, session_id')
-        .eq('id', projectId)
-        .eq('user_id', user.id)
-        .single();
-
-      if (projectError || !projectData) {
-        console.error('❌ Project not found:', projectId, projectError);
-        return new Response(JSON.stringify({ error: 'Project not found' }), {
-          status: 404,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
-      }
-
-      // Create a new search record for the project
-      const { data: newSearch, error: newSearchError } = await supabase
-        .from('searches')
-        .insert({
           project_id: projectId,
-          user_id: user.id,
-          prompt: message,
-          status: 'pending',
           similar_roles: similarRoles,
-          is_temporary: false
+          status: 'pending'
         })
         .select('id')
         .single();
@@ -155,11 +137,12 @@ serve(async (req) => {
         });
       }
       searchId = newSearch.id;
-    } else {
-      return new Response(JSON.stringify({ error: 'Either projectId or valid sessionId/isTemporary is required' }), {
-        status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
+
+      // Update project with the new session_id
+      await supabase
+        .from('projects')
+        .update({ session_id: newSessionId })
+        .eq('id', projectId);
     }
 
     // Get user profile for additional context
@@ -254,7 +237,7 @@ serve(async (req) => {
         candidate_count: apiData?.candidates?.length || 0
       };
 
-      if (apiData.session_id && !isTemporary) {
+      if (apiData.session_id) {
         // Update project with session_id for future use
         await supabase
           .from('projects')
@@ -269,9 +252,9 @@ serve(async (req) => {
 
       console.log('✅ Search completed successfully');
 
-      // Return response with session_id for first temporary search
+      // Return response with session_id for first search
       const responseData = { ...apiData };
-      if (isTemporary && (!sessionId || sessionId === "")) {
+      if (!sessionId || sessionId === "") {
         // Get the session_id from the created search for first request
         const { data: searchData } = await supabase
           .from('searches')

@@ -16,6 +16,7 @@ export interface SearchResult {
   completed_at?: string;
   error_message?: string;
   raw_response?: any;
+  project_id?: string;
 }
 
 export async function createIndependentSearch({
@@ -28,14 +29,32 @@ export async function createIndependentSearch({
     throw new Error('User not authenticated');
   }
 
-  // Call the search function with sessionId="" for first request
+  // Create a temporary project for this search
+  const { data: tempProject, error: projectError } = await supabase
+    .from('projects')
+    .insert({
+      name: `Search: ${message.substring(0, 50)}...`,
+      query: message,
+      user_id: user.user.id,
+      similar_roles: similarRoles,
+      is_temporary: true,
+      session_id: ""
+    })
+    .select()
+    .single();
+
+  if (projectError) {
+    throw projectError;
+  }
+
+  // Call the search function with the temporary project ID
   const { data, error } = await supabase.functions.invoke('get-candidates-by-chat', {
     body: {
       message,
       count,
       similarRoles,
-      sessionId: "", // empty string for first request
-      isTemporary: true
+      projectId: tempProject.id,
+      sessionId: ""
     }
   });
 
@@ -53,7 +72,7 @@ export async function createIndependentSearch({
     .from('searches')
     .select('*')
     .eq('session_id', data.session_id)
-    .eq('is_temporary', true)
+    .eq('project_id', tempProject.id)
     .single();
 
   if (searchError) {
@@ -64,11 +83,11 @@ export async function createIndependentSearch({
 }
 
 export async function getSearchResults(sessionId: string) {
+  // Find search by session_id, could be temporary or permanent
   const { data: search, error: searchError } = await supabase
     .from('searches')
     .select('*')
     .eq('session_id', sessionId)
-    .eq('is_temporary', true)
     .single();
 
   if (searchError) {
@@ -107,43 +126,35 @@ export async function saveSearchToProject({
     throw new Error('User not authenticated');
   }
 
-  // Get the temporary search
+  // Get the temporary search and its associated temporary project
   const { data: search, error: searchError } = await supabase
     .from('searches')
     .select('*')
     .eq('session_id', sessionId)
-    .eq('is_temporary', true)
     .single();
 
   if (searchError) {
     throw searchError;
   }
 
-  // Create the project
+  if (!search.project_id) {
+    throw new Error('No project associated with this search');
+  }
+
+  // Update the temporary project to make it permanent
   const { data: project, error: projectError } = await supabase
     .from('projects')
-    .insert({
+    .update({
       name: projectName,
-      query: search.prompt,
-      user_id: user.user.id,
-      similar_roles: search.similar_roles || false,
-      session_id: search.session_id
+      is_temporary: false
     })
+    .eq('id', search.project_id)
     .select()
     .single();
 
   if (projectError) {
     throw projectError;
   }
-
-  // Update the search to be non-temporary and link to project
-  await supabase
-    .from('searches')
-    .update({
-      is_temporary: false,
-      project_id: project.id
-    })
-    .eq('id', search.id);
 
   // Get search results and copy them to project shortlist if needed
   const { data: searchResults } = await supabase
