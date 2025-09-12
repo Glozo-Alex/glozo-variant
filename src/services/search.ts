@@ -28,13 +28,13 @@ export async function createIndependentSearch({
     throw new Error('User not authenticated');
   }
 
-  // Call the search function with sessionId=null for first request
+  // Call the search function with sessionId="" for first request
   const { data, error } = await supabase.functions.invoke('get-candidates-by-chat', {
     body: {
       message,
       count,
       similarRoles,
-      sessionId: null, // null for first request
+      sessionId: "", // empty string for first request
       isTemporary: true
     }
   });

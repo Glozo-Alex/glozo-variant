@@ -74,7 +74,7 @@ serve(async (req) => {
     let searchId: string;
     let userFullName = user.user_metadata?.full_name || user.user_metadata?.name || user.email || 'Unknown User';
 
-    if (isTemporary && sessionId) {
+    if (isTemporary && sessionId && sessionId !== "") {
       // For subsequent requests, find the existing search by session_id
       const { data: searchData, error: searchError } = await supabase
         .from('searches')
@@ -92,7 +92,7 @@ serve(async (req) => {
         });
       }
       searchId = searchData.id;
-    } else if (isTemporary && !sessionId) {
+    } else if (isTemporary && (!sessionId || sessionId === "")) {
       // For first independent search request, create new search record
       const newSessionId = crypto.randomUUID();
       const { data: newSearch, error: newSearchError } = await supabase
@@ -271,7 +271,7 @@ serve(async (req) => {
 
       // Return response with session_id for first temporary search
       const responseData = { ...apiData };
-      if (isTemporary && !sessionId) {
+      if (isTemporary && (!sessionId || sessionId === "")) {
         // Get the session_id from the created search for first request
         const { data: searchData } = await supabase
           .from('searches')
