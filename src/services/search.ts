@@ -4,6 +4,8 @@ export interface CreateSearchParams {
   message: string;
   count?: number;
   similarRoles?: boolean;
+  projectId: string;
+  sessionId?: string;
 }
 
 export interface SearchResult {
@@ -21,40 +23,35 @@ export interface SearchResult {
 
 export async function createIndependentSearch({
   message,
-  count = 50,
-  similarRoles = false
+  count = 200,
+  similarRoles = false,
+  projectId,
+  sessionId = ""
 }: CreateSearchParams): Promise<SearchResult> {
   const { data: user } = await supabase.auth.getUser();
   if (!user.user) {
     throw new Error('User not authenticated');
   }
 
-  // Create a temporary project for this search
-  const { data: tempProject, error: projectError } = await supabase
-    .from('projects')
-    .insert({
-      name: `Search: ${message.substring(0, 50)}...`,
-      query: message,
-      user_id: user.user.id,
-      similar_roles: similarRoles,
-      is_temporary: true,
-      session_id: ""
-    })
-    .select()
+  // Get user profile for user_name
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('full_name')
+    .eq('id', user.user.id)
     .single();
 
-  if (projectError) {
-    throw projectError;
-  }
+  const userName = profile?.full_name || user.user.user_metadata?.full_name || user.user.user_metadata?.name || user.user.email || 'Unknown User';
 
-  // Call the search function with the temporary project ID
+  // Call the search function with correct API parameters
   const { data, error } = await supabase.functions.invoke('get-candidates-by-chat', {
     body: {
       message,
       count,
       similarRoles,
-      projectId: tempProject.id,
-      sessionId: ""
+      project_id: projectId,
+      session_id: sessionId,
+      user_name: userName,
+      user_id: user.user.id
     }
   });
 
@@ -72,7 +69,7 @@ export async function createIndependentSearch({
     .from('searches')
     .select('*')
     .eq('session_id', data.session_id)
-    .eq('project_id', tempProject.id)
+    .eq('project_id', projectId)
     .single();
 
   if (searchError) {

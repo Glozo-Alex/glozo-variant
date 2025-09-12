@@ -11,8 +11,10 @@ interface RequestBody {
   message: string;
   count?: number;
   similarRoles?: boolean;
-  projectId?: string;
-  sessionId?: string;
+  project_id: string;
+  session_id?: string;
+  user_name: string;
+  user_id: string;
 }
 
 serve(async (req) => {
@@ -59,7 +61,7 @@ serve(async (req) => {
 
     // Parse request body
     const body: RequestBody = await req.json();
-    const { message, count = 50, similarRoles = false, projectId, sessionId } = body;
+    const { message, count = 200, similarRoles = false, project_id, session_id, user_name, user_id } = body;
 
     if (!message) {
       return new Response(JSON.stringify({ error: 'Message is required' }), {
@@ -68,45 +70,51 @@ serve(async (req) => {
       });
     }
 
-    if (!projectId) {
+    if (!project_id) {
       return new Response(JSON.stringify({ error: 'Project ID is required' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-    console.log('📝 Request details:', { message, count, similarRoles, projectId, sessionId });
+    if (!user_name || !user_id) {
+      return new Response(JSON.stringify({ error: 'User name and ID are required' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    console.log('📝 Request details:', { message, count, similarRoles, project_id, session_id, user_name, user_id });
 
     let searchId: string;
-    let userFullName = user.user_metadata?.full_name || user.user_metadata?.name || user.email || 'Unknown User';
 
     // Check if project exists and user has access
     const { data: projectData, error: projectError } = await supabase
       .from('projects')
       .select('id, session_id')
-      .eq('id', projectId)
+      .eq('id', project_id)
       .eq('user_id', user.id)
       .single();
 
     if (projectError || !projectData) {
-      console.error('❌ Project not found:', projectId, projectError);
+      console.error('❌ Project not found:', project_id, projectError);
       return new Response(JSON.stringify({ error: 'Project not found or access denied' }), {
         status: 404,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-    if (sessionId && sessionId !== "") {
+    if (session_id && session_id !== "") {
       // Find existing search for this session
       const { data: searchData, error: searchError } = await supabase
         .from('searches')
         .select('id')
-        .eq('session_id', sessionId)
-        .eq('project_id', projectId)
+        .eq('session_id', session_id)
+        .eq('project_id', project_id)
         .single();
 
       if (searchError || !searchData) {
-        console.error('❌ Search not found for session:', sessionId, searchError);
+        console.error('❌ Search not found for session:', session_id, searchError);
         return new Response(JSON.stringify({ error: 'Search not found' }), {
           status: 404,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -122,7 +130,7 @@ serve(async (req) => {
           session_id: newSessionId,
           prompt: message,
           user_id: user.id,
-          project_id: projectId,
+          project_id: project_id,
           similar_roles: similarRoles,
           status: 'pending'
         })
@@ -142,32 +150,20 @@ serve(async (req) => {
       await supabase
         .from('projects')
         .update({ session_id: newSessionId })
-        .eq('id', projectId);
+        .eq('id', project_id);
     }
 
-    // Get user profile for additional context
-    const { data: profileData } = await supabase
-      .from('profiles')
-      .select('full_name')
-      .eq('id', user.id)
-      .single();
-
-    if (profileData?.full_name) {
-      userFullName = profileData.full_name;
-    }
-
-    console.log('👤 User details:', { userFullName, userId: user.id });
+    console.log('👤 User details:', { user_name, user_id });
 
     // Prepare request data for external API
     const requestData = {
-      user_id: user.id,
-      user_name: userFullName,
+      user_id,
+      user_name,
       message,
       count,
-      similarRoles: similarRoles,
-      project_id: projectId || null,
-      session_id: sessionId || null,
-      search_id: searchId
+      similarRoles,
+      project_id,
+      session_id: session_id || null
     };
 
     console.log('📤 Calling external API with:', requestData);
@@ -242,7 +238,7 @@ serve(async (req) => {
         await supabase
           .from('projects')
           .update({ session_id: apiData.session_id })
-          .eq('id', projectId);
+          .eq('id', project_id);
       }
 
       await supabase

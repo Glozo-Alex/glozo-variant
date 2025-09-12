@@ -10,6 +10,7 @@ import { X, Plus, Search } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Switch } from "@/components/ui/switch";
 import { createIndependentSearch } from "@/services/search";
+import { supabase } from "@/integrations/supabase/client";
 const NewSearch = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -51,10 +52,35 @@ const NewSearch = () => {
 
     setIsLoading(true);
     try {
+      // Get current user
+      const { data: user } = await supabase.auth.getUser();
+      if (!user.user) {
+        throw new Error('User not authenticated');
+      }
+
+      // Create a temporary project for this search
+      const { data: tempProject, error: projectError } = await supabase
+        .from('projects')
+        .insert({
+          name: `Search: ${fullQuery.substring(0, 50)}...`,
+          query: fullQuery,
+          user_id: user.user.id,
+          similar_roles: similarRoles,
+          is_temporary: true,
+          session_id: ""
+        })
+        .select()
+        .single();
+
+      if (projectError) {
+        throw projectError;
+      }
+
       const search = await createIndependentSearch({
         message: fullQuery,
-        count: 50,
-        similarRoles
+        count: 200,
+        similarRoles,
+        projectId: tempProject.id
       });
       
       toast({
