@@ -250,7 +250,7 @@ serve(async (req) => {
 
       // Return response with session_id for first search
       const responseData = { ...apiData };
-      if (!sessionId || sessionId === "") {
+      if (!session_id || session_id === "") {
         // Get the session_id from the created search for first request
         const { data: searchData } = await supabase
           .from('searches')
