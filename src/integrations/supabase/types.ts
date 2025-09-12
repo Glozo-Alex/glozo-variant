@@ -44,6 +44,86 @@ export type Database = {
         }
         Relationships: []
       }
+      candidate_relationships: {
+        Row: {
+          candidate_uuid: string
+          created_at: string
+          ended_at: string | null
+          id: string
+          related_object_data: Json | null
+          related_object_id: string
+          relationship_type: string
+          status: string | null
+          user_id: string
+        }
+        Insert: {
+          candidate_uuid: string
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          related_object_data?: Json | null
+          related_object_id: string
+          relationship_type: string
+          status?: string | null
+          user_id: string
+        }
+        Update: {
+          candidate_uuid?: string
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          related_object_data?: Json | null
+          related_object_id?: string
+          relationship_type?: string
+          status?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "candidate_relationships_candidate_uuid_fkey"
+            columns: ["candidate_uuid"]
+            isOneToOne: false
+            referencedRelation: "candidates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      candidates: {
+        Row: {
+          basic_data: Json
+          candidate_id: string
+          data_completeness_score: number | null
+          detailed_data: Json | null
+          first_seen_at: string
+          has_detailed_contacts: boolean | null
+          id: string
+          last_updated_at: string
+          user_id: string
+        }
+        Insert: {
+          basic_data?: Json
+          candidate_id: string
+          data_completeness_score?: number | null
+          detailed_data?: Json | null
+          first_seen_at?: string
+          has_detailed_contacts?: boolean | null
+          id?: string
+          last_updated_at?: string
+          user_id: string
+        }
+        Update: {
+          basic_data?: Json
+          candidate_id?: string
+          data_completeness_score?: number | null
+          detailed_data?: Json | null
+          first_seen_at?: string
+          has_detailed_contacts?: boolean | null
+          id?: string
+          last_updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       email_logs: {
         Row: {
           candidate_id: string
@@ -392,6 +472,7 @@ export type Database = {
           added_at: string
           candidate_id: string
           candidate_snapshot: Json
+          candidate_uuid: string | null
           id: string
           project_id: string
           user_id: string
@@ -400,6 +481,7 @@ export type Database = {
           added_at?: string
           candidate_id: string
           candidate_snapshot: Json
+          candidate_uuid?: string | null
           id?: string
           project_id: string
           user_id: string
@@ -408,11 +490,19 @@ export type Database = {
           added_at?: string
           candidate_id?: string
           candidate_snapshot?: Json
+          candidate_uuid?: string | null
           id?: string
           project_id?: string
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "project_shortlist_candidate_uuid_fkey"
+            columns: ["candidate_uuid"]
+            isOneToOne: false
+            referencedRelation: "candidates"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "project_shortlist_project_id_fkey"
             columns: ["project_id"]
@@ -552,6 +642,7 @@ export type Database = {
       sequence_recipients: {
         Row: {
           candidate_id: string
+          candidate_uuid: string | null
           completed_at: string | null
           current_template_index: number
           enrolled_at: string
@@ -564,6 +655,7 @@ export type Database = {
         }
         Insert: {
           candidate_id: string
+          candidate_uuid?: string | null
           completed_at?: string | null
           current_template_index?: number
           enrolled_at?: string
@@ -576,6 +668,7 @@ export type Database = {
         }
         Update: {
           candidate_id?: string
+          candidate_uuid?: string | null
           completed_at?: string | null
           current_template_index?: number
           enrolled_at?: string
@@ -587,6 +680,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "sequence_recipients_candidate_uuid_fkey"
+            columns: ["candidate_uuid"]
+            isOneToOne: false
+            referencedRelation: "candidates"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "sequence_recipients_project_id_fkey"
             columns: ["project_id"]
