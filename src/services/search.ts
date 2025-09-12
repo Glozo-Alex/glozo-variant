@@ -91,19 +91,12 @@ export async function getSearchResults(sessionId: string) {
     throw searchError;
   }
 
-  const { data: results, error: resultsError } = await supabase
-    .from('search_results')
-    .select('*')
-    .eq('search_id', search.id)
-    .order('match_percentage', { ascending: false });
-
-  if (resultsError) {
-    throw resultsError;
-  }
+  // Extract candidates directly from raw_response
+  const candidates = (search.raw_response as any)?.candidates || [];
 
   return {
     search,
-    results: results || []
+    results: candidates
   };
 }
 
