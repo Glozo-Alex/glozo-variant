@@ -74,7 +74,7 @@ const NewSearch = () => {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-foreground mb-2">New Search</h1>
-        <p className="text-muted-foreground">Create a new candidate search project</p>
+        <p className="text-muted-foreground">Search for candidates without creating a project</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -84,10 +84,10 @@ const NewSearch = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Search className="h-5 w-5 text-primary" />
-                Project Details
+                Search Parameters
               </CardTitle>
               <CardDescription>
-                Configure your candidate search parameters
+                Configure your candidate search criteria. You can save results to a project later.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
