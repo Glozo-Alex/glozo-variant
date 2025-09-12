@@ -115,87 +115,157 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
   };
 
   const deleteProject = async (projectId: string) => {
+    console.log('🗑️ Starting project deletion for ID:', projectId);
+    
     try {
       // Delete all related data first
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('User not authenticated');
 
+      console.log('👤 User authenticated:', user.id);
+
       // Get all email sequences for this project first
-      const { data: emailSequences } = await supabase
+      console.log('📧 Fetching email sequences for project...');
+      const { data: emailSequences, error: sequencesError } = await supabase
         .from('email_sequences')
         .select('id')
         .eq('project_id', projectId)
         .eq('user_id', user.id);
 
+      if (sequencesError) {
+        console.error('❌ Error fetching email sequences:', sequencesError);
+        throw sequencesError;
+      }
+
+      console.log('📧 Found email sequences:', emailSequences?.length || 0);
+
       // Delete email logs for sequences in this project
       if (emailSequences?.length) {
         const sequenceIds = emailSequences.map(seq => seq.id);
-        await supabase
+        console.log('🗑️ Deleting email logs for sequences:', sequenceIds);
+        
+        const { error: logsError } = await supabase
           .from('email_logs')
           .delete()
           .in('sequence_id', sequenceIds)
           .eq('user_id', user.id);
 
+        if (logsError) {
+          console.error('❌ Error deleting email logs:', logsError);
+          throw logsError;
+        }
+
         // Delete email templates for sequences in this project
-        await supabase
+        console.log('🗑️ Deleting email templates for sequences:', sequenceIds);
+        const { error: templatesError } = await supabase
           .from('email_templates')
           .delete()
           .in('sequence_id', sequenceIds)
           .eq('user_id', user.id);
+
+        if (templatesError) {
+          console.error('❌ Error deleting email templates:', templatesError);
+          throw templatesError;
+        }
       }
 
       // Delete sequence recipients for this project
-      await supabase
+      console.log('🗑️ Deleting sequence recipients...');
+      const { error: recipientsError } = await supabase
         .from('sequence_recipients')
         .delete()
         .eq('project_id', projectId)
         .eq('user_id', user.id);
 
+      if (recipientsError) {
+        console.error('❌ Error deleting sequence recipients:', recipientsError);
+        throw recipientsError;
+      }
+
       // Delete email sequences for this project
-      await supabase
+      console.log('🗑️ Deleting email sequences...');
+      const { error: deleteSequencesError } = await supabase
         .from('email_sequences')
         .delete()
         .eq('project_id', projectId)
         .eq('user_id', user.id);
 
+      if (deleteSequencesError) {
+        console.error('❌ Error deleting email sequences:', deleteSequencesError);
+        throw deleteSequencesError;
+      }
+
       // Delete candidate details for this project
-      await supabase
+      console.log('🗑️ Deleting candidate details...');
+      const { error: candidateDetailsError } = await supabase
         .from('candidate_details')
         .delete()
         .eq('project_id', projectId)
         .eq('user_id', user.id);
 
+      if (candidateDetailsError) {
+        console.error('❌ Error deleting candidate details:', candidateDetailsError);
+        throw candidateDetailsError;
+      }
+
       // Delete project shortlist entries
-      await supabase
+      console.log('🗑️ Deleting project shortlist...');
+      const { error: shortlistError } = await supabase
         .from('project_shortlist')
         .delete()
         .eq('project_id', projectId)
         .eq('user_id', user.id);
 
+      if (shortlistError) {
+        console.error('❌ Error deleting project shortlist:', shortlistError);
+        throw shortlistError;
+      }
+
       // Delete search results
-      const { data: searches } = await supabase
+      console.log('🗑️ Fetching searches for project...');
+      const { data: searches, error: searchesError } = await supabase
         .from('searches')
         .select('id')
         .eq('project_id', projectId)
         .eq('user_id', user.id);
 
+      if (searchesError) {
+        console.error('❌ Error fetching searches:', searchesError);
+        throw searchesError;
+      }
+
+      console.log('🔍 Found searches:', searches?.length || 0);
+
       if (searches?.length) {
         for (const search of searches) {
-          await supabase
+          console.log('🗑️ Deleting search results for search:', search.id);
+          const { error: searchResultsError } = await supabase
             .from('search_results')
             .delete()
             .eq('search_id', search.id);
+
+          if (searchResultsError) {
+            console.error('❌ Error deleting search results:', searchResultsError);
+            throw searchResultsError;
+          }
         }
       }
 
       // Delete searches
-      await supabase
+      console.log('🗑️ Deleting searches...');
+      const { error: deleteSearchesError } = await supabase
         .from('searches')
         .delete()
         .eq('project_id', projectId)
         .eq('user_id', user.id);
 
+      if (deleteSearchesError) {
+        console.error('❌ Error deleting searches:', deleteSearchesError);
+        throw deleteSearchesError;
+      }
+
       // Finally delete the project
+      console.log('🗑️ Deleting project...');
       const { error } = await supabase
         .from('projects')
         .delete()
@@ -203,9 +273,11 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
         .eq('user_id', user.id);
 
       if (error) {
-        console.error('Failed to delete project in Supabase:', error);
-        throw new Error('Failed to delete project');
+        console.error('❌ Error deleting project:', error);
+        throw error;
       }
+
+      console.log('✅ Project deleted successfully');
 
       if (activeProject?.id === projectId) {
         setActiveProjectState(null);
@@ -213,7 +285,7 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
       await reloadProjects();
     } catch (error) {
-      console.error('Error deleting project:', error);
+      console.error('💥 Error during project deletion:', error);
       throw error;
     }
   };
