@@ -124,48 +124,44 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
       console.log('👤 User authenticated:', user.id);
 
-      // Get all email sequences for this project first
-      console.log('📧 Fetching email sequences for project...');
+      // Get email sequence IDs first
       const { data: emailSequences, error: sequencesError } = await supabase
         .from('email_sequences')
         .select('id')
-        .eq('project_id', projectId)
-        .eq('user_id', user.id);
+        .eq('project_id', projectId);
 
       if (sequencesError) {
         console.error('❌ Error fetching email sequences:', sequencesError);
-        throw sequencesError;
       }
 
-      console.log('📧 Found email sequences:', emailSequences?.length || 0);
+      const sequenceIds = emailSequences?.map(seq => seq.id) || [];
+      console.log('📧 Found email sequences:', sequenceIds);
 
-      // Delete email logs for sequences in this project
-      if (emailSequences?.length) {
-        const sequenceIds = emailSequences.map(seq => seq.id);
-        console.log('🗑️ Deleting email logs for sequences:', sequenceIds);
-        
+      // Delete email logs first (for all sequences in this project)
+      if (sequenceIds.length > 0) {
+        console.log('🗑️ Deleting email logs...');
         const { error: logsError } = await supabase
           .from('email_logs')
           .delete()
-          .in('sequence_id', sequenceIds)
-          .eq('user_id', user.id);
+          .eq('user_id', user.id)
+          .in('sequence_id', sequenceIds);
 
         if (logsError) {
           console.error('❌ Error deleting email logs:', logsError);
-          throw logsError;
+          // Don't throw, continue with deletion
         }
 
-        // Delete email templates for sequences in this project
-        console.log('🗑️ Deleting email templates for sequences:', sequenceIds);
+        // Delete email templates (for all sequences in this project)
+        console.log('🗑️ Deleting email templates...');
         const { error: templatesError } = await supabase
           .from('email_templates')
           .delete()
-          .in('sequence_id', sequenceIds)
-          .eq('user_id', user.id);
+          .eq('user_id', user.id)
+          .in('sequence_id', sequenceIds);
 
         if (templatesError) {
           console.error('❌ Error deleting email templates:', templatesError);
-          throw templatesError;
+          // Don't throw, continue with deletion
         }
       }
 
@@ -179,10 +175,10 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
       if (recipientsError) {
         console.error('❌ Error deleting sequence recipients:', recipientsError);
-        throw recipientsError;
+        // Don't throw, continue with deletion
       }
 
-      // Delete email sequences for this project
+      // Delete email sequences for this project (this is critical)
       console.log('🗑️ Deleting email sequences...');
       const { error: deleteSequencesError } = await supabase
         .from('email_sequences')
@@ -192,8 +188,16 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
       if (deleteSequencesError) {
         console.error('❌ Error deleting email sequences:', deleteSequencesError);
-        throw deleteSequencesError;
+        throw deleteSequencesError; // This is critical - must succeed
       }
+
+      // Verify sequences are deleted
+      const { data: remainingSequences } = await supabase
+        .from('email_sequences')
+        .select('id')
+        .eq('project_id', projectId);
+      
+      console.log('🔍 Remaining sequences after deletion:', remainingSequences?.length || 0);
 
       // Delete candidate details for this project
       console.log('🗑️ Deleting candidate details...');
@@ -205,7 +209,6 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
       if (candidateDetailsError) {
         console.error('❌ Error deleting candidate details:', candidateDetailsError);
-        throw candidateDetailsError;
       }
 
       // Delete project shortlist entries
@@ -218,7 +221,6 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
       if (shortlistError) {
         console.error('❌ Error deleting project shortlist:', shortlistError);
-        throw shortlistError;
       }
 
       // Delete search results
@@ -231,7 +233,6 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
       if (searchesError) {
         console.error('❌ Error fetching searches:', searchesError);
-        throw searchesError;
       }
 
       console.log('🔍 Found searches:', searches?.length || 0);
@@ -246,7 +247,6 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
           if (searchResultsError) {
             console.error('❌ Error deleting search results:', searchResultsError);
-            throw searchResultsError;
           }
         }
       }
@@ -261,7 +261,6 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
       if (deleteSearchesError) {
         console.error('❌ Error deleting searches:', deleteSearchesError);
-        throw deleteSearchesError;
       }
 
       // Finally delete the project
