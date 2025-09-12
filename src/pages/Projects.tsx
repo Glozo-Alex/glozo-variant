@@ -10,7 +10,10 @@ import {
   Users,
   Filter,
   SortAsc,
-  SortDesc
+  SortDesc,
+  AlertTriangle,
+  X,
+  Check
 } from "lucide-react";
 import { useProject } from "@/contexts/ProjectContext";
 import { Button } from "@/components/ui/button";
@@ -60,6 +63,7 @@ const Projects = () => {
   const [projectToDelete, setProjectToDelete] = useState<string | null>(null);
   const [projectToEdit, setProjectToEdit] = useState<{ id: string; name: string } | null>(null);
   const [newProjectName, setNewProjectName] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Filter and sort projects
   const filteredProjects = projects
@@ -97,6 +101,7 @@ const Projects = () => {
 
   const confirmDelete = async () => {
     if (projectToDelete) {
+      setIsDeleting(true);
       try {
         await deleteProject(projectToDelete);
         toast({
@@ -105,6 +110,8 @@ const Projects = () => {
         });
       } catch (e) {
         toast({ title: "Delete failed", description: "Couldn't delete project", variant: "destructive" });
+      } finally {
+        setIsDeleting(false);
       }
     }
     setDeleteDialogOpen(false);
@@ -317,17 +324,68 @@ const Projects = () => {
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent className="max-w-md">
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Project?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. The project and all associated data will be permanently deleted.
+            <div className="flex items-center gap-3">
+              <div className="rounded-full bg-destructive/10 p-2">
+                <AlertTriangle className="h-5 w-5 text-destructive" />
+              </div>
+              <AlertDialogTitle className="text-lg">Delete Project - Irreversible Action</AlertDialogTitle>
+            </div>
+            <AlertDialogDescription className="space-y-4 pt-2">
+              <p className="text-sm">This action cannot be undone. The following data will be permanently deleted:</p>
+              
+              <div className="space-y-2">
+                <div className="rounded-md bg-destructive/5 p-3 space-y-2">
+                  <p className="font-medium text-sm text-destructive-foreground">What will be deleted:</p>
+                  <ul className="text-xs space-y-1 text-muted-foreground">
+                    <li className="flex items-center gap-2">
+                      <X className="h-3 w-3 text-destructive" />
+                      Project settings and configuration
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <X className="h-3 w-3 text-destructive" />
+                      Email sequences and all templates
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <X className="h-3 w-3 text-destructive" />
+                      Email sending history for this project
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <X className="h-3 w-3 text-destructive" />
+                      Project shortlist (candidate links)
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <X className="h-3 w-3 text-destructive" />
+                      All searches and results for this project
+                    </li>
+                  </ul>
+                </div>
+                
+                <div className="rounded-md bg-success/5 p-3 space-y-2">
+                  <p className="font-medium text-sm text-success-foreground">What will NOT be deleted:</p>
+                  <ul className="text-xs space-y-1 text-muted-foreground">
+                    <li className="flex items-center gap-2">
+                      <Check className="h-3 w-3 text-success" />
+                      Candidates remain in global database (accessible in Candidates section)
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="h-3 w-3 text-success" />
+                      Contact details of candidates are preserved forever
+                    </li>
+                  </ul>
+                </div>
+              </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-              Delete
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={confirmDelete} 
+              disabled={isDeleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isDeleting ? "Deleting..." : "Delete"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

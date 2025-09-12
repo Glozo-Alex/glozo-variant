@@ -120,6 +120,44 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('User not authenticated');
 
+      // Get all email sequences for this project first
+      const { data: emailSequences } = await supabase
+        .from('email_sequences')
+        .select('id')
+        .eq('project_id', projectId)
+        .eq('user_id', user.id);
+
+      // Delete email logs for sequences in this project
+      if (emailSequences?.length) {
+        const sequenceIds = emailSequences.map(seq => seq.id);
+        await supabase
+          .from('email_logs')
+          .delete()
+          .in('sequence_id', sequenceIds)
+          .eq('user_id', user.id);
+
+        // Delete email templates for sequences in this project
+        await supabase
+          .from('email_templates')
+          .delete()
+          .in('sequence_id', sequenceIds)
+          .eq('user_id', user.id);
+      }
+
+      // Delete sequence recipients for this project
+      await supabase
+        .from('sequence_recipients')
+        .delete()
+        .eq('project_id', projectId)
+        .eq('user_id', user.id);
+
+      // Delete email sequences for this project
+      await supabase
+        .from('email_sequences')
+        .delete()
+        .eq('project_id', projectId)
+        .eq('user_id', user.id);
+
       // Delete candidate details for this project
       await supabase
         .from('candidate_details')
