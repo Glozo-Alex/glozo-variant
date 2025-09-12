@@ -18,6 +18,15 @@ const NewSearch = () => {
   const [skillInput, setSkillInput] = useState("");
   const [similarRoles, setSimilarRoles] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  const exampleQueries = [
+    "Senior frontend developer with React and TypeScript experience for fintech startup",
+    "Full-stack engineer, 3-5 years experience, Node.js and databases"
+  ];
+
+  const handleExampleClick = (exampleText: string) => {
+    setSearchQuery(exampleText);
+  };
   const addSkill = (skill: string) => {
     const trimmedSkill = skill.trim();
     if (trimmedSkill && !selectedSkills.includes(trimmedSkill)) {
@@ -148,12 +157,15 @@ const NewSearch = () => {
               <CardTitle className="text-sm font-medium">Example Queries</CardTitle>
             </CardHeader>
             <CardContent className="text-sm space-y-2">
-              <p className="text-muted-foreground">
-                "Senior frontend developer with React and TypeScript experience for fintech startup"
-              </p>
-              <p className="text-muted-foreground">
-                "Full-stack engineer, 3-5 years experience, Node.js and databases"
-              </p>
+              {exampleQueries.map((query, index) => (
+                <button
+                  key={index}
+                  onClick={() => handleExampleClick(query)}
+                  className="block w-full text-left p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors cursor-pointer border border-transparent hover:border-border"
+                >
+                  "{query}"
+                </button>
+              ))}
             </CardContent>
           </Card>
         </div>
