@@ -3,12 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { useProject } from "@/contexts/ProjectContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import { X, Plus, Search } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { Search, Copy } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Switch } from "@/components/ui/switch";
 import { getCandidatesByChat } from "@/services/candidates";
@@ -20,31 +17,27 @@ const NewSearch = () => {
   const {
     toast
   } = useToast();
-  const [projectName, setProjectName] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
-  const [skillInput, setSkillInput] = useState("");
   const [similarRoles, setSimilarRoles] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const addSkill = (skill: string) => {
-    const trimmedSkill = skill.trim();
-    if (trimmedSkill && !selectedSkills.includes(trimmedSkill)) {
-      setSelectedSkills([...selectedSkills, trimmedSkill]);
-      setSkillInput("");
-    }
+
+  const exampleQueries = [
+    "Senior frontend developer with React and TypeScript experience for fintech startup",
+    "Full-stack engineer, 3-5 years experience, Node.js and databases",
+    "DevOps engineer with AWS and Kubernetes experience",
+    "Product designer with 5+ years experience in SaaS products"
+  ];
+
+  const generateProjectName = () => {
+    const now = new Date();
+    const date = now.toLocaleDateString('en-GB').replace(/\//g, '.');
+    const time = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+    return `Search ${date} ${time}`;
   };
-  const removeSkill = (skill: string) => {
-    setSelectedSkills(selectedSkills.filter(s => s !== skill));
+  const handleExampleClick = (example: string) => {
+    setSearchQuery(example);
   };
   const handleCreateProject = async () => {
-    if (!projectName.trim()) {
-      toast({
-        title: "Project name required",
-        description: "Please enter a name for your project",
-        variant: "destructive"
-      });
-      return;
-    }
     if (!searchQuery.trim()) {
       toast({
         title: "Search query required",
@@ -54,16 +47,16 @@ const NewSearch = () => {
       return;
     }
 
-    const fullQuery = selectedSkills.length > 0 ? `${searchQuery} Skills: ${selectedSkills.join(", ")}` : searchQuery;
+    const projectName = generateProjectName();
 
     setIsLoading(true);
     try {
-      // First create the project in Supabase
-      const project = await createProject(projectName, fullQuery, similarRoles);
+      // First create the temporary project in Supabase
+      const project = await createProject(projectName, searchQuery, similarRoles, true);
       
       // Then perform the search
       const apiRes = await getCandidatesByChat({ 
-        message: fullQuery, 
+        message: searchQuery, 
         similarRoles, 
         projectId: project.id 
       });
@@ -71,7 +64,7 @@ const NewSearch = () => {
 
       toast({
         title: "Search started",
-        description: count !== undefined ? `Found ${count} candidates for "${project.name}"` : `"${project.name}" is ready for candidate search`
+        description: count !== undefined ? `Found ${count} candidates` : "Search is ready for candidate results"
       });
       navigate(`/project/${project.id}/results`);
     } catch (error: any) {
@@ -83,12 +76,6 @@ const NewSearch = () => {
       });
     } finally {
       setIsLoading(false);
-    }
-  };
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && skillInput.trim()) {
-      e.preventDefault();
-      addSkill(skillInput);
     }
   };
   return <div className="p-6 max-w-4xl mx-auto">
@@ -112,12 +99,6 @@ const NewSearch = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              {/* Project Name */}
-              <div className="space-y-2">
-                <Label htmlFor="project-name">Project Name</Label>
-                <Input id="project-name" placeholder="e.g., Senior React Developer Search" value={projectName} onChange={e => setProjectName(e.target.value)} />
-              </div>
-
               {/* Search Query */}
               <div className="space-y-2">
                 <Label htmlFor="search-query">Search Query</Label>
@@ -141,7 +122,7 @@ const NewSearch = () => {
               <div className="flex gap-3 pt-4">
                 <Button onClick={handleCreateProject} className="flex-1" size="lg" disabled={isLoading}>
                   <Search className="h-4 w-4 mr-2" />
-                  {isLoading ? "Searching..." : "Create Project & Search"}
+                  {isLoading ? "Searching..." : "Start Search"}
                 </Button>
                 <Button variant="outline" onClick={() => navigate('/')}>
                   Cancel
@@ -174,13 +155,19 @@ const NewSearch = () => {
             <CardHeader>
               <CardTitle className="text-sm font-medium">Example Queries</CardTitle>
             </CardHeader>
-            <CardContent className="text-sm space-y-2">
-              <p className="text-muted-foreground">
-                "Senior frontend developer with React and TypeScript experience for fintech startup"
-              </p>
-              <p className="text-muted-foreground">
-                "Full-stack engineer, 3-5 years experience, Node.js and databases"
-              </p>
+            <CardContent className="space-y-2">
+              {exampleQueries.map((example, index) => (
+                <Button
+                  key={index}
+                  variant="ghost"
+                  size="sm"
+                  className="w-full justify-start text-left h-auto p-3 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 whitespace-normal"
+                  onClick={() => handleExampleClick(example)}
+                >
+                  <Copy className="h-3 w-3 mr-2 flex-shrink-0 mt-0.5" />
+                  <span className="flex-1">{example}</span>
+                </Button>
+              ))}
             </CardContent>
           </Card>
         </div>

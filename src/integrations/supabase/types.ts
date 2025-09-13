@@ -474,6 +474,7 @@ export type Database = {
           candidate_snapshot: Json
           candidate_uuid: string | null
           id: string
+          is_temporary: boolean
           project_id: string
           user_id: string
         }
@@ -483,6 +484,7 @@ export type Database = {
           candidate_snapshot: Json
           candidate_uuid?: string | null
           id?: string
+          is_temporary?: boolean
           project_id: string
           user_id: string
         }
@@ -492,6 +494,7 @@ export type Database = {
           candidate_snapshot?: Json
           candidate_uuid?: string | null
           id?: string
+          is_temporary?: boolean
           project_id?: string
           user_id?: string
         }

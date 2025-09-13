@@ -36,6 +36,7 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
       createdAt: new Date(p.created_at),
       updatedAt: new Date(p.updated_at),
       shortlistCount: p.shortlist_count || 0,
+      isTemporary: p.is_temporary || false,
     }));
 
     setProjects(mapped);
@@ -69,7 +70,7 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   }, [activeProject]);
 
-  const createProject = async (name: string, query: string, similarRoles?: boolean): Promise<Project> => {
+  const createProject = async (name: string, query: string, similarRoles?: boolean, isTemporary?: boolean): Promise<Project> => {
     // Get current user
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
@@ -83,6 +84,7 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
         name,
         query,
         similar_roles: similarRoles || false,
+        is_temporary: isTemporary || false,
         user_id: user.id
       })
       .select()
@@ -101,6 +103,7 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
       createdAt: new Date(supabaseProject.created_at),
       updatedAt: new Date(supabaseProject.updated_at),
       shortlistCount: supabaseProject.shortlist_count || 0,
+      isTemporary: supabaseProject.is_temporary || false,
     };
     
     setProjects(prev => [...prev, newProject]);
