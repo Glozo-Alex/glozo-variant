@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useCallback } from "react";
+import { useEffect, useMemo, useState, useCallback, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import CandidateCard from "./CandidateCard";
@@ -42,12 +42,19 @@ const CandidateList = () => {
   const [shortlistStatus, setShortlistStatus] = useState<Record<string, boolean>>({});
   const [availableFilters, setAvailableFilters] = useState<Record<string, any>>({});
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
+  
+  // Use refs to prevent unnecessary re-renders
+  const pollingRef = useRef<number | null>(null);
+  const isPollingRef = useRef(false);
+  const currentProjectIdRef = useRef(projectId);
 
-  const fetchLatestSearch = useCallback(async () => {
+  const fetchLatestSearch = useCallback(async (force = false) => {
     if (!projectId) return;
     
     try {
-      console.log('🔍 CandidateList: Fetching search results for projectId:', projectId);
+      if (!force) {
+        console.log('🔍 CandidateList: Fetching search results for projectId:', projectId);
+      }
       
       const { data, error } = await supabase
         .from("searches")
@@ -57,12 +64,14 @@ const CandidateList = () => {
         .limit(1)
         .maybeSingle();
 
-      console.log('📊 CandidateList: Search data received:', data);
+      if (!force) {
+        console.log('📊 CandidateList: Search data received:', data);
+      }
 
       if (error) throw error;
 
       if (!data) {
-        console.log('🚫 CandidateList: No search data found');
+        if (!force) console.log('🚫 CandidateList: No search data found');
         setStatus("idle");
         setCandidates([]);
         setCandidateCount(0);
@@ -77,7 +86,9 @@ const CandidateList = () => {
       const fromArray = (st === 'completed' && Array.isArray(raw?.candidates)) ? raw.candidates : [];
       const count = Array.isArray(fromArray) ? fromArray.length : (data.candidate_count ?? 0);
 
-      console.log('👥 CandidateList: Candidates array length:', fromArray.length, 'Status:', st);
+      if (!force) {
+        console.log('👥 CandidateList: Candidates array length:', fromArray.length, 'Status:', st);
+      }
 
       // Extract filters from raw response
       const filters = raw?.filters || {};
@@ -98,6 +109,15 @@ const CandidateList = () => {
           console.error('Failed to load shortlist status:', error);
         }
       }
+      
+      // Stop polling if search is completed or failed
+      if (st === 'completed' || st === 'failed') {
+        if (pollingRef.current) {
+          clearInterval(pollingRef.current);
+          pollingRef.current = null;
+          isPollingRef.current = false;
+        }
+      }
     } catch (e: any) {
       setError(e?.message ?? "Failed to load search results");
     } finally {
@@ -105,38 +125,72 @@ const CandidateList = () => {
     }
   }, [projectId]);
 
+  // Handle project change
+  useEffect(() => {
+    if (currentProjectIdRef.current !== projectId) {
+      currentProjectIdRef.current = projectId;
+      
+      // Clear existing polling
+      if (pollingRef.current) {
+        clearInterval(pollingRef.current);
+        pollingRef.current = null;
+        isPollingRef.current = false;
+      }
+      
+      // Reset state
+      setLoading(true);
+      setError(null);
+      setStatus("idle");
+      setCandidates([]);
+      setCandidateCount(0);
+      setAvailableFilters({});
+      setShortlistStatus({});
+    }
+  }, [projectId]);
+
+  // Initial fetch and polling setup
   useEffect(() => {
     if (!projectId) return;
-
-    let cancelled = false;
-    let timer: number | undefined;
 
     // Initial fetch
     fetchLatestSearch();
     
-    // Set up polling only if needed
-    const setupPolling = () => {
-      timer = setInterval(() => {
-        if (cancelled) return;
-        fetchLatestSearch();
-      }, 3000) as unknown as number;
+    // Set up polling for non-completed statuses
+    const startPolling = () => {
+      if (!isPollingRef.current && !pollingRef.current) {
+        pollingRef.current = setInterval(() => {
+          fetchLatestSearch(true); // silent polling
+        }, 3000) as unknown as number;
+        isPollingRef.current = true;
+      }
     };
 
-    // Start polling if status is pending or idle
-    if (status === "pending" || status === "idle") {
-      setupPolling();
-    }
+    // Start polling after initial fetch
+    const pollTimeout = setTimeout(() => {
+      if (status === "pending" || status === "idle") {
+        startPolling();
+      }
+    }, 1000);
 
     return () => {
-      cancelled = true;
-      if (timer) clearInterval(timer);
+      clearTimeout(pollTimeout);
+      if (pollingRef.current) {
+        clearInterval(pollingRef.current);
+        pollingRef.current = null;
+        isPollingRef.current = false;
+      }
     };
-  }, [projectId, fetchLatestSearch]);
+  }, [projectId]); // Only depend on projectId
 
   // Stop polling when status changes to completed
   useEffect(() => {
-    // This effect will run when status changes
-    // No need to do anything here as the cleanup in the main useEffect handles stopping
+    if (status === 'completed' || status === 'failed') {
+      if (pollingRef.current) {
+        clearInterval(pollingRef.current);
+        pollingRef.current = null;
+        isPollingRef.current = false;
+      }
+    }
   }, [status]);
 
   // Extract filters from API response
@@ -244,7 +298,7 @@ const CandidateList = () => {
         console.error('Failed to update shortlist count:', error);
       }
     }
-  }, [projectId, updateShortlistCount]);
+  }, [projectId]); // Remove updateShortlistCount from dependencies
 
   const headerText = useMemo(() => {
     if (loading) return "Loading candidates...";

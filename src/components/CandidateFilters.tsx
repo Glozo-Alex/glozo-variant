@@ -53,10 +53,7 @@ const CandidateFilters = ({ availableFilters, selectedFilters, onFiltersChange }
   const safeAvailableFilters = availableFilters || {};
   
   
-  // Ensure dropdown renders and add debug logging  
-  React.useEffect(() => {
-    console.log('🎛️ CandidateFilters: Component updated, isOpen:', isOpen, 'filters count:', Object.keys(safeAvailableFilters).length);
-  }, [isOpen, safeAvailableFilters]);
+  // Remove console logs to prevent unnecessary logging in production
 
   return (
     <div className="relative">
@@ -84,11 +81,7 @@ const CandidateFilters = ({ availableFilters, selectedFilters, onFiltersChange }
           variant="outline" 
           size="sm" 
           className="flex items-center gap-2"
-          onClick={() => {
-            console.log('🖱️ CandidateFilters: Button clicked, current isOpen:', isOpen);
-            console.log('🖱️ CandidateFilters: Available filters:', safeAvailableFilters);
-            setIsOpen(!isOpen);
-          }}
+          onClick={() => setIsOpen(!isOpen)}
         >
           <Filter className="h-4 w-4" />
           Filters
