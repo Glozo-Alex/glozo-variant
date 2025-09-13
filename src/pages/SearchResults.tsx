@@ -102,7 +102,7 @@ const SearchResults = () => {
   }
 
   return (
-    <div className="flex flex-1 flex-col h-full">
+    <div className="flex flex-1 flex-col">
       {/* Save Project Banner for temporary projects */}
       {project.isTemporary && (
         <div className="bg-muted/50 border-b border-border px-6 py-3 shrink-0">
@@ -122,8 +122,8 @@ const SearchResults = () => {
         </div>
       )}
       
-      <div className="flex flex-1 overflow-hidden">
-        <div className="flex-1 overflow-hidden">
+      <div className="flex flex-1 min-h-0">
+        <div className="flex-1 min-h-0">
           <CandidateList />
         </div>
         <RightSidebar />
