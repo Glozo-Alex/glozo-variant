@@ -101,7 +101,7 @@ const Projects = () => {
         await deleteProject(projectToDelete);
         toast({
           title: "Project Deleted",
-          description: "Project has been successfully deleted",
+          description: "Project and related data deleted. Candidates in CRM preserved.",
         });
       } catch (e) {
         toast({ title: "Delete failed", description: "Couldn't delete project", variant: "destructive" });
@@ -320,14 +320,25 @@ const Projects = () => {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Project?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. The project and all associated data will be permanently deleted.
+            <AlertDialogDescription className="space-y-3">
+              <p>
+                This action cannot be undone. The following data will be permanently deleted:
+              </p>
+              <ul className="list-disc list-inside space-y-1 text-sm">
+                <li>Project searches and results</li>
+                <li>Shortlist entries for this project</li>
+                <li>Email sequences and templates</li>
+                <li>Sequence recipients and email logs</li>
+              </ul>
+              <p className="text-sm font-medium text-foreground">
+                ✓ Candidates saved in your CRM will be preserved
+              </p>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-              Delete
+              Delete Project
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
