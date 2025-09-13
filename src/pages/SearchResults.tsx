@@ -152,9 +152,7 @@ const SearchResults = () => {
           )}
           
           {/* Candidate List - Scrollable */}
-          <div className="flex-1">
-            <CandidateList />
-          </div>
+          <CandidateList />
         </div>
         
         {/* Right Sidebar */}
