@@ -8,7 +8,10 @@ interface AuthContextType {
   session: Session | null;
   loading: boolean;
   signInWithGoogle: () => Promise<void>;
+  signInAsTestUser: () => void;
   signOut: () => Promise<void>;
+  isInIframe: boolean;
+  isDevelopment: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -30,6 +33,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  
+  // Check if running in iframe and development mode
+  const isInIframe = window.self !== window.top;
+  const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname.includes('lovable.app');
 
   useEffect(() => {
     console.log('Auth Debug - Setting up auth listener, current origin:', window.location.origin);
@@ -83,6 +90,40 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const signInAsTestUser = () => {
+    // Create a mock user for development/iframe testing
+    const mockUser = {
+      id: 'test-user-123',
+      email: 'test@example.com',
+      email_confirmed_at: new Date().toISOString(),
+      app_metadata: {},
+      aud: 'authenticated',
+      created_at: new Date().toISOString(),
+      user_metadata: {
+        name: 'Test User',
+        picture: 'https://via.placeholder.com/150',
+      },
+    } as User;
+
+    const mockSession = {
+      user: mockUser,
+      access_token: 'mock-access-token',
+      refresh_token: 'mock-refresh-token',
+      expires_in: 3600,
+      expires_at: Date.now() + 3600000,
+      token_type: 'bearer',
+    } as Session;
+
+    setUser(mockUser);
+    setSession(mockSession);
+    setLoading(false);
+    
+    toast({
+      title: "Test User Signed In",
+      description: "You are now signed in as a test user for development.",
+    });
+  };
+
   const signOut = async () => {
     try {
       const { error } = await supabase.auth.signOut();
@@ -112,7 +153,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     session,
     loading,
     signInWithGoogle,
+    signInAsTestUser,
     signOut,
+    isInIframe,
+    isDevelopment,
   };
 
   return (

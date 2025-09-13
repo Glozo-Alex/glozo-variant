@@ -6,7 +6,7 @@ import { Navigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 
 const Auth = () => {
-  const { user, loading, signInWithGoogle } = useAuth();
+  const { user, loading, signInWithGoogle, signInAsTestUser, isInIframe, isDevelopment } = useAuth();
 
   // Redirect authenticated users to dashboard
   if (user && !loading) {
@@ -56,6 +56,36 @@ const Auth = () => {
             </svg>
             Continue with Google
           </Button>
+          
+          {(isDevelopment || isInIframe) && (
+            <>
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t border-muted" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-card px-2 text-muted-foreground">
+                    Development Mode
+                  </span>
+                </div>
+              </div>
+              
+              <Button
+                onClick={signInAsTestUser}
+                variant="outline"
+                className="w-full h-12"
+                size="lg"
+              >
+                Sign in as Test User
+              </Button>
+              
+              <div className="text-center">
+                <p className="text-xs text-muted-foreground">
+                  {isInIframe ? "Quick login for iframe preview" : "Development testing only"}
+                </p>
+              </div>
+            </>
+          )}
           
           <div className="text-center">
             <p className="text-xs text-muted-foreground">
