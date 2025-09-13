@@ -73,6 +73,8 @@ const CandidateCard = ({
           description,
           skills,
           open_to_offers: openToOffers,
+          social: socialLinks,
+          ...fullCandidateData, // Include any additional data from the full candidate object
         };
         await addToShortlist(projectId, candidateId, candidateData);
         toast({

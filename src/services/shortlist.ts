@@ -24,6 +24,24 @@ export const addToShortlist = async (projectId: string, candidateId: string, can
     candidateDataKeys: Object.keys(candidateData || {})
   });
 
+  // Verify project exists and user has access (works for both temporary and permanent projects)
+  const { data: projectCheck, error: projectError } = await supabase
+    .from('projects')
+    .select('id, name')
+    .eq('id', projectId)
+    .eq('user_id', user.id)
+    .single();
+
+  if (projectError || !projectCheck) {
+    console.error('Project not found or access denied:', projectError);
+    throw new Error('Project not found or access denied');
+  }
+
+  console.log('Project verified:', { 
+    id: projectCheck.id, 
+    name: projectCheck.name
+  });
+
   // Normalize candidate snapshot to ensure match score is present
   const normalizedSnapshot = {
     ...candidateData,
@@ -67,7 +85,7 @@ export const addToShortlist = async (projectId: string, candidateId: string, can
       console.log('Successfully incremented shortlist count');
     }
 
-    // Background fetch of candidate details
+    // Background fetch of candidate details for both temporary and permanent projects
     const numericCandidateId = parseInt(candidateId, 10);
     if (Number.isFinite(numericCandidateId)) {
       console.log('Fetching candidate details in background for:', numericCandidateId);

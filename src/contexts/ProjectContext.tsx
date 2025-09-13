@@ -237,41 +237,52 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
     console.log('Converting temporary project:', { projectId, name, userId: user.id });
 
-    const { data: updatedProject, error } = await supabase
-      .from('projects')
-      .update({ 
-        name,
-        is_temporary: false,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', projectId)
-      .eq('user_id', user.id)
-      .select()
-      .single();
+    try {
+      // Convert the project itself
+      const { data: updatedProject, error } = await supabase
+        .from('projects')
+        .update({ 
+          name,
+          is_temporary: false,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', projectId)
+        .eq('user_id', user.id)
+        .select()
+        .single();
 
-    if (error) {
-      console.error('Failed to convert temporary project:', error);
-      throw new Error('Failed to save project');
+      if (error) {
+        console.error('Failed to convert temporary project:', error);
+        throw new Error('Failed to save project');
+      }
+
+      console.log('Project converted successfully:', updatedProject);
+
+      // The shortlist entries are already associated with the projectId,
+      // so they automatically become permanent when the project becomes permanent.
+      // No additional action needed for shortlist conversion.
+
+      // Reload projects to get updated state
+      await reloadProjects();
+      
+      // Return the converted project from database response
+      const convertedProject: Project = {
+        id: updatedProject.id,
+        name: updatedProject.name,
+        query: updatedProject.query,
+        createdAt: new Date(updatedProject.created_at),
+        updatedAt: new Date(updatedProject.updated_at),
+        shortlistCount: updatedProject.shortlist_count || 0,
+        isTemporary: false,
+      };
+      
+      console.log('Returning converted project:', convertedProject);
+      return convertedProject;
+      
+    } catch (error) {
+      console.error('Error in convertTemporaryToProject:', error);
+      throw error;
     }
-
-    console.log('Project converted successfully:', updatedProject);
-
-    // Reload projects to get updated state
-    await reloadProjects();
-    
-    // Return the converted project from database response
-    const convertedProject: Project = {
-      id: updatedProject.id,
-      name: updatedProject.name,
-      query: updatedProject.query,
-      createdAt: new Date(updatedProject.created_at),
-      updatedAt: new Date(updatedProject.updated_at),
-      shortlistCount: updatedProject.shortlist_count || 0,
-      isTemporary: false,
-    };
-    
-    console.log('Returning converted project:', convertedProject);
-    return convertedProject;
   };
 
   return (
