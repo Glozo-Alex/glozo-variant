@@ -235,7 +235,9 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
       throw new Error('User not authenticated');
     }
 
-    const { error } = await supabase
+    console.log('Converting temporary project:', { projectId, name, userId: user.id });
+
+    const { data: updatedProject, error } = await supabase
       .from('projects')
       .update({ 
         name,
@@ -243,22 +245,33 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
         updated_at: new Date().toISOString()
       })
       .eq('id', projectId)
-      .eq('user_id', user.id);
+      .eq('user_id', user.id)
+      .select()
+      .single();
 
     if (error) {
       console.error('Failed to convert temporary project:', error);
       throw new Error('Failed to save project');
     }
 
+    console.log('Project converted successfully:', updatedProject);
+
+    // Reload projects to get updated state
     await reloadProjects();
     
-    // Return the updated project
-    const updatedProject = projects.find(p => p.id === projectId);
-    if (!updatedProject) {
-      throw new Error('Project not found after conversion');
-    }
+    // Return the converted project from database response
+    const convertedProject: Project = {
+      id: updatedProject.id,
+      name: updatedProject.name,
+      query: updatedProject.query,
+      createdAt: new Date(updatedProject.created_at),
+      updatedAt: new Date(updatedProject.updated_at),
+      shortlistCount: updatedProject.shortlist_count || 0,
+      isTemporary: false,
+    };
     
-    return { ...updatedProject, name, isTemporary: false };
+    console.log('Returning converted project:', convertedProject);
+    return convertedProject;
   };
 
   return (
