@@ -91,6 +91,55 @@ const NewSearch = () => {
       addSkill(skillInput);
     }
   };
+
+  const exampleQueries = [
+    {
+      title: "Senior Frontend Developer",
+      query: "Senior frontend developer with React and TypeScript experience for fintech startup",
+      category: "Frontend"
+    },
+    {
+      title: "Full-Stack Engineer",
+      query: "Full-stack engineer, 3-5 years experience, Node.js and databases",
+      category: "Full-Stack"
+    },
+    {
+      title: "DevOps Engineer",
+      query: "DevOps engineer with AWS, Docker, and Kubernetes experience for scaling startup",
+      category: "DevOps"
+    },
+    {
+      title: "Backend Developer",
+      query: "Senior backend developer with Python, Django, and microservices architecture",
+      category: "Backend"
+    },
+    {
+      title: "Mobile Developer",
+      query: "React Native developer with 2+ years experience, iOS and Android publishing",
+      category: "Mobile"
+    },
+    {
+      title: "Data Scientist",
+      query: "Data scientist with machine learning, Python, and SQL for e-commerce analytics",
+      category: "Data"
+    }
+  ];
+
+  const handleExampleClick = (query: string) => {
+    setSearchQuery(query);
+    toast({
+      title: "Example applied",
+      description: "Search query has been populated with the example",
+    });
+    
+    // Focus the textarea after a short delay to show the populated content
+    setTimeout(() => {
+      const textarea = document.getElementById('search-query');
+      if (textarea) {
+        textarea.focus();
+      }
+    }, 100);
+  };
   return <div className="p-6 max-w-4xl mx-auto">
       {/* Header */}
       <div className="mb-8">
@@ -173,14 +222,35 @@ const NewSearch = () => {
           <Card className="glass-card">
             <CardHeader>
               <CardTitle className="text-sm font-medium">Example Queries</CardTitle>
+              <CardDescription className="text-xs">Click any example to use it as your search query</CardDescription>
             </CardHeader>
-            <CardContent className="text-sm space-y-2">
-              <p className="text-muted-foreground">
-                "Senior frontend developer with React and TypeScript experience for fintech startup"
-              </p>
-              <p className="text-muted-foreground">
-                "Full-stack engineer, 3-5 years experience, Node.js and databases"
-              </p>
+            <CardContent className="space-y-3">
+              <div className="grid gap-2">
+                {exampleQueries.map((example, index) => (
+                  <div
+                    key={index}
+                    onClick={() => handleExampleClick(example.query)}
+                    className="group relative cursor-pointer rounded-lg border border-input bg-background/50 p-3 transition-all duration-200 hover:border-primary/50 hover:bg-background hover:shadow-sm"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <Badge variant="secondary" className="text-xs px-2 py-0.5">
+                            {example.category}
+                          </Badge>
+                        </div>
+                        <h4 className="text-sm font-medium text-foreground mb-1 group-hover:text-primary transition-colors">
+                          {example.title}
+                        </h4>
+                        <p className="text-xs text-muted-foreground line-clamp-2">
+                          {example.query}
+                        </p>
+                      </div>
+                      <Plus className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+                    </div>
+                  </div>
+                ))}
+              </div>
             </CardContent>
           </Card>
         </div>
