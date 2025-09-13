@@ -20,19 +20,12 @@ const NewSearch = () => {
   const {
     toast
   } = useToast();
+  const [projectName, setProjectName] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const [skillInput, setSkillInput] = useState("");
   const [similarRoles, setSimilarRoles] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
-  const exampleQueries = [
-    "Senior frontend developer with React and TypeScript experience for fintech startup",
-    "Full-stack engineer, 3-5 years experience, Node.js and databases",
-    "DevOps engineer with AWS and Kubernetes experience",
-    "Senior Python developer with machine learning background",
-    "Mobile developer with React Native and Flutter experience"
-  ];
   const addSkill = (skill: string) => {
     const trimmedSkill = skill.trim();
     if (trimmedSkill && !selectedSkills.includes(trimmedSkill)) {
@@ -43,7 +36,15 @@ const NewSearch = () => {
   const removeSkill = (skill: string) => {
     setSelectedSkills(selectedSkills.filter(s => s !== skill));
   };
-  const handleStartSearch = async () => {
+  const handleCreateProject = async () => {
+    if (!projectName.trim()) {
+      toast({
+        title: "Project name required",
+        description: "Please enter a name for your project",
+        variant: "destructive"
+      });
+      return;
+    }
     if (!searchQuery.trim()) {
       toast({
         title: "Search query required",
@@ -57,9 +58,8 @@ const NewSearch = () => {
 
     setIsLoading(true);
     try {
-      // Create temporary project with auto-generated name
-      const temporaryName = `Search from ${new Date().toLocaleDateString()}`;
-      const project = await createProject(temporaryName, fullQuery, similarRoles, true);
+      // First create the project in Supabase
+      const project = await createProject(projectName, fullQuery, similarRoles);
       
       // Then perform the search
       const apiRes = await getCandidatesByChat({ 
@@ -70,25 +70,21 @@ const NewSearch = () => {
       const count = Array.isArray(apiRes) ? apiRes.length : Array.isArray(apiRes?.data) ? apiRes.data.length : undefined;
 
       toast({
-        title: "Search completed",
-        description: count !== undefined ? `Found ${count} candidates` : "Search results are ready"
+        title: "Search started",
+        description: count !== undefined ? `Found ${count} candidates for "${project.name}"` : `"${project.name}" is ready for candidate search`
       });
       navigate(`/project/${project.id}/results`);
     } catch (error: any) {
-      console.error("Search error:", error);
+      console.error("Project creation or search error:", error);
       toast({
         title: "Search failed",
-        description: error?.message ?? "Unable to perform candidate search",
+        description: error?.message ?? "Unable to create project and fetch candidates",
         variant: "destructive",
       });
     } finally {
       setIsLoading(false);
     }
   };
-  const handleExampleClick = (example: string) => {
-    setSearchQuery(example);
-  };
-
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && skillInput.trim()) {
       e.preventDefault();
@@ -99,7 +95,7 @@ const NewSearch = () => {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-foreground mb-2">New Search</h1>
-        <p className="text-muted-foreground">Start searching for candidates instantly</p>
+        <p className="text-muted-foreground">Create a new candidate search project</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -109,13 +105,19 @@ const NewSearch = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Search className="h-5 w-5 text-primary" />
-                Search Query
+                Project Details
               </CardTitle>
               <CardDescription>
-                Describe the candidates you're looking for
+                Configure your candidate search parameters
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
+              {/* Project Name */}
+              <div className="space-y-2">
+                <Label htmlFor="project-name">Project Name</Label>
+                <Input id="project-name" placeholder="e.g., Senior React Developer Search" value={projectName} onChange={e => setProjectName(e.target.value)} />
+              </div>
+
               {/* Search Query */}
               <div className="space-y-2">
                 <Label htmlFor="search-query">Search Query</Label>
@@ -137,9 +139,9 @@ const NewSearch = () => {
               
               {/* Action Buttons */}
               <div className="flex gap-3 pt-4">
-                <Button onClick={handleStartSearch} className="flex-1" size="lg" disabled={isLoading}>
+                <Button onClick={handleCreateProject} className="flex-1" size="lg" disabled={isLoading}>
                   <Search className="h-4 w-4 mr-2" />
-                  {isLoading ? "Searching..." : "Start Search"}
+                  {isLoading ? "Searching..." : "Create Project & Search"}
                 </Button>
                 <Button variant="outline" onClick={() => navigate('/')}>
                   Cancel
@@ -173,16 +175,12 @@ const NewSearch = () => {
               <CardTitle className="text-sm font-medium">Example Queries</CardTitle>
             </CardHeader>
             <CardContent className="text-sm space-y-2">
-              {exampleQueries.map((example, index) => (
-                <Button
-                  key={index}
-                  variant="ghost"
-                  className="h-auto p-2 text-left justify-start text-muted-foreground hover:text-foreground text-wrap"
-                  onClick={() => handleExampleClick(example)}
-                >
-                  "{example}"
-                </Button>
-              ))}
+              <p className="text-muted-foreground">
+                "Senior frontend developer with React and TypeScript experience for fintech startup"
+              </p>
+              <p className="text-muted-foreground">
+                "Full-stack engineer, 3-5 years experience, Node.js and databases"
+              </p>
             </CardContent>
           </Card>
         </div>

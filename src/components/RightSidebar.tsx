@@ -36,7 +36,6 @@ const RightSidebar = () => {
   };
 
   useEffect(() => {
-    // Always scroll to bottom when messages change, including initial load
     scrollToBottom();
   }, [messages]);
 
@@ -88,10 +87,10 @@ const RightSidebar = () => {
   };
 
   return (
-    <aside className="w-96 glass-sidebar h-full flex flex-col animate-slide-in-right shrink-0">
+    <aside className="w-96 glass-sidebar h-full flex flex-col animate-slide-in-right">
 
       {/* Conversation */}
-      <div className="flex-1 p-4 overflow-auto min-h-0">
+      <div className="flex-1 p-4 overflow-auto">
         <div className="space-y-1">
           {loading ? (
             <div className="text-center text-muted-foreground py-8">Loading chat...</div>
@@ -116,7 +115,7 @@ const RightSidebar = () => {
       </div>
 
       {/* Controls */}
-      <div className="p-4 space-y-3 shrink-0 border-t border-border/50">
+      <div className="p-4 space-y-3">
         <div className="flex items-center justify-center">
           <Button variant="outline" size="sm" className="flex items-center gap-2 hover-scale bg-card-hover border-card-border text-card-foreground hover:bg-card-hover/70"><RotateCcw className="h-4 w-4" /> Reset</Button>
         </div>

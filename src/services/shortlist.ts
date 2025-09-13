@@ -13,34 +13,8 @@ export interface ShortlistCandidate {
 export const addToShortlist = async (projectId: string, candidateId: string, candidateData: any) => {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
-    console.error('User not authenticated in addToShortlist');
     throw new Error('User not authenticated');
   }
-
-  console.log('Adding to shortlist:', { 
-    projectId, 
-    candidateId, 
-    userId: user.id,
-    candidateDataKeys: Object.keys(candidateData || {})
-  });
-
-  // Verify project exists and user has access (works for both temporary and permanent projects)
-  const { data: projectCheck, error: projectError } = await supabase
-    .from('projects')
-    .select('id, name')
-    .eq('id', projectId)
-    .eq('user_id', user.id)
-    .single();
-
-  if (projectError || !projectCheck) {
-    console.error('Project not found or access denied:', projectError);
-    throw new Error('Project not found or access denied');
-  }
-
-  console.log('Project verified:', { 
-    id: projectCheck.id, 
-    name: projectCheck.name
-  });
 
   // Normalize candidate snapshot to ensure match score is present
   const normalizedSnapshot = {
@@ -52,56 +26,46 @@ export const addToShortlist = async (projectId: string, candidateId: string, can
     ),
   };
 
-  console.log('Normalized snapshot match_percentage:', normalizedSnapshot.match_percentage);
-
-  try {
-    // Insert into project_shortlist
-    const { error: insertError } = await supabase
-      .from('project_shortlist')
-      .insert({
-        project_id: projectId,
-        candidate_id: candidateId,
-        candidate_snapshot: normalizedSnapshot,
-        user_id: user.id
-      });
-
-    if (insertError) {
-      console.error('Failed to insert into shortlist:', insertError);
-      throw new Error(`Failed to add to shortlist: ${insertError.message}`);
-    }
-
-    console.log('Successfully inserted into shortlist');
-
-    // Use database function to increment shortlist count atomically
-    const { error: countError } = await supabase.rpc('increment_shortlist_count', {
-      project_id_param: projectId
+  // Insert into project_shortlist
+  const { error: insertError } = await supabase
+    .from('project_shortlist')
+    .insert({
+      project_id: projectId,
+      candidate_id: candidateId,
+      candidate_snapshot: normalizedSnapshot,
+      user_id: user.id
     });
 
-    if (countError) {
-      console.error('Failed to increment shortlist count:', countError);
-      // Don't throw here as the main operation succeeded
-      console.warn('Shortlist entry created but count update failed');
-    } else {
-      console.log('Successfully incremented shortlist count');
-    }
+  if (insertError) {
+    throw new Error(`Failed to add to shortlist: ${insertError.message}`);
+  }
 
-    // Background fetch of candidate details for both temporary and permanent projects
-    const numericCandidateId = parseInt(candidateId, 10);
-    if (Number.isFinite(numericCandidateId)) {
-      console.log('Fetching candidate details in background for:', numericCandidateId);
-      getCandidateDetails({
-        candidateIds: [numericCandidateId],
-        projectId
-      }).catch(error => {
-        console.error('Failed to fetch candidate details in background:', error);
-      });
-    } else {
-      console.warn('Invalid candidate ID for detail fetch:', candidateId);
-    }
+  // First get current count, then update
+  const { data: projectData } = await supabase
+    .from('projects')
+    .select('shortlist_count')
+    .eq('id', projectId)
+    .single();
 
-  } catch (error) {
-    console.error('Error in addToShortlist:', error);
-    throw error;
+  const currentCount = projectData?.shortlist_count || 0;
+  const { error: updateError } = await supabase
+    .from('projects')
+    .update({ shortlist_count: currentCount + 1 })
+    .eq('id', projectId);
+
+  if (updateError) {
+    console.error('Failed to update shortlist count:', updateError);
+  }
+
+  // Background fetch of candidate details
+  const numericCandidateId = parseInt(candidateId, 10);
+  if (Number.isFinite(numericCandidateId)) {
+    getCandidateDetails({
+      candidateIds: [numericCandidateId],
+      projectId
+    }).catch(error => {
+      console.error('Failed to fetch candidate details in background:', error);
+    });
   }
 };
 
@@ -109,46 +73,38 @@ export const addToShortlist = async (projectId: string, candidateId: string, can
 export const removeFromShortlist = async (projectId: string, candidateId: string) => {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
-    console.error('User not authenticated in removeFromShortlist');
     throw new Error('User not authenticated');
   }
 
-  console.log('Removing from shortlist:', { projectId, candidateId, userId: user.id });
-
-  try {
-    // Remove from project_shortlist
-    const { error: deleteError } = await supabase
-      .from('project_shortlist')
-      .delete()
-      .match({
-        project_id: projectId,
-        candidate_id: candidateId,
-        user_id: user.id
-      });
-
-    if (deleteError) {
-      console.error('Failed to delete from shortlist:', deleteError);
-      throw new Error(`Failed to remove from shortlist: ${deleteError.message}`);
-    }
-
-    console.log('Successfully removed from shortlist');
-
-    // Use database function to decrement shortlist count atomically
-    const { error: countError } = await supabase.rpc('decrement_shortlist_count', {
-      project_id_param: projectId
+  // Remove from project_shortlist
+  const { error: deleteError } = await supabase
+    .from('project_shortlist')
+    .delete()
+    .match({
+      project_id: projectId,
+      candidate_id: candidateId,
+      user_id: user.id
     });
 
-    if (countError) {
-      console.error('Failed to decrement shortlist count:', countError);
-      // Don't throw here as the main operation succeeded
-      console.warn('Shortlist entry removed but count update failed');
-    } else {
-      console.log('Successfully decremented shortlist count');
-    }
+  if (deleteError) {
+    throw new Error(`Failed to remove from shortlist: ${deleteError.message}`);
+  }
 
-  } catch (error) {
-    console.error('Error in removeFromShortlist:', error);
-    throw error;
+  // First get current count, then update
+  const { data: projectData } = await supabase
+    .from('projects')
+    .select('shortlist_count')
+    .eq('id', projectId)
+    .single();
+
+  const currentCount = projectData?.shortlist_count || 0;
+  const { error: updateError } = await supabase
+    .from('projects')
+    .update({ shortlist_count: Math.max(currentCount - 1, 0) })
+    .eq('id', projectId);
+
+  if (updateError) {
+    console.error('Failed to update shortlist count:', updateError);
   }
 };
 

@@ -16,7 +16,7 @@ interface CandidateFiltersProps {
   onFiltersChange: (filters: Record<string, string[]>) => void;
 }
 
-const CandidateFilters = React.memo(({ availableFilters, selectedFilters, onFiltersChange }: CandidateFiltersProps) => {
+const CandidateFilters = ({ availableFilters, selectedFilters, onFiltersChange }: CandidateFiltersProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleFilterToggle = (category: string, value: string, checked: boolean) => {
@@ -51,6 +51,12 @@ const CandidateFilters = React.memo(({ availableFilters, selectedFilters, onFilt
 
   // Defensive check to prevent crashes
   const safeAvailableFilters = availableFilters || {};
+  
+  
+  // Ensure dropdown renders and add debug logging  
+  React.useEffect(() => {
+    console.log('🎛️ CandidateFilters: Component updated, isOpen:', isOpen, 'filters count:', Object.keys(safeAvailableFilters).length);
+  }, [isOpen, safeAvailableFilters]);
 
   return (
     <div className="relative">
@@ -78,7 +84,11 @@ const CandidateFilters = React.memo(({ availableFilters, selectedFilters, onFilt
           variant="outline" 
           size="sm" 
           className="flex items-center gap-2"
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={() => {
+            console.log('🖱️ CandidateFilters: Button clicked, current isOpen:', isOpen);
+            console.log('🖱️ CandidateFilters: Available filters:', safeAvailableFilters);
+            setIsOpen(!isOpen);
+          }}
         >
           <Filter className="h-4 w-4" />
           Filters
@@ -171,8 +181,6 @@ const CandidateFilters = React.memo(({ availableFilters, selectedFilters, onFilt
       )}
     </div>
   );
-});
-
-CandidateFilters.displayName = 'CandidateFilters';
+};
 
 export default CandidateFilters;
