@@ -2,17 +2,16 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Project, ProjectContextType } from '@/types/project';
 import { supabase } from '@/integrations/supabase/client';
 import { getCandidatesByChat } from '@/services/candidates';
-import { useAuth } from '@/contexts/AuthContext';
 
 const ProjectContext = createContext<ProjectContextType | undefined>(undefined);
 
 export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [activeProject, setActiveProjectState] = useState<Project | null>(null);
-  const { user } = useAuth();
 
   // Reload projects from Supabase
   const reloadProjects = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       setProjects([]);
       setActiveProjectState(null);
@@ -56,10 +55,10 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   };
 
-  // Load from Supabase on mount and when user changes
+  // Load from Supabase on mount
   useEffect(() => {
     void reloadProjects();
-  }, [user]);
+  }, []);
 
 
   useEffect(() => {
@@ -70,8 +69,9 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   }, [activeProject]);
 
-  const createProject = async (name: string, query: string, similarRoles?: boolean, isTemporary?: boolean): Promise<Project> => {
-    // Use user from auth context
+  const createProject = async (name: string, query: string, similarRoles?: boolean): Promise<Project> => {
+    // Get current user
+    const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       throw new Error('User not authenticated');
     }
@@ -83,7 +83,6 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
         name,
         query,
         similar_roles: similarRoles || false,
-        is_temporary: isTemporary || false,
         user_id: user.id
       })
       .select()
@@ -107,6 +106,7 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setProjects(prev => [...prev, newProject]);
     setActiveProjectState(newProject);
 
+
     return newProject;
   };
 
@@ -117,6 +117,7 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const deleteProject = async (projectId: string) => {
     try {
       // Delete all related data first
+      const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('User not authenticated');
 
       // Delete candidate details for this project
@@ -180,6 +181,7 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
   };
 
   const updateProject = async (projectId: string, updates: Partial<Pick<Project, 'name' | 'query'>>) => {
+    const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       throw new Error('User not authenticated');
     }

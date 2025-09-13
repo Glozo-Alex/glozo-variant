@@ -20,6 +20,7 @@ const NewSearch = () => {
   const {
     toast
   } = useToast();
+  const [projectName, setProjectName] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const [skillInput, setSkillInput] = useState("");
@@ -35,22 +36,15 @@ const NewSearch = () => {
   const removeSkill = (skill: string) => {
     setSelectedSkills(selectedSkills.filter(s => s !== skill));
   };
-  const generateTemporaryProjectName = (searchQuery: string): string => {
-    const date = new Date();
-    const dateStr = date.toLocaleDateString('en-GB', { 
-      day: '2-digit', 
-      month: '2-digit', 
-      year: 'numeric' 
-    }).replace(/\//g, '.');
-    
-    // Extract first few words from search query for context
-    const words = searchQuery.trim().split(' ').slice(0, 3).join(' ');
-    const truncatedQuery = words.length > 30 ? words.substring(0, 30) + '...' : words;
-    
-    return `Search ${dateStr} - ${truncatedQuery}`;
-  };
-
   const handleCreateProject = async () => {
+    if (!projectName.trim()) {
+      toast({
+        title: "Project name required",
+        description: "Please enter a name for your project",
+        variant: "destructive"
+      });
+      return;
+    }
     if (!searchQuery.trim()) {
       toast({
         title: "Search query required",
@@ -61,12 +55,11 @@ const NewSearch = () => {
     }
 
     const fullQuery = selectedSkills.length > 0 ? `${searchQuery} Skills: ${selectedSkills.join(", ")}` : searchQuery;
-    const temporaryProjectName = generateTemporaryProjectName(searchQuery);
 
     setIsLoading(true);
     try {
-      // Create temporary project in Supabase
-      const project = await createProject(temporaryProjectName, fullQuery, similarRoles, true);
+      // First create the project in Supabase
+      const project = await createProject(projectName, fullQuery, similarRoles);
       
       // Then perform the search
       const apiRes = await getCandidatesByChat({ 
@@ -78,7 +71,7 @@ const NewSearch = () => {
 
       toast({
         title: "Search started",
-        description: count !== undefined ? `Found ${count} candidates` : "Search is ready for candidate matching"
+        description: count !== undefined ? `Found ${count} candidates for "${project.name}"` : `"${project.name}" is ready for candidate search`
       });
       navigate(`/project/${project.id}/results`);
     } catch (error: any) {
@@ -97,55 +90,6 @@ const NewSearch = () => {
       e.preventDefault();
       addSkill(skillInput);
     }
-  };
-
-  const exampleQueries = [
-    {
-      title: "Senior Frontend Developer",
-      query: "Senior frontend developer with React and TypeScript experience for fintech startup",
-      category: "Frontend"
-    },
-    {
-      title: "Full-Stack Engineer",
-      query: "Full-stack engineer, 3-5 years experience, Node.js and databases",
-      category: "Full-Stack"
-    },
-    {
-      title: "DevOps Engineer",
-      query: "DevOps engineer with AWS, Docker, and Kubernetes experience for scaling startup",
-      category: "DevOps"
-    },
-    {
-      title: "Backend Developer",
-      query: "Senior backend developer with Python, Django, and microservices architecture",
-      category: "Backend"
-    },
-    {
-      title: "Mobile Developer",
-      query: "React Native developer with 2+ years experience, iOS and Android publishing",
-      category: "Mobile"
-    },
-    {
-      title: "Data Scientist",
-      query: "Data scientist with machine learning, Python, and SQL for e-commerce analytics",
-      category: "Data"
-    }
-  ];
-
-  const handleExampleClick = (query: string) => {
-    setSearchQuery(query);
-    toast({
-      title: "Example applied",
-      description: "Search query has been populated with the example",
-    });
-    
-    // Focus the textarea after a short delay to show the populated content
-    setTimeout(() => {
-      const textarea = document.getElementById('search-query');
-      if (textarea) {
-        textarea.focus();
-      }
-    }, 100);
   };
   return <div className="p-6 max-w-4xl mx-auto">
       {/* Header */}
@@ -168,6 +112,11 @@ const NewSearch = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
+              {/* Project Name */}
+              <div className="space-y-2">
+                <Label htmlFor="project-name">Project Name</Label>
+                <Input id="project-name" placeholder="e.g., Senior React Developer Search" value={projectName} onChange={e => setProjectName(e.target.value)} />
+              </div>
 
               {/* Search Query */}
               <div className="space-y-2">
@@ -224,35 +173,14 @@ const NewSearch = () => {
           <Card className="glass-card">
             <CardHeader>
               <CardTitle className="text-sm font-medium">Example Queries</CardTitle>
-              <CardDescription className="text-xs">Click any example to use it as your search query</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="grid gap-2">
-                {exampleQueries.map((example, index) => (
-                  <div
-                    key={index}
-                    onClick={() => handleExampleClick(example.query)}
-                    className="group relative cursor-pointer rounded-lg border border-input bg-background/50 p-3 transition-all duration-200 hover:border-primary/50 hover:bg-background hover:shadow-sm"
-                  >
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <Badge variant="secondary" className="text-xs px-2 py-0.5">
-                            {example.category}
-                          </Badge>
-                        </div>
-                        <h4 className="text-sm font-medium text-foreground mb-1 group-hover:text-primary transition-colors">
-                          {example.title}
-                        </h4>
-                        <p className="text-xs text-muted-foreground line-clamp-2">
-                          {example.query}
-                        </p>
-                      </div>
-                      <Plus className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
-                    </div>
-                  </div>
-                ))}
-              </div>
+            <CardContent className="text-sm space-y-2">
+              <p className="text-muted-foreground">
+                "Senior frontend developer with React and TypeScript experience for fintech startup"
+              </p>
+              <p className="text-muted-foreground">
+                "Full-stack engineer, 3-5 years experience, Node.js and databases"
+              </p>
             </CardContent>
           </Card>
         </div>
