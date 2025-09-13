@@ -128,11 +128,11 @@ const SearchResults = () => {
 
   return (
     <div className="flex flex-1 flex-col h-full">
-      {/* Main Content Area - Flex container */}
+      {/* Upper Section - Main Content Area */}
       <div className="flex flex-1">
-        {/* Left Side - Candidate List with Banner and Pagination */}
+        {/* Central Area - Banner and Candidate List */}
         <div className="flex-1 flex flex-col">
-          {/* Save Project Banner for temporary projects - Only in left section */}
+          {/* Save Project Banner for temporary projects */}
           {project.isTemporary && (
             <div className="bg-muted/50 border-b border-border px-6 py-3 shrink-0">
               <div className="flex items-center justify-between">
@@ -152,14 +152,27 @@ const SearchResults = () => {
           )}
           
           {/* Candidate List - Scrollable */}
-          <CandidateList />
-          
-          {/* Pagination Bar - Fixed at bottom of left section */}
-          <PaginationBar />
+          <div className="flex-1">
+            <CandidateList />
+          </div>
         </div>
         
         {/* Right Sidebar */}
         <RightSidebar />
+      </div>
+      
+      {/* Lower Section - Fixed Pagination */}
+      <div className="flex shrink-0">
+        {/* Space for Sidebar - responsive width */}
+        <div className="w-20 lg:w-64"></div>
+        
+        {/* Pagination Bar - Central area only */}
+        <div className="flex-1">
+          <PaginationBar />
+        </div>
+        
+        {/* Space for Right Sidebar */}
+        <div className="w-96"></div>
       </div>
     </div>
   );
