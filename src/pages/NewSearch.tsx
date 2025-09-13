@@ -20,7 +20,6 @@ const NewSearch = () => {
   const {
     toast
   } = useToast();
-  const [projectName, setProjectName] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const [skillInput, setSkillInput] = useState("");
@@ -36,15 +35,7 @@ const NewSearch = () => {
   const removeSkill = (skill: string) => {
     setSelectedSkills(selectedSkills.filter(s => s !== skill));
   };
-  const handleCreateProject = async () => {
-    if (!projectName.trim()) {
-      toast({
-        title: "Project name required",
-        description: "Please enter a name for your project",
-        variant: "destructive"
-      });
-      return;
-    }
+  const handleStartSearch = async () => {
     if (!searchQuery.trim()) {
       toast({
         title: "Search query required",
@@ -58,8 +49,9 @@ const NewSearch = () => {
 
     setIsLoading(true);
     try {
-      // First create the project in Supabase
-      const project = await createProject(projectName, fullQuery, similarRoles);
+      // Create temporary project with auto-generated name
+      const temporaryName = `Search from ${new Date().toLocaleDateString()}`;
+      const project = await createProject(temporaryName, fullQuery, similarRoles, true);
       
       // Then perform the search
       const apiRes = await getCandidatesByChat({ 
@@ -70,15 +62,15 @@ const NewSearch = () => {
       const count = Array.isArray(apiRes) ? apiRes.length : Array.isArray(apiRes?.data) ? apiRes.data.length : undefined;
 
       toast({
-        title: "Search started",
-        description: count !== undefined ? `Found ${count} candidates for "${project.name}"` : `"${project.name}" is ready for candidate search`
+        title: "Search completed",
+        description: count !== undefined ? `Found ${count} candidates` : "Search results are ready"
       });
       navigate(`/project/${project.id}/results`);
     } catch (error: any) {
-      console.error("Project creation or search error:", error);
+      console.error("Search error:", error);
       toast({
         title: "Search failed",
-        description: error?.message ?? "Unable to create project and fetch candidates",
+        description: error?.message ?? "Unable to perform candidate search",
         variant: "destructive",
       });
     } finally {
@@ -95,7 +87,7 @@ const NewSearch = () => {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-foreground mb-2">New Search</h1>
-        <p className="text-muted-foreground">Create a new candidate search project</p>
+        <p className="text-muted-foreground">Start searching for candidates instantly</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -105,19 +97,13 @@ const NewSearch = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Search className="h-5 w-5 text-primary" />
-                Project Details
+                Search Query
               </CardTitle>
               <CardDescription>
-                Configure your candidate search parameters
+                Describe the candidates you're looking for
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              {/* Project Name */}
-              <div className="space-y-2">
-                <Label htmlFor="project-name">Project Name</Label>
-                <Input id="project-name" placeholder="e.g., Senior React Developer Search" value={projectName} onChange={e => setProjectName(e.target.value)} />
-              </div>
-
               {/* Search Query */}
               <div className="space-y-2">
                 <Label htmlFor="search-query">Search Query</Label>
@@ -139,9 +125,9 @@ const NewSearch = () => {
               
               {/* Action Buttons */}
               <div className="flex gap-3 pt-4">
-                <Button onClick={handleCreateProject} className="flex-1" size="lg" disabled={isLoading}>
+                <Button onClick={handleStartSearch} className="flex-1" size="lg" disabled={isLoading}>
                   <Search className="h-4 w-4 mr-2" />
-                  {isLoading ? "Searching..." : "Create Project & Search"}
+                  {isLoading ? "Searching..." : "Start Search"}
                 </Button>
                 <Button variant="outline" onClick={() => navigate('/')}>
                   Cancel

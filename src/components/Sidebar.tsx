@@ -86,8 +86,8 @@ const Sidebar = () => {
             )}
           </NavLink>
 
-          {/* Current Project section - appears right after New Search */}
-          {activeProject && !collapsed && (
+          {/* Current Project section - appears right after New Search, only for non-temporary projects */}
+          {activeProject && !activeProject.isTemporary && !collapsed && (
             <div className="space-y-1 mt-4">
               <div className="text-xs font-medium text-sidebar-text uppercase tracking-wider mb-2 px-3">
                 Current Project

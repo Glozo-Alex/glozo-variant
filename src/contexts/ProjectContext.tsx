@@ -29,14 +29,17 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
       return;
     }
 
-    const mapped = (supabaseProjects || []).map(p => ({
-      id: p.id,
-      name: p.name,
-      query: p.query,
-      createdAt: new Date(p.created_at),
-      updatedAt: new Date(p.updated_at),
-      shortlistCount: p.shortlist_count || 0,
-    }));
+    const mapped = (supabaseProjects || [])
+      .filter(p => !(p as any).is_temporary) // Filter out temporary projects
+      .map(p => ({
+        id: p.id,
+        name: p.name,
+        query: p.query,
+        createdAt: new Date(p.created_at),
+        updatedAt: new Date(p.updated_at),
+        shortlistCount: p.shortlist_count || 0,
+        isTemporary: (p as any).is_temporary || false,
+      }));
 
     setProjects(mapped);
 
@@ -69,7 +72,7 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   }, [activeProject]);
 
-  const createProject = async (name: string, query: string, similarRoles?: boolean): Promise<Project> => {
+  const createProject = async (name: string, query: string, similarRoles?: boolean, isTemporary?: boolean): Promise<Project> => {
     // Get current user
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
@@ -83,6 +86,7 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
         name,
         query,
         similar_roles: similarRoles || false,
+        is_temporary: isTemporary || false,
         user_id: user.id
       })
       .select()
@@ -101,6 +105,7 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
       createdAt: new Date(supabaseProject.created_at),
       updatedAt: new Date(supabaseProject.updated_at),
       shortlistCount: supabaseProject.shortlist_count || 0,
+      isTemporary: (supabaseProject as any).is_temporary || false,
     };
     
     setProjects(prev => [...prev, newProject]);
@@ -224,6 +229,38 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   };
 
+  const convertTemporaryToProject = async (projectId: string, name: string, description?: string): Promise<Project> => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      throw new Error('User not authenticated');
+    }
+
+    const { error } = await supabase
+      .from('projects')
+      .update({ 
+        name,
+        is_temporary: false,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', projectId)
+      .eq('user_id', user.id);
+
+    if (error) {
+      console.error('Failed to convert temporary project:', error);
+      throw new Error('Failed to save project');
+    }
+
+    await reloadProjects();
+    
+    // Return the updated project
+    const updatedProject = projects.find(p => p.id === projectId);
+    if (!updatedProject) {
+      throw new Error('Project not found after conversion');
+    }
+    
+    return { ...updatedProject, name, isTemporary: false };
+  };
+
   return (
     <ProjectContext.Provider value={{
       projects,
@@ -234,6 +271,7 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
       updateProject,
       duplicateProject,
       updateShortlistCount,
+      convertTemporaryToProject,
     }}>
       {children}
     </ProjectContext.Provider>
