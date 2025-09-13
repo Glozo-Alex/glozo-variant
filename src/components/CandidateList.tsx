@@ -1,9 +1,7 @@
 import { useEffect, useMemo, useState, useCallback, useRef } from "react";
 import { useParams } from "react-router-dom";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import CandidateCard from "./CandidateCard";
 import CandidateFilters from "./CandidateFilters";
-import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { getShortlistStatus } from "@/services/shortlist";
 import { useProject } from "@/contexts/ProjectContext";
@@ -259,10 +257,20 @@ const CandidateList = () => {
       : `Found Candidates (${totalCount})`;
   }, [loading, error, status, candidateCount, filteredCandidates.length]);
 
+  // Scroll to top ref
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll to top when candidates load
+  useEffect(() => {
+    if (filteredCandidates.length > 0 && contentRef.current) {
+      contentRef.current.scrollTo(0, 0);
+    }
+  }, [filteredCandidates.length]);
+
   return (
-    <main className="flex-1 glass-surface flex flex-col animate-fade-in min-h-0">
-      {/* Header */}
-      <div className="h-14 px-6 flex items-center justify-between">
+    <main className="flex flex-col h-full glass-surface animate-fade-in">
+      {/* Header - Fixed */}
+      <div className="h-14 px-6 flex items-center justify-between shrink-0 bg-background/80 backdrop-blur border-b border-border/50">
         <h1 className="text-lg font-semibold text-card-foreground">{headerText}</h1>
         <CandidateFilters
           availableFilters={availableFilters}
@@ -271,8 +279,8 @@ const CandidateList = () => {
         />
       </div>
 
-      {/* Content */}
-      <div className="flex-1 overflow-auto p-6 space-y-2">
+      {/* Content - Scrollable */}
+      <div ref={contentRef} className="flex-1 overflow-auto p-6 space-y-2">
         {error && (
           <div className="text-destructive">{error}</div>
         )}
@@ -317,29 +325,6 @@ const CandidateList = () => {
             />
           );
         })}
-      </div>
-
-      {/* Footer */}
-      <div className="h-14 px-6 glass-surface flex items-center justify-between">
-        <span className="text-sm text-muted-foreground">
-          {candidateCount > 0 ? (
-            filteredCandidates.length !== candidateCount 
-              ? `${filteredCandidates.length} of ${candidateCount} candidates`
-              : `${candidateCount} candidates`
-          ) : ""}
-        </span>
-
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="hover-scale border-card-border bg-card-hover text-card-foreground hover:bg-card-hover/70"><ChevronLeft className="h-4 w-4" /></Button>
-          <Button variant="outline" size="sm" className="bg-primary text-primary-foreground hover-scale border-primary/50">1</Button>
-          <Button variant="outline" size="sm" className="hover-scale border-card-border bg-card-hover text-card-foreground hover:bg-card-hover/70">2</Button>
-          <Button variant="outline" size="sm" className="hover-scale border-card-border bg-card-hover text-card-foreground hover:bg-card-hover/70">3</Button>
-          <span className="text-muted-foreground">...</span>
-          <Button variant="outline" size="sm" className="hover-scale border-card-border bg-card-hover text-card-foreground hover:bg-card-hover/70">24</Button>
-          <Button variant="outline" size="sm" className="hover-scale border-card-border bg-card-hover text-card-foreground hover:bg-card-hover/70"><ChevronRight className="h-4 w-4" /></Button>
-        </div>
-
-        <div className="text-sm text-muted-foreground">20 per page</div>
       </div>
     </main>
   );

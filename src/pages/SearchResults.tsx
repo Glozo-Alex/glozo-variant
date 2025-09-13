@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useProject } from "@/contexts/ProjectContext";
 import { Button } from "@/components/ui/button";
-import { Save } from "lucide-react";
+import { Save, ChevronLeft, ChevronRight } from "lucide-react";
 import CandidateList from "@/components/CandidateList";
 import RightSidebar from "@/components/RightSidebar";
 import SaveProjectDialog from "@/components/SaveProjectDialog";
@@ -101,9 +101,34 @@ const SearchResults = () => {
     );
   }
 
+  // Pagination component
+  const PaginationBar = () => (
+    <div className="h-14 px-6 glass-surface flex items-center justify-between shrink-0 border-t border-border/50 bg-background/80 backdrop-blur">
+      <span className="text-sm text-muted-foreground">
+        Showing 1-20 of 247 candidates
+      </span>
+
+      <div className="flex items-center gap-2">
+        <Button variant="outline" size="sm" className="hover-scale border-card-border bg-card-hover text-card-foreground hover:bg-card-hover/70">
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+        <Button variant="outline" size="sm" className="bg-primary text-primary-foreground hover-scale border-primary/50">1</Button>
+        <Button variant="outline" size="sm" className="hover-scale border-card-border bg-card-hover text-card-foreground hover:bg-card-hover/70">2</Button>
+        <Button variant="outline" size="sm" className="hover-scale border-card-border bg-card-hover text-card-foreground hover:bg-card-hover/70">3</Button>
+        <span className="text-muted-foreground">...</span>
+        <Button variant="outline" size="sm" className="hover-scale border-card-border bg-card-hover text-card-foreground hover:bg-card-hover/70">13</Button>
+        <Button variant="outline" size="sm" className="hover-scale border-card-border bg-card-hover text-card-foreground hover:bg-card-hover/70">
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+      </div>
+
+      <div className="text-sm text-muted-foreground">20 per page</div>
+    </div>
+  );
+
   return (
     <div className="flex flex-1 flex-col h-full">
-      {/* Save Project Banner for temporary projects */}
+      {/* Save Project Banner for temporary projects - Fixed */}
       {project.isTemporary && (
         <div className="bg-muted/50 border-b border-border px-6 py-3 shrink-0">
           <div className="flex items-center justify-between">
@@ -122,10 +147,17 @@ const SearchResults = () => {
         </div>
       )}
       
+      {/* Main Content Area - Flex container */}
       <div className="flex flex-1 min-h-0">
-        <div className="flex-1 min-h-0">
-          <CandidateList />
+        {/* Left Side - Candidate List + Pagination */}
+        <div className="flex flex-1 flex-col min-h-0">
+          <div className="flex-1 min-h-0">
+            <CandidateList />
+          </div>
+          <PaginationBar />
         </div>
+        
+        {/* Right Sidebar */}
         <RightSidebar />
       </div>
     </div>
