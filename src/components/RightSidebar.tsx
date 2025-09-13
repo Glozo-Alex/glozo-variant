@@ -36,10 +36,8 @@ const RightSidebar = () => {
   };
 
   useEffect(() => {
-    // Only scroll to bottom when new messages are added, not on initial load
-    if (messages.length > 0) {
-      scrollToBottom();
-    }
+    // Always scroll to bottom when messages change, including initial load
+    scrollToBottom();
   }, [messages]);
 
   const handleSendMessage = async () => {
