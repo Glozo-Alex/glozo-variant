@@ -148,18 +148,18 @@ const SearchResults = () => {
       )}
       
       {/* Main Content Area - Flex container */}
-      <div className="flex flex-1">
-        {/* Left Side - Candidate List + Pagination */}
-        <div className="flex flex-1 flex-col">
-          <div className="flex-1 overflow-hidden">
-            <CandidateList />
-          </div>
-          <PaginationBar />
+      <div className="flex flex-1 overflow-hidden">
+        {/* Left Side - Candidate List */}
+        <div className="flex-1 overflow-hidden">
+          <CandidateList />
         </div>
         
         {/* Right Sidebar */}
         <RightSidebar />
       </div>
+      
+      {/* Pagination Bar - Fixed at bottom */}
+      <PaginationBar />
     </div>
   );
 };
