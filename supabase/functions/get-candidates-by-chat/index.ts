@@ -47,17 +47,38 @@ serve(async (req) => {
     }
 
     const jwt = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: authError } = await supabase.auth.getUser(jwt);
+    const isTestUser = jwt === 'test-user-token';
+    const testUserId = '00000000-0000-0000-0000-000000000001';
     
-    if (authError || !user) {
-      console.error('Authentication failed:', authError);
-      return new Response('Invalid authentication', { 
-        status: 401, 
-        headers: corsHeaders 
-      });
+    let user;
+    
+    if (isTestUser) {
+      // For test user, create a mock user object without JWT verification
+      user = {
+        id: testUserId,
+        email: 'test@example.com',
+        aud: 'authenticated',
+        user_metadata: {
+          name: 'Test User',
+          full_name: 'Test User'
+        }
+      };
+      console.log('Test user authenticated:', user.id);
+    } else {
+      // Verify the JWT token and get the user for real users
+      const { data: { user: authUser }, error: authError } = await supabase.auth.getUser(jwt);
+      
+      if (authError || !authUser) {
+        console.error('Authentication failed:', authError);
+        return new Response('Invalid authentication', { 
+          status: 401, 
+          headers: corsHeaders 
+        });
+      }
+      
+      user = authUser;
+      console.log('Real user authenticated:', user.id);
     }
-
-    console.log('User authenticated:', user.id);
 
     // Parse request body
     const body: RequestBody = await req.json();

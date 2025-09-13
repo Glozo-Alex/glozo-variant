@@ -91,9 +91,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const signInAsTestUser = () => {
-    // Create a mock user for development/iframe testing
+    // Create a mock user for development/iframe testing with valid UUID
+    const testUserId = '00000000-0000-0000-0000-000000000001';
     const mockUser = {
-      id: 'test-user-123',
+      id: testUserId,
       email: 'test@example.com',
       email_confirmed_at: new Date().toISOString(),
       app_metadata: {},
@@ -107,8 +108,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     const mockSession = {
       user: mockUser,
-      access_token: 'mock-access-token',
-      refresh_token: 'mock-refresh-token',
+      access_token: 'test-user-token',
+      refresh_token: 'test-refresh-token',
       expires_in: 3600,
       expires_at: Date.now() + 3600000,
       token_type: 'bearer',
