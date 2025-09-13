@@ -5,12 +5,39 @@ import type { Database } from './types';
 const SUPABASE_URL = "https://uisjaqfkfdckvgwcdsyf.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVpc2phcWZrZmRja3Znd2Nkc3lmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY4MzQ0OTIsImV4cCI6MjA3MjQxMDQ5Mn0.3PAL-MPQx466fICK-sqSH1sSy92d3T69e_5hLdxhUXU";
 
+// Cookie-based storage adapter for cross-subdomain authentication
+const cookieStorage = {
+  getItem: (key: string): string | null => {
+    if (typeof document === 'undefined') return null;
+    const cookies = document.cookie.split(';');
+    for (let cookie of cookies) {
+      const [name, value] = cookie.trim().split('=');
+      if (name === key) {
+        return decodeURIComponent(value);
+      }
+    }
+    return null;
+  },
+  setItem: (key: string, value: string): void => {
+    if (typeof document === 'undefined') return;
+    const domain = window.location.hostname.includes('lovable.app') ? '.lovable.app' : '';
+    const expires = new Date();
+    expires.setTime(expires.getTime() + (365 * 24 * 60 * 60 * 1000)); // 1 year
+    document.cookie = `${key}=${encodeURIComponent(value)}; expires=${expires.toUTCString()}; path=/; domain=${domain}; secure; samesite=lax`;
+  },
+  removeItem: (key: string): void => {
+    if (typeof document === 'undefined') return;
+    const domain = window.location.hostname.includes('lovable.app') ? '.lovable.app' : '';
+    document.cookie = `${key}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${domain};`;
+  }
+};
+
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
-    storage: localStorage,
+    storage: cookieStorage,
     persistSession: true,
     autoRefreshToken: true,
   }
