@@ -47,12 +47,12 @@ serve(async (req) => {
     }
 
     const jwt = authHeader.replace('Bearer ', '');
-    const isTestUser = jwt === 'test-user-token';
     const testUserId = '00000000-0000-0000-0000-000000000001';
     
     let user;
     
-    if (isTestUser) {
+    // Check if this is a test user request BEFORE trying JWT verification
+    if (jwt === 'test-user-token') {
       // For test user, create a mock user object without JWT verification
       user = {
         id: testUserId,
@@ -65,7 +65,7 @@ serve(async (req) => {
       };
       console.log('Test user authenticated:', user.id);
     } else {
-      // Verify the JWT token and get the user for real users
+      // Only for real users, verify the JWT token
       const { data: { user: authUser }, error: authError } = await supabase.auth.getUser(jwt);
       
       if (authError || !authUser) {
