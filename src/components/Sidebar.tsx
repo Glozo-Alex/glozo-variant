@@ -124,6 +124,24 @@ const Sidebar = () => {
             )}
           </NavLink>
 
+          <NavLink to="/candidates" className={({ isActive }) => `${navCls} ${isActive ? 'bg-sidebar-accent text-sidebar-text-active' : ''}`}>
+            {collapsed ? (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center justify-center">
+                    <Users className="h-5 w-5" />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="right">Candidates</TooltipContent>
+              </Tooltip>
+            ) : (
+              <>
+                <Users className="h-5 w-5" />
+                <span>Candidates</span>
+              </>
+            )}
+          </NavLink>
+
           {/* Outreach Section */}
           {collapsed ? (
             <Tooltip>
@@ -228,14 +246,14 @@ const Sidebar = () => {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div className="flex items-center justify-center">
-                    <Users className="h-5 w-5" />
+                    <User className="h-5 w-5" />
                   </div>
                 </TooltipTrigger>
                 <TooltipContent side="right">Team</TooltipContent>
               </Tooltip>
             ) : (
               <>
-                <Users className="h-5 w-5" />
+                <User className="h-5 w-5" />
                 <span>Team</span>
               </>
             )}

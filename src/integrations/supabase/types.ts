@@ -92,34 +92,55 @@ export type Database = {
         Row: {
           basic_data: Json
           candidate_id: string
+          contact_details_available: boolean | null
+          contact_details_requested_at: string | null
           data_completeness_score: number | null
           detailed_data: Json | null
           first_seen_at: string
           has_detailed_contacts: boolean | null
           id: string
+          interaction_count: number | null
+          last_interaction_at: string | null
           last_updated_at: string
+          notes: string | null
+          status: string | null
+          tags: string[] | null
           user_id: string
         }
         Insert: {
           basic_data?: Json
           candidate_id: string
+          contact_details_available?: boolean | null
+          contact_details_requested_at?: string | null
           data_completeness_score?: number | null
           detailed_data?: Json | null
           first_seen_at?: string
           has_detailed_contacts?: boolean | null
           id?: string
+          interaction_count?: number | null
+          last_interaction_at?: string | null
           last_updated_at?: string
+          notes?: string | null
+          status?: string | null
+          tags?: string[] | null
           user_id: string
         }
         Update: {
           basic_data?: Json
           candidate_id?: string
+          contact_details_available?: boolean | null
+          contact_details_requested_at?: string | null
           data_completeness_score?: number | null
           detailed_data?: Json | null
           first_seen_at?: string
           has_detailed_contacts?: boolean | null
           id?: string
+          interaction_count?: number | null
+          last_interaction_at?: string | null
           last_updated_at?: string
+          notes?: string | null
+          status?: string | null
+          tags?: string[] | null
           user_id?: string
         }
         Relationships: []

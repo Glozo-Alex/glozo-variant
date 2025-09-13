@@ -57,15 +57,42 @@ export const addToShortlist = async (projectId: string, candidateId: string, can
     console.error('Failed to update shortlist count:', updateError);
   }
 
-  // Background fetch of candidate details
-  const numericCandidateId = parseInt(candidateId, 10);
-  if (Number.isFinite(numericCandidateId)) {
-    getCandidateDetails({
-      candidateIds: [numericCandidateId],
-      projectId
-    }).catch(error => {
-      console.error('Failed to fetch candidate details in background:', error);
-    });
+  // Upsert candidate in the main candidates table for CRM
+  if (candidateData && typeof candidateData === 'object') {
+    const candidateSnapshot = candidateData as any;
+    
+    try {
+      // Use the new upsertCandidate function from candidates service
+      const { upsertCandidate } = await import('./candidates');
+      await upsertCandidate({
+        candidateId: candidateId,
+        basicData: candidateSnapshot,
+        detailedData: null,
+        contactDetailsRequested: false
+      });
+    } catch (error) {
+      console.warn('Failed to upsert candidate to CRM:', error);
+    }
+    
+    // Check if detailed contact information is available
+    const hasDetailedContacts = Boolean(
+      candidateSnapshot.email && 
+      candidateSnapshot.phone && 
+      (candidateSnapshot.personal_email || candidateSnapshot.personal_phone)
+    );
+
+    // Trigger background fetch if no detailed contacts available
+    if (!hasDetailedContacts) {
+      const numericCandidateId = parseInt(candidateId, 10);
+      if (Number.isFinite(numericCandidateId)) {
+        getCandidateDetails({
+          candidateIds: [numericCandidateId],
+          projectId
+        }).catch(error => {
+          console.error('Failed to fetch candidate details in background:', error);
+        });
+      }
+    }
   }
 };
 

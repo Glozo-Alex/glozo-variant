@@ -151,10 +151,9 @@ export async function getCachedCandidateDetails(
 ): Promise<Record<number, CandidateDetail>> {
   try {
     const { data, error } = await supabase
-      .from('candidate_details')
+      .from('candidates')
       .select('candidate_id, detailed_data')
-      .eq('project_id', projectId)
-      .in('candidate_id', candidateIds);
+      .in('candidate_id', candidateIds.map(id => id.toString()));
 
     if (error) {
       console.error('Error fetching cached candidate details:', error);
@@ -162,8 +161,11 @@ export async function getCachedCandidateDetails(
     }
 
     const detailsMap: Record<number, CandidateDetail> = {};
-    data?.forEach(detail => {
-      detailsMap[detail.candidate_id] = detail.detailed_data as unknown as CandidateDetail;
+    data?.forEach(candidate => {
+      const candidateId = parseInt(candidate.candidate_id);
+      if (candidate.detailed_data && Object.keys(candidate.detailed_data).length > 0) {
+        detailsMap[candidateId] = candidate.detailed_data as unknown as CandidateDetail;
+      }
     });
 
     return detailsMap;
