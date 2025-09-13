@@ -88,7 +88,7 @@ const RightSidebar = () => {
   };
 
   return (
-    <aside className="w-96 glass-sidebar h-screen flex flex-col animate-slide-in-right shrink-0">
+    <aside className="w-96 glass-sidebar h-full flex flex-col animate-slide-in-right shrink-0">
 
       {/* Conversation */}
       <div className="flex-1 p-4 overflow-auto min-h-0">

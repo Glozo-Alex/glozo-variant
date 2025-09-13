@@ -148,10 +148,10 @@ const SearchResults = () => {
       )}
       
       {/* Main Content Area - Flex container */}
-      <div className="flex flex-1 min-h-0">
+      <div className="flex flex-1">
         {/* Left Side - Candidate List + Pagination */}
-        <div className="flex flex-1 flex-col min-h-0">
-          <div className="flex-1 min-h-0">
+        <div className="flex flex-1 flex-col">
+          <div className="flex-1 overflow-hidden">
             <CandidateList />
           </div>
           <PaginationBar />
