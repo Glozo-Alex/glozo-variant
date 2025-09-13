@@ -260,7 +260,7 @@ const CandidateList = () => {
   }, [loading, error, status, candidateCount, filteredCandidates.length]);
 
   return (
-    <main className="flex-1 glass-surface flex flex-col animate-fade-in">
+    <main className="h-full glass-surface flex flex-col animate-fade-in">
       {/* Header */}
       <div className="h-14 px-6 flex items-center justify-between">
         <h1 className="text-lg font-semibold text-card-foreground">{headerText}</h1>
