@@ -102,7 +102,7 @@ const SearchResults = () => {
   }
 
   return (
-    <div className="flex flex-1 flex-col">
+    <div className="flex flex-1 flex-col h-full">
       {/* Save Project Banner for temporary projects */}
       {project.isTemporary && (
         <div className="bg-muted/50 border-b border-border px-6 py-3 shrink-0">
