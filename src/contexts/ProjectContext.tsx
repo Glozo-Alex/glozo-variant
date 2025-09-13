@@ -69,7 +69,7 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   }, [activeProject]);
 
-  const createProject = async (name: string, query: string, similarRoles?: boolean): Promise<Project> => {
+  const createProject = async (name: string, query: string, similarRoles?: boolean, isTemporary?: boolean): Promise<Project> => {
     // Get current user
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
@@ -83,6 +83,7 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
         name,
         query,
         similar_roles: similarRoles || false,
+        is_temporary: isTemporary || false,
         user_id: user.id
       })
       .select()
@@ -105,7 +106,6 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
     
     setProjects(prev => [...prev, newProject]);
     setActiveProjectState(newProject);
-
 
     return newProject;
   };

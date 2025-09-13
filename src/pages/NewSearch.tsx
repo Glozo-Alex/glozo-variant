@@ -20,7 +20,6 @@ const NewSearch = () => {
   const {
     toast
   } = useToast();
-  const [projectName, setProjectName] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const [skillInput, setSkillInput] = useState("");
@@ -36,15 +35,22 @@ const NewSearch = () => {
   const removeSkill = (skill: string) => {
     setSelectedSkills(selectedSkills.filter(s => s !== skill));
   };
+  const generateTemporaryProjectName = (searchQuery: string): string => {
+    const date = new Date();
+    const dateStr = date.toLocaleDateString('en-GB', { 
+      day: '2-digit', 
+      month: '2-digit', 
+      year: 'numeric' 
+    }).replace(/\//g, '.');
+    
+    // Extract first few words from search query for context
+    const words = searchQuery.trim().split(' ').slice(0, 3).join(' ');
+    const truncatedQuery = words.length > 30 ? words.substring(0, 30) + '...' : words;
+    
+    return `Search ${dateStr} - ${truncatedQuery}`;
+  };
+
   const handleCreateProject = async () => {
-    if (!projectName.trim()) {
-      toast({
-        title: "Project name required",
-        description: "Please enter a name for your project",
-        variant: "destructive"
-      });
-      return;
-    }
     if (!searchQuery.trim()) {
       toast({
         title: "Search query required",
@@ -55,11 +61,12 @@ const NewSearch = () => {
     }
 
     const fullQuery = selectedSkills.length > 0 ? `${searchQuery} Skills: ${selectedSkills.join(", ")}` : searchQuery;
+    const temporaryProjectName = generateTemporaryProjectName(searchQuery);
 
     setIsLoading(true);
     try {
-      // First create the project in Supabase
-      const project = await createProject(projectName, fullQuery, similarRoles);
+      // Create temporary project in Supabase
+      const project = await createProject(temporaryProjectName, fullQuery, similarRoles, true);
       
       // Then perform the search
       const apiRes = await getCandidatesByChat({ 
@@ -71,7 +78,7 @@ const NewSearch = () => {
 
       toast({
         title: "Search started",
-        description: count !== undefined ? `Found ${count} candidates for "${project.name}"` : `"${project.name}" is ready for candidate search`
+        description: count !== undefined ? `Found ${count} candidates` : "Search is ready for candidate matching"
       });
       navigate(`/project/${project.id}/results`);
     } catch (error: any) {
@@ -161,11 +168,6 @@ const NewSearch = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              {/* Project Name */}
-              <div className="space-y-2">
-                <Label htmlFor="project-name">Project Name</Label>
-                <Input id="project-name" placeholder="e.g., Senior React Developer Search" value={projectName} onChange={e => setProjectName(e.target.value)} />
-              </div>
 
               {/* Search Query */}
               <div className="space-y-2">
