@@ -102,10 +102,10 @@ const SearchResults = () => {
   }
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-screen flex-col">
       {/* Save Project Banner for temporary projects */}
       {project.isTemporary && (
-        <div className="bg-muted/50 border-b border-border px-6 py-3">
+        <div className="bg-muted/50 border-b border-border px-6 py-3 shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex-1">
               <p className="text-sm text-muted-foreground">
@@ -122,8 +122,10 @@ const SearchResults = () => {
         </div>
       )}
       
-      <div className="flex h-full flex-1">
-        <CandidateList />
+      <div className="flex flex-1 min-h-0">
+        <div className="flex-1 min-h-0">
+          <CandidateList />
+        </div>
         <RightSidebar />
       </div>
     </div>
