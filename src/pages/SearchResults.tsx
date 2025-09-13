@@ -148,7 +148,7 @@ const SearchResults = () => {
       )}
       
       {/* Main Content Area - Flex container */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1">
         {/* Left Side - Candidate List */}
         <div className="flex-1 overflow-hidden">
           <CandidateList />
