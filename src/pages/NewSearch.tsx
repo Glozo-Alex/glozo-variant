@@ -25,6 +25,14 @@ const NewSearch = () => {
   const [skillInput, setSkillInput] = useState("");
   const [similarRoles, setSimilarRoles] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  const exampleQueries = [
+    "Senior frontend developer with React and TypeScript experience for fintech startup",
+    "Full-stack engineer, 3-5 years experience, Node.js and databases",
+    "DevOps engineer with AWS and Kubernetes experience",
+    "Senior Python developer with machine learning background",
+    "Mobile developer with React Native and Flutter experience"
+  ];
   const addSkill = (skill: string) => {
     const trimmedSkill = skill.trim();
     if (trimmedSkill && !selectedSkills.includes(trimmedSkill)) {
@@ -77,6 +85,10 @@ const NewSearch = () => {
       setIsLoading(false);
     }
   };
+  const handleExampleClick = (example: string) => {
+    setSearchQuery(example);
+  };
+
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && skillInput.trim()) {
       e.preventDefault();
@@ -161,12 +173,16 @@ const NewSearch = () => {
               <CardTitle className="text-sm font-medium">Example Queries</CardTitle>
             </CardHeader>
             <CardContent className="text-sm space-y-2">
-              <p className="text-muted-foreground">
-                "Senior frontend developer with React and TypeScript experience for fintech startup"
-              </p>
-              <p className="text-muted-foreground">
-                "Full-stack engineer, 3-5 years experience, Node.js and databases"
-              </p>
+              {exampleQueries.map((example, index) => (
+                <Button
+                  key={index}
+                  variant="ghost"
+                  className="h-auto p-2 text-left justify-start text-muted-foreground hover:text-foreground text-wrap"
+                  onClick={() => handleExampleClick(example)}
+                >
+                  "{example}"
+                </Button>
+              ))}
             </CardContent>
           </Card>
         </div>
