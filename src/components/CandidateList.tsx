@@ -43,158 +43,12 @@ const CandidateList = () => {
   const [availableFilters, setAvailableFilters] = useState<Record<string, any>>({});
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
   
-  // Use refs to prevent unnecessary re-renders
-  const pollingRef = useRef<number | null>(null);
-  const isPollingRef = useRef(false);
-  const currentProjectIdRef = useRef(projectId);
+  // Use refs to track polling state and prevent infinite re-renders
+  const pollingIntervalRef = useRef<number | null>(null);
+  const isPollingRef = useRef<boolean>(false);
 
-  const fetchLatestSearch = useCallback(async (force = false) => {
-    if (!projectId) return;
-    
-    try {
-      if (!force) {
-        console.log('🔍 CandidateList: Fetching search results for projectId:', projectId);
-      }
-      
-      const { data, error } = await supabase
-        .from("searches")
-        .select("id, status, raw_response, candidate_count, created_at")
-        .eq("project_id", projectId)
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
-      if (!force) {
-        console.log('📊 CandidateList: Search data received:', data);
-      }
-
-      if (error) throw error;
-
-      if (!data) {
-        if (!force) console.log('🚫 CandidateList: No search data found');
-        setStatus("idle");
-        setCandidates([]);
-        setCandidateCount(0);
-        setAvailableFilters({});
-        return;
-      }
-
-      const st = (data.status as any) ?? "pending";
-      const raw = data.raw_response as any;
-      
-      // For candidates display, only show results from completed searches
-      const fromArray = (st === 'completed' && Array.isArray(raw?.candidates)) ? raw.candidates : [];
-      const count = Array.isArray(fromArray) ? fromArray.length : (data.candidate_count ?? 0);
-
-      if (!force) {
-        console.log('👥 CandidateList: Candidates array length:', fromArray.length, 'Status:', st);
-      }
-
-      // Extract filters from raw response
-      const filters = raw?.filters || {};
-      const processedFilters = extractFiltersFromResponse(filters, fromArray);
-
-      setStatus(st);
-      setCandidates(fromArray);
-      setCandidateCount(count);
-      setAvailableFilters(processedFilters);
-      
-      // Load shortlist status for candidates
-      if (fromArray.length > 0) {
-        try {
-          const candidateIds = fromArray.map((c: APICandidate) => String(c.id || ''));
-          const shortlistMap = await getShortlistStatus(projectId, candidateIds);
-          setShortlistStatus(shortlistMap);
-        } catch (error) {
-          console.error('Failed to load shortlist status:', error);
-        }
-      }
-      
-      // Stop polling if search is completed or failed
-      if (st === 'completed' || st === 'failed') {
-        if (pollingRef.current) {
-          clearInterval(pollingRef.current);
-          pollingRef.current = null;
-          isPollingRef.current = false;
-        }
-      }
-    } catch (e: any) {
-      setError(e?.message ?? "Failed to load search results");
-    } finally {
-      setLoading(false);
-    }
-  }, [projectId]);
-
-  // Handle project change
-  useEffect(() => {
-    if (currentProjectIdRef.current !== projectId) {
-      currentProjectIdRef.current = projectId;
-      
-      // Clear existing polling
-      if (pollingRef.current) {
-        clearInterval(pollingRef.current);
-        pollingRef.current = null;
-        isPollingRef.current = false;
-      }
-      
-      // Reset state
-      setLoading(true);
-      setError(null);
-      setStatus("idle");
-      setCandidates([]);
-      setCandidateCount(0);
-      setAvailableFilters({});
-      setShortlistStatus({});
-    }
-  }, [projectId]);
-
-  // Initial fetch and polling setup
-  useEffect(() => {
-    if (!projectId) return;
-
-    // Initial fetch
-    fetchLatestSearch();
-    
-    // Set up polling for non-completed statuses
-    const startPolling = () => {
-      if (!isPollingRef.current && !pollingRef.current) {
-        pollingRef.current = setInterval(() => {
-          fetchLatestSearch(true); // silent polling
-        }, 3000) as unknown as number;
-        isPollingRef.current = true;
-      }
-    };
-
-    // Start polling after initial fetch
-    const pollTimeout = setTimeout(() => {
-      if (status === "pending" || status === "idle") {
-        startPolling();
-      }
-    }, 1000);
-
-    return () => {
-      clearTimeout(pollTimeout);
-      if (pollingRef.current) {
-        clearInterval(pollingRef.current);
-        pollingRef.current = null;
-        isPollingRef.current = false;
-      }
-    };
-  }, [projectId]); // Only depend on projectId
-
-  // Stop polling when status changes to completed
-  useEffect(() => {
-    if (status === 'completed' || status === 'failed') {
-      if (pollingRef.current) {
-        clearInterval(pollingRef.current);
-        pollingRef.current = null;
-        isPollingRef.current = false;
-      }
-    }
-  }, [status]);
-
-  // Extract filters from API response
-  const extractFiltersFromResponse = (filters: any, candidates: APICandidate[]) => {
+  // Extract filters from API response - memoized to avoid recreation
+  const extractFiltersFromResponse = useCallback((filters: any, candidates: APICandidate[]) => {
     const processedFilters: Record<string, any> = {};
 
     // Process each filter category directly from API structure
@@ -247,7 +101,100 @@ const CandidateList = () => {
     });
 
     return processedFilters;
-  };
+  }, []);
+
+  const fetchLatestSearch = useCallback(async () => {
+    if (!projectId) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from("searches")
+        .select("id, status, raw_response, candidate_count, created_at")
+        .eq("project_id", projectId)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (error) throw error;
+
+      if (!data) {
+        setStatus("idle");
+        setCandidates([]);
+        setCandidateCount(0);
+        setAvailableFilters({});
+        return;
+      }
+
+      const st = (data.status as any) ?? "pending";
+      const raw = data.raw_response as any;
+      
+      // For candidates display, only show results from completed searches
+      const fromArray = (st === 'completed' && Array.isArray(raw?.candidates)) ? raw.candidates : [];
+      const count = Array.isArray(fromArray) ? fromArray.length : (data.candidate_count ?? 0);
+
+      // Extract filters from raw response
+      const filters = raw?.filters || {};
+      const processedFilters = extractFiltersFromResponse(filters, fromArray);
+
+      setStatus(st);
+      setCandidates(fromArray);
+      setCandidateCount(count);
+      setAvailableFilters(processedFilters);
+      
+      // Load shortlist status for candidates
+      if (fromArray.length > 0) {
+        try {
+          const candidateIds = fromArray.map((c: APICandidate) => String(c.id || ''));
+          const shortlistMap = await getShortlistStatus(projectId, candidateIds);
+          setShortlistStatus(shortlistMap);
+        } catch (error) {
+          console.error('Failed to load shortlist status:', error);
+        }
+      }
+    } catch (e: any) {
+      setError(e?.message ?? "Failed to load search results");
+    } finally {
+      setLoading(false);
+    }
+  }, [projectId, extractFiltersFromResponse]);
+
+  // Initial data fetch effect
+  useEffect(() => {
+    if (!projectId) return;
+    
+    fetchLatestSearch();
+  }, [projectId, fetchLatestSearch]);
+
+  // Polling effect - separate from initial fetch to prevent infinite loops
+  useEffect(() => {
+    if (!projectId) return;
+
+    // Start polling if status is pending or idle
+    if (status === "pending" || status === "idle") {
+      if (!isPollingRef.current) {
+        isPollingRef.current = true;
+        pollingIntervalRef.current = setInterval(() => {
+          fetchLatestSearch();
+        }, 3000) as unknown as number;
+      }
+    } else {
+      // Stop polling when status is completed or failed
+      if (isPollingRef.current && pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current);
+        pollingIntervalRef.current = null;
+        isPollingRef.current = false;
+      }
+    }
+
+    // Cleanup on unmount
+    return () => {
+      if (pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current);
+        pollingIntervalRef.current = null;
+        isPollingRef.current = false;
+      }
+    };
+  }, [status]); // Only depend on status to avoid infinite loops
 
   // Filter candidates based on selected filters
   const filteredCandidates = useMemo(() => {
@@ -298,7 +245,7 @@ const CandidateList = () => {
         console.error('Failed to update shortlist count:', error);
       }
     }
-  }, [projectId]); // Remove updateShortlistCount from dependencies
+  }, [projectId, updateShortlistCount]);
 
   const headerText = useMemo(() => {
     if (loading) return "Loading candidates...";
