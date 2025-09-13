@@ -128,38 +128,41 @@ const SearchResults = () => {
 
   return (
     <div className="flex flex-1 flex-col h-full">
-      {/* Save Project Banner for temporary projects - Fixed */}
-      {project.isTemporary && (
-        <div className="bg-muted/50 border-b border-border px-6 py-3 shrink-0">
-          <div className="flex items-center justify-between">
-            <div className="flex-1">
-              <p className="text-sm text-muted-foreground">
-                This is a temporary search. Save it as a project to keep these results.
-              </p>
-            </div>
-            <SaveProjectDialog onSave={handleSaveProject}>
-              <Button size="sm" className="ml-4">
-                <Save className="h-4 w-4 mr-2" />
-                Save Project
-              </Button>
-            </SaveProjectDialog>
-          </div>
-        </div>
-      )}
-      
       {/* Main Content Area - Flex container */}
       <div className="flex flex-1">
-        {/* Left Side - Candidate List */}
-        <div className="flex-1 overflow-hidden">
-          <CandidateList />
+        {/* Left Side - Candidate List with Banner and Pagination */}
+        <div className="flex-1 flex flex-col">
+          {/* Save Project Banner for temporary projects - Only in left section */}
+          {project.isTemporary && (
+            <div className="bg-muted/50 border-b border-border px-6 py-3 shrink-0">
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <p className="text-sm text-muted-foreground">
+                    This is a temporary search. Save it as a project to keep these results.
+                  </p>
+                </div>
+                <SaveProjectDialog onSave={handleSaveProject}>
+                  <Button size="sm" className="ml-4">
+                    <Save className="h-4 w-4 mr-2" />
+                    Save Project
+                  </Button>
+                </SaveProjectDialog>
+              </div>
+            </div>
+          )}
+          
+          {/* Candidate List - Scrollable */}
+          <div className="flex-1">
+            <CandidateList />
+          </div>
+          
+          {/* Pagination Bar - Fixed at bottom of left section */}
+          <PaginationBar />
         </div>
         
         {/* Right Sidebar */}
         <RightSidebar />
       </div>
-      
-      {/* Pagination Bar - Fixed at bottom */}
-      <PaginationBar />
     </div>
   );
 };
