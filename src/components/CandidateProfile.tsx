@@ -138,5 +138,3 @@ export const CandidateProfile = React.memo(function CandidateProfile({ children,
     </Sheet>
   );
 });
-
-export default CandidateProfile;

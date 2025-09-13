@@ -11,24 +11,22 @@ interface RequestBody {
   message: string;
   count?: number;
   similarRoles?: boolean;
-  project_id: string;
-  session_id?: string;
-  user_name: string;
-  user_id: string;
+  projectId: string;
 }
 
 serve(async (req) => {
-  console.log('🚀 get-candidates-by-chat function called');
+  console.log('get-candidates-by-chat function called');
 
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Only allow POST requests
   if (req.method !== 'POST') {
-    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
-      status: 405,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    return new Response('Method not allowed', { 
+      status: 405, 
+      headers: corsHeaders 
     });
   }
 
@@ -38,244 +36,187 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Get the user from the auth header
+    // Get and verify user authentication
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
-      console.error('❌ No authorization header');
-      return new Response(JSON.stringify({ error: 'Authorization required' }), {
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      console.error('No authorization header provided');
+      return new Response('Authorization required', { 
+        status: 401, 
+        headers: corsHeaders 
       });
     }
 
-    const { data: { user }, error: authError } = await supabase.auth.getUser(authHeader.replace('Bearer ', ''));
+    const jwt = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabase.auth.getUser(jwt);
+    
     if (authError || !user) {
-      console.error('❌ Auth error:', authError);
-      return new Response(JSON.stringify({ error: 'Invalid authorization' }), {
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      console.error('Authentication failed:', authError);
+      return new Response('Invalid authentication', { 
+        status: 401, 
+        headers: corsHeaders 
       });
     }
 
-    console.log('✅ User authenticated:', user.id);
+    console.log('User authenticated:', user.id);
 
     // Parse request body
     const body: RequestBody = await req.json();
-    const { message, count = 200, similarRoles = false, project_id, session_id, user_name, user_id } = body;
+    const { message, count = 200, similarRoles = false, projectId } = body;
 
-    if (!message) {
-      return new Response(JSON.stringify({ error: 'Message is required' }), {
-        status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    if (!message || !projectId) {
+      return new Response('Missing required fields: message, projectId', { 
+        status: 400, 
+        headers: corsHeaders 
       });
     }
 
-    if (!project_id) {
-      return new Response(JSON.stringify({ error: 'Project ID is required' }), {
-        status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-
-    if (!user_name || !user_id) {
-      return new Response(JSON.stringify({ error: 'User name and ID are required' }), {
-        status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-
-    console.log('📝 Request details:', { message, count, similarRoles, project_id, session_id, user_name, user_id });
-
-    let searchId: string;
-
-    // Check if project exists and user has access
-    const { data: projectData, error: projectError } = await supabase
+    // Get project and session_id from database
+    const { data: project, error: projectError } = await supabase
       .from('projects')
-      .select('id, session_id')
-      .eq('id', project_id)
+      .select('session_id, name')
+      .eq('id', projectId)
       .eq('user_id', user.id)
       .single();
 
-    if (projectError || !projectData) {
-      console.error('❌ Project not found:', project_id, projectError);
-      return new Response(JSON.stringify({ error: 'Project not found or access denied' }), {
-        status: 404,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    if (projectError || !project) {
+      console.error('Project not found:', projectError);
+      return new Response('Project not found', { 
+        status: 404, 
+        headers: corsHeaders 
       });
     }
 
-    if (session_id && session_id !== "") {
-      // Find existing search for this session
-      const { data: searchData, error: searchError } = await supabase
-        .from('searches')
-        .select('id')
-        .eq('session_id', session_id)
-        .eq('project_id', project_id)
-        .single();
+    // Get user name from metadata
+    const userName = user.user_metadata?.full_name || 
+                    user.user_metadata?.name || 
+                    user.email?.split('@')[0] || 
+                    'User';
 
-      if (searchError || !searchData) {
-        console.error('❌ Search not found for session:', session_id, searchError);
-        return new Response(JSON.stringify({ error: 'Search not found' }), {
-          status: 404,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
-      }
-      searchId = searchData.id;
-    } else {
-      // Create new search for this project
-      const newSessionId = crypto.randomUUID();
-      const { data: newSearch, error: newSearchError } = await supabase
-        .from('searches')
-        .insert({
-          session_id: newSessionId,
-          prompt: message,
-          user_id: user.id,
-          project_id: project_id,
-          similar_roles: similarRoles,
-          status: 'pending'
-        })
-        .select('id')
-        .single();
-
-      if (newSearchError || !newSearch) {
-        console.error('❌ Failed to create search record:', newSearchError);
-        return new Response(JSON.stringify({ error: 'Failed to create search record' }), {
-          status: 500,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
-      }
-      searchId = newSearch.id;
-
-      // Update project with the new session_id
-      await supabase
-        .from('projects')
-        .update({ session_id: newSessionId })
-        .eq('id', project_id);
-    }
-
-    console.log('👤 User details:', { user_name, user_id });
-
-    // Prepare request data for external API
-    const requestData = {
-      user_id,
-      user_name,
+    console.log('Making API request with:', {
       message,
       count,
       similarRoles,
-      project_id,
-      session_id: session_id === undefined ? null : session_id
+      projectId,
+      userId: user.id,
+      userName,
+      sessionId: project.session_id
+    });
+
+    // Create search record with pending status (keep all previous searches for chat history)
+    const { data: searchRecord, error: searchError } = await supabase
+      .from('searches')
+      .insert({
+        user_id: user.id,
+        project_id: projectId,
+        prompt: message,
+        similar_roles: similarRoles,
+        status: 'pending'
+      })
+      .select()
+      .single();
+
+    if (searchError) {
+      console.error('Failed to create search record:', searchError);
+      return new Response('Failed to create search record', { 
+        status: 500, 
+        headers: corsHeaders 
+      });
+    }
+
+    // Make request to external API
+    const requestBody = {
+      message,
+      count,
+      // send both casing variants just in case
+      similarRoles: !!similarRoles,
+      similar_roles: !!similarRoles,
+      session_id: project.session_id || '',
+      user_name: userName,
+      user_id: user.id,
+      project_id: projectId
     };
 
-    console.log('📤 Calling external API with:', requestData);
+    const apiUrl = 'http://34.75.197.68:8888/api/get-candidates-by-chat';
 
-    // Call external API
-    try {
-      const apiResponse = await fetch('http://35.193.171.159:8888/api/get-candidates-by-chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+    console.log('API URL:', apiUrl);
+    console.log('API request body:', JSON.stringify(requestBody));
+
+    const apiResponse = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(requestBody),
+    });
+
+    if (!apiResponse.ok) {
+      const errorText = await apiResponse.text();
+      console.error('External API error:', apiResponse.status, errorText);
+
+      // Build fallback response so the app can show a bot message and persist chat history
+      const fallbackResponse = {
+        session: {
+          message: `Sorry, the search service is temporarily unavailable (HTTP ${apiResponse.status}). Please try again in a moment.`,
+          session_id: project.session_id || ''
         },
-        body: JSON.stringify(requestData),
-      });
-
-      if (!apiResponse.ok) {
-        const errorText = await apiResponse.text();
-        console.error('❌ External API error:', apiResponse.status, errorText);
-        
-        // Update search status to error
-        await supabase
-          .from('searches')
-          .update({ 
-            status: 'failed', 
-            error_message: `API Error: ${apiResponse.status} - ${errorText}`,
-            completed_at: new Date().toISOString()
-          })
-          .eq('id', searchId);
-
-        return new Response(JSON.stringify({ 
-          error: 'External API error',
-          details: `Status: ${apiResponse.status}`,
-          candidates: [] // Return empty array as fallback
-        }), {
-          status: 200, // Return 200 to avoid frontend errors
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
-      }
-
-      const apiData = await apiResponse.json();
-      console.log('✅ External API response received, candidates found:', apiData?.candidates?.length || 0);
-
-      // Candidates are now stored in searches.raw_response, no need for separate table
-      console.log('✅ API data will be stored in searches.raw_response:', apiData?.candidates?.length || 0, 'candidates');
-
-      // Update search status to completed and store session_id if provided
-      const updateData: any = {
-        status: 'completed',
-        completed_at: new Date().toISOString(),
-        raw_response: apiData,
-        candidate_count: apiData?.candidates?.length || 0
+        candidates: [] as any[]
       };
 
-      if (apiData.session_id) {
-        // Update project with session_id for future use
-        await supabase
-          .from('projects')
-          .update({ session_id: apiData.session_id })
-          .eq('id', project_id);
-      }
-
+      // Store as completed with empty candidates so chat history and UI stay consistent
       await supabase
         .from('searches')
-        .update(updateData)
-        .eq('id', searchId);
+        .update({
+          status: 'completed',
+          candidate_count: 0,
+          raw_response: fallbackResponse,
+          error_message: `API error: ${apiResponse.status}`,
+          completed_at: new Date().toISOString()
+        })
+        .eq('id', searchRecord.id);
 
-      console.log('✅ Search completed successfully');
-
-      // Return response with session_id for first search
-      const responseData = { ...apiData };
-      if (!session_id || session_id === "") {
-        // Get the session_id from the created search for first request
-        const { data: searchData } = await supabase
-          .from('searches')
-          .select('session_id')
-          .eq('id', searchId)
-          .single();
-        
-        if (searchData?.session_id) {
-          responseData.session_id = searchData.session_id;
-        }
-      }
-
-      return new Response(JSON.stringify(responseData), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    } catch (apiError) {
-      console.error('❌ API call failed:', apiError);
-      
-      // Update search status to error
-        await supabase
-          .from('searches')
-          .update({ 
-            status: 'failed', 
-            error_message: apiError.message || 'API call failed',
-            completed_at: new Date().toISOString()
-          })
-          .eq('id', searchId);
-
-      return new Response(JSON.stringify({ 
-        error: 'Failed to connect to search service',
-        candidates: [] // Return empty array as fallback
-      }), {
-        status: 200, // Return 200 to avoid frontend errors
+      return new Response(JSON.stringify(fallbackResponse), {
+        status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
+
+    const responseData = await apiResponse.json();
+    console.log('API response received:', {
+      candidatesCount: responseData.candidates?.length || 0,
+      sessionId: responseData.session?.session_id,
+      message: responseData.session?.message?.substring(0, 100) + '...'
+    });
+
+    // Update project with session_id if provided
+    if (responseData.session?.session_id) {
+      await supabase
+        .from('projects')
+        .update({ session_id: responseData.session.session_id })
+        .eq('id', projectId);
+    }
+
+    // Update search record with completed status and results
+    await supabase
+      .from('searches')
+      .update({
+        status: 'completed',
+        candidate_count: responseData.candidates?.length || 0,
+        raw_response: responseData,
+        completed_at: new Date().toISOString()
+      })
+      .eq('id', searchRecord.id);
+
+    console.log('Search completed successfully');
+
+    // Return the full response data
+    return new Response(JSON.stringify(responseData), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+
   } catch (error) {
-    console.error('❌ Function error:', error);
-    return new Response(JSON.stringify({ 
-      error: 'Internal server error',
-      details: error.message 
-    }), {
+    console.error('Error in get-candidates-by-chat function:', error);
+    return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });

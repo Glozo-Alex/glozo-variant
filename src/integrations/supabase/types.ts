@@ -44,86 +44,6 @@ export type Database = {
         }
         Relationships: []
       }
-      candidate_relationships: {
-        Row: {
-          candidate_uuid: string
-          created_at: string
-          ended_at: string | null
-          id: string
-          related_object_data: Json | null
-          related_object_id: string
-          relationship_type: string
-          status: string | null
-          user_id: string
-        }
-        Insert: {
-          candidate_uuid: string
-          created_at?: string
-          ended_at?: string | null
-          id?: string
-          related_object_data?: Json | null
-          related_object_id: string
-          relationship_type: string
-          status?: string | null
-          user_id: string
-        }
-        Update: {
-          candidate_uuid?: string
-          created_at?: string
-          ended_at?: string | null
-          id?: string
-          related_object_data?: Json | null
-          related_object_id?: string
-          relationship_type?: string
-          status?: string | null
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "candidate_relationships_candidate_uuid_fkey"
-            columns: ["candidate_uuid"]
-            isOneToOne: false
-            referencedRelation: "candidates"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      candidates: {
-        Row: {
-          basic_data: Json
-          candidate_id: string
-          data_completeness_score: number | null
-          detailed_data: Json | null
-          first_seen_at: string
-          has_detailed_contacts: boolean | null
-          id: string
-          last_updated_at: string
-          user_id: string
-        }
-        Insert: {
-          basic_data?: Json
-          candidate_id: string
-          data_completeness_score?: number | null
-          detailed_data?: Json | null
-          first_seen_at?: string
-          has_detailed_contacts?: boolean | null
-          id?: string
-          last_updated_at?: string
-          user_id: string
-        }
-        Update: {
-          basic_data?: Json
-          candidate_id?: string
-          data_completeness_score?: number | null
-          detailed_data?: Json | null
-          first_seen_at?: string
-          has_detailed_contacts?: boolean | null
-          id?: string
-          last_updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       email_logs: {
         Row: {
           candidate_id: string
@@ -422,47 +342,38 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
-          candidate_view_preference: string | null
           company: string | null
           created_at: string
           full_name: string | null
           id: string
           job_title: string | null
           phone: string | null
-          sidebar_collapsed: boolean | null
           theme_preference: string | null
           timezone: string | null
-          ui_density_preference: string | null
           updated_at: string
         }
         Insert: {
           avatar_url?: string | null
-          candidate_view_preference?: string | null
           company?: string | null
           created_at?: string
           full_name?: string | null
           id: string
           job_title?: string | null
           phone?: string | null
-          sidebar_collapsed?: boolean | null
           theme_preference?: string | null
           timezone?: string | null
-          ui_density_preference?: string | null
           updated_at?: string
         }
         Update: {
           avatar_url?: string | null
-          candidate_view_preference?: string | null
           company?: string | null
           created_at?: string
           full_name?: string | null
           id?: string
           job_title?: string | null
           phone?: string | null
-          sidebar_collapsed?: boolean | null
           theme_preference?: string | null
           timezone?: string | null
-          ui_density_preference?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -472,7 +383,6 @@ export type Database = {
           added_at: string
           candidate_id: string
           candidate_snapshot: Json
-          candidate_uuid: string | null
           id: string
           project_id: string
           user_id: string
@@ -481,7 +391,6 @@ export type Database = {
           added_at?: string
           candidate_id: string
           candidate_snapshot: Json
-          candidate_uuid?: string | null
           id?: string
           project_id: string
           user_id: string
@@ -490,19 +399,11 @@ export type Database = {
           added_at?: string
           candidate_id?: string
           candidate_snapshot?: Json
-          candidate_uuid?: string | null
           id?: string
           project_id?: string
           user_id?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "project_shortlist_candidate_uuid_fkey"
-            columns: ["candidate_uuid"]
-            isOneToOne: false
-            referencedRelation: "candidates"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "project_shortlist_project_id_fkey"
             columns: ["project_id"]
@@ -516,7 +417,6 @@ export type Database = {
         Row: {
           created_at: string
           id: string
-          is_temporary: boolean
           name: string
           query: string
           session_id: string | null
@@ -528,7 +428,6 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
-          is_temporary?: boolean
           name: string
           query: string
           session_id?: string | null
@@ -540,7 +439,6 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
-          is_temporary?: boolean
           name?: string
           query?: string
           session_id?: string | null
@@ -593,11 +491,9 @@ export type Database = {
           created_at: string
           error_message: string | null
           id: string
-          is_temporary: boolean | null
-          project_id: string | null
+          project_id: string
           prompt: string
           raw_response: Json | null
-          session_id: string | null
           similar_roles: boolean | null
           status: string | null
           user_id: string
@@ -608,11 +504,9 @@ export type Database = {
           created_at?: string
           error_message?: string | null
           id?: string
-          is_temporary?: boolean | null
-          project_id?: string | null
+          project_id: string
           prompt: string
           raw_response?: Json | null
-          session_id?: string | null
           similar_roles?: boolean | null
           status?: string | null
           user_id: string
@@ -623,11 +517,9 @@ export type Database = {
           created_at?: string
           error_message?: string | null
           id?: string
-          is_temporary?: boolean | null
-          project_id?: string | null
+          project_id?: string
           prompt?: string
           raw_response?: Json | null
-          session_id?: string | null
           similar_roles?: boolean | null
           status?: string | null
           user_id?: string
@@ -645,7 +537,6 @@ export type Database = {
       sequence_recipients: {
         Row: {
           candidate_id: string
-          candidate_uuid: string | null
           completed_at: string | null
           current_template_index: number
           enrolled_at: string
@@ -658,7 +549,6 @@ export type Database = {
         }
         Insert: {
           candidate_id: string
-          candidate_uuid?: string | null
           completed_at?: string | null
           current_template_index?: number
           enrolled_at?: string
@@ -671,7 +561,6 @@ export type Database = {
         }
         Update: {
           candidate_id?: string
-          candidate_uuid?: string | null
           completed_at?: string | null
           current_template_index?: number
           enrolled_at?: string
@@ -683,13 +572,6 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "sequence_recipients_candidate_uuid_fkey"
-            columns: ["candidate_uuid"]
-            isOneToOne: false
-            referencedRelation: "candidates"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "sequence_recipients_project_id_fkey"
             columns: ["project_id"]

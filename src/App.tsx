@@ -23,7 +23,6 @@ import Integrations from "./pages/Integrations";
 import Settings from "./pages/Settings";
 import Auth from "./pages/Auth";
 import Projects from "./pages/Projects";
-import Candidates from "./pages/Candidates";
 import TestCandidateDetails from "./pages/TestCandidateDetails";
 import EmailSequences from "./pages/EmailSequences";
 import EmailSequenceDetails from "./pages/EmailSequenceDetails";
@@ -72,27 +71,7 @@ const App = () => (
                 }
               />
               <Route
-                path="/search-results/:sessionId"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <SearchResults />
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
                 path="/project/:projectId/results"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <SearchResults />
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/project/:projectId"
                 element={
                   <ProtectedRoute>
                     <Layout>
@@ -117,16 +96,6 @@ const App = () => (
                    <ProtectedRoute>
                      <Layout>
                        <Projects />
-                     </Layout>
-                   </ProtectedRoute>
-                  }
-                />
-                <Route
-                 path="/candidates"
-                 element={
-                   <ProtectedRoute>
-                     <Layout>
-                       <Candidates />
                      </Layout>
                    </ProtectedRoute>
                   }
