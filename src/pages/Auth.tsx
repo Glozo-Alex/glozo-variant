@@ -36,11 +36,6 @@ const Auth = () => {
           </CardTitle>
           <CardDescription className="text-muted-foreground">
             Sign in with your Google account to access your recruiting dashboard
-            {window.self !== window.top && (
-              <span className="block mt-2 text-xs text-primary">
-                Authentication will open in a popup window
-              </span>
-            )}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">

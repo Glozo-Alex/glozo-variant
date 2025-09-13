@@ -56,16 +56,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const signInWithGoogle = async () => {
     try {
-      // Check if we're in an iframe (Lovable preview)
-      const isInIframe = window.self !== window.top;
-      console.log('Auth Debug - Is in iframe:', isInIframe);
+      // Determine redirect URL to current origin (must be allowlisted in Supabase Auth settings)
+      const redirectUrl = window.location.origin;
+      console.log('Auth Debug - Redirect URL:', redirectUrl);
       
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          // Use popup mode when in iframe, redirect mode otherwise
-          skipBrowserRedirect: isInIframe,
-          redirectTo: isInIframe ? undefined : `${window.location.origin}/`
+          redirectTo: `${redirectUrl}/`
         }
       });
 
@@ -77,10 +75,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         });
       }
     } catch (error) {
-      console.error('Auth Error:', error);
       toast({
         title: "Authentication Error",
-        description: "An unexpected error occurred during sign in. Please try again.",
+        description: "An unexpected error occurred during sign in.",
         variant: "destructive",
       });
     }
