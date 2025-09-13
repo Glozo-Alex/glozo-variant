@@ -152,9 +152,7 @@ const SearchResults = () => {
           )}
           
           {/* Candidate List - Scrollable */}
-          <div className="flex-1">
-            <CandidateList />
-          </div>
+          <CandidateList />
           
           {/* Pagination Bar - Fixed at bottom of left section */}
           <PaginationBar />
