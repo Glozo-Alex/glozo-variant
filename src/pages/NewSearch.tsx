@@ -137,8 +137,8 @@ const NewSearch = () => {
     }
   };
   return (
-    <div className="bg-background">
-      <div className="container mx-auto px-4 py-4">
+    <div className="bg-background min-h-screen">
+      <div className="container mx-auto px-4 py-2 h-full">
         {/* Compact Header */}
         <div className="text-center mb-6">
           <h1 className="text-2xl font-bold text-foreground mb-2">
