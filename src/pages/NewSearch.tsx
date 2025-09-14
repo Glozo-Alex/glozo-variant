@@ -149,45 +149,18 @@ const NewSearch = () => {
           </p>
         </div>
 
-        {/* Three Column Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 flex-1 max-w-7xl mx-auto w-full">
-          {/* Left Column - Recent Searches (25%) */}
-          <div className="lg:col-span-1">
-            {recentSearches.length > 0 && (
-              <Card className="p-3 h-fit">
-                <h3 className="text-sm font-semibold mb-3 flex items-center">
-                  <History className="mr-2 h-3 w-3" />
-                  Recent Searches
-                </h3>
-                <div className="space-y-2">
-                  {recentSearches.slice(0, 3).map((search) => (
-                    <button
-                      key={search.id}
-                      onClick={() => handleRecentSearchClick(search)}
-                      className="w-full text-left p-2 rounded bg-muted/50 hover:bg-muted transition-colors"
-                    >
-                      <p className="text-xs font-medium truncate">
-                        {search.prompt.slice(0, 60)}...
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {new Date(search.created_at).toLocaleDateString()} • {search.candidate_count || 0} candidates
-                      </p>
-                    </button>
-                  ))}
-                </div>
-              </Card>
-            )}
-          </div>
-
-          {/* Center Column - Main Search (50%) */}
-          <div className="lg:col-span-2 flex flex-col">
-            <Card className="p-6 flex-1 flex flex-col">
-              <div className="flex-1 flex flex-col space-y-4">
+        {/* Two Column Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 max-w-7xl mx-auto w-full">
+          {/* Left Column - Main Search Area (66%) */}
+          <div className="lg:col-span-2 flex flex-col space-y-6">
+            {/* Job Description Section - Takes most space */}
+            <Card className="p-6 flex-1">
+              <div className="flex flex-col h-full space-y-4">
                 <div className="flex-1">
-                  <Label htmlFor="searchQuery" className="text-base font-semibold">
+                  <Label htmlFor="searchQuery" className="text-lg font-semibold">
                     Job Description
                   </Label>
-                  <p className="text-xs text-muted-foreground mt-1 mb-2">
+                  <p className="text-sm text-muted-foreground mt-1 mb-3">
                     Provide a detailed description of the position
                   </p>
                   <Textarea
@@ -195,7 +168,7 @@ const NewSearch = () => {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="e.g., Looking for a Senior React Developer with 5+ years experience in modern web technologies..."
-                    className="h-32 resize-none"
+                    className="h-48 resize-none"
                   />
                 </div>
 
@@ -216,7 +189,7 @@ const NewSearch = () => {
 
                 <Button 
                   onClick={handleCreateProject}
-                  className="w-full h-10"
+                  className="w-full h-12"
                   disabled={!searchQuery.trim() || isLoading}
                 >
                   {isLoading ? (
@@ -233,66 +206,99 @@ const NewSearch = () => {
                 </Button>
               </div>
             </Card>
+
+            {/* Recent Searches - Below Job Description */}
+            {recentSearches.length > 0 && (
+              <Card className="p-4">
+                <h3 className="text-sm font-semibold mb-3 flex items-center">
+                  <History className="mr-2 h-4 w-4" />
+                  Recent Searches
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {recentSearches.slice(0, 4).map((search) => (
+                    <button
+                      key={search.id}
+                      onClick={() => handleRecentSearchClick(search)}
+                      className="text-left p-3 rounded bg-muted/50 hover:bg-muted transition-colors"
+                    >
+                      <p className="text-sm font-medium truncate">
+                        {search.prompt.slice(0, 80)}...
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {new Date(search.created_at).toLocaleDateString()} • {search.candidate_count || 0} candidates
+                      </p>
+                    </button>
+                  ))}
+                </div>
+              </Card>
+            )}
           </div>
 
-          {/* Right Column - Info Panel (25%) */}
-          <div className="lg:col-span-1 space-y-3">
-            {/* Search Tips */}
-            <Card className="p-3">
-              <h3 className="text-sm font-semibold mb-3 flex items-center">
-                <Lightbulb className="mr-2 h-3 w-3" />
-                Tips
-              </h3>
-              <div className="space-y-2">
-                {searchTips.slice(0, 3).map((tip, index) => (
-                  <div key={index} className="text-xs">
-                    <p className="font-medium text-foreground">{tip.title}</p>
-                    <p className="text-muted-foreground">{tip.description}</p>
+          {/* Right Column - Info Panel (33%) */}
+          <div className="lg:col-span-1 flex flex-col h-full">
+            <div className="flex flex-col h-full space-y-4">
+              {/* Search Tips - 1/3 height */}
+              <Card className="p-4 flex-1">
+                <h3 className="text-sm font-semibold mb-3 flex items-center">
+                  <Lightbulb className="mr-2 h-4 w-4" />
+                  Tips
+                </h3>
+                <div className="space-y-3">
+                  {searchTips.slice(0, 4).map((tip, index) => (
+                    <div key={index} className="text-xs">
+                      <p className="font-medium text-foreground mb-1">{tip.title}</p>
+                      <p className="text-muted-foreground leading-relaxed">{tip.description}</p>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+
+              {/* Example Queries - 1/3 height */}
+              <Card className="p-4 flex-1">
+                <h3 className="text-sm font-semibold mb-3 flex items-center">
+                  <FileText className="mr-2 h-4 w-4" />
+                  Examples
+                </h3>
+                <div className="space-y-2">
+                  {exampleQueries.slice(0, 4).map((example, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handleExampleClick(example)}
+                      className="w-full text-left p-2 rounded bg-muted/50 hover:bg-muted transition-colors text-xs leading-relaxed"
+                    >
+                      {example.slice(0, 60)}...
+                    </button>
+                  ))}
+                </div>
+              </Card>
+
+              {/* Statistics - 1/3 height */}
+              <Card className="p-4 flex-1">
+                <h3 className="text-sm font-semibold mb-3 flex items-center">
+                  <BarChart3 className="mr-2 h-4 w-4" />
+                  Statistics
+                </h3>
+                <div className="space-y-3 text-sm">
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Total Candidates</span>
+                    <span className="font-semibold text-lg">2.4M+</span>
                   </div>
-                ))}
-              </div>
-            </Card>
-
-            {/* Example Queries */}
-            <Card className="p-3">
-              <h3 className="text-sm font-semibold mb-3 flex items-center">
-                <FileText className="mr-2 h-3 w-3" />
-                Examples
-              </h3>
-              <div className="space-y-2">
-                {exampleQueries.slice(0, 3).map((example, index) => (
-                  <button
-                    key={index}
-                    onClick={() => handleExampleClick(example)}
-                    className="w-full text-left p-2 rounded bg-muted/50 hover:bg-muted transition-colors text-xs"
-                  >
-                    {example.slice(0, 50)}...
-                  </button>
-                ))}
-              </div>
-            </Card>
-
-            {/* Statistics */}
-            <Card className="p-3">
-              <h3 className="text-sm font-semibold mb-3 flex items-center">
-                <BarChart3 className="mr-2 h-3 w-3" />
-                Statistics
-              </h3>
-              <div className="space-y-1 text-xs">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Total</span>
-                  <span className="font-medium">2.4M+</span>
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Active Profiles</span>
+                    <span className="font-semibold text-lg">890K+</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Updated Today</span>
+                    <span className="font-semibold text-lg">45K+</span>
+                  </div>
+                  <div className="pt-2 border-t">
+                    <div className="text-xs text-muted-foreground text-center">
+                      Database updated every hour
+                    </div>
+                  </div>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Active</span>
-                  <span className="font-medium">890K+</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Updated</span>
-                  <span className="font-medium">45K+</span>
-                </div>
-              </div>
-            </Card>
+              </Card>
+            </div>
           </div>
         </div>
       </div>
