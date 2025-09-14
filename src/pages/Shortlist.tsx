@@ -164,8 +164,29 @@ const Shortlist = () => {
             projectId
           }).then(response => {
             if (response.success) {
-              // Refresh the list to include the newly fetched details
-              fetchShortlistedCandidates();
+              // Update the current candidates with new details instead of re-fetching everything
+              const updatedCandidates = transformedCandidates.map(candidate => {
+                const newDetails = response.details[candidate.numericId];
+                if (newDetails) {
+                  return {
+                    ...candidate,
+                    name: newDetails.name || candidate.name,
+                    title: newDetails.title || newDetails.role || candidate.title,
+                    company: newDetails.employer || candidate.company,
+                    location: newDetails.location || candidate.location,
+                    skills: newDetails.skills ? newDetails.skills.flatMap(skillGroup => {
+                      if (skillGroup && typeof skillGroup === 'object' && 'skills' in skillGroup) {
+                        return skillGroup.skills || [];
+                      }
+                      return Array.isArray(skillGroup) ? skillGroup : [skillGroup];
+                    }).filter(skill => typeof skill === 'string' && skill.trim().length > 0) : candidate.skills,
+                    contacts: newDetails.contacts || candidate.contacts,
+                    socialLinks: newDetails.social || candidate.socialLinks
+                  };
+                }
+                return candidate;
+              });
+              setShortlistedCandidates(updatedCandidates);
             }
           }).catch(error => {
             console.error('Failed to fetch missing candidate details:', error);
