@@ -165,13 +165,13 @@ const NewSearch = () => {
                   </p>
                 </div>
                 
-                 <div className="flex-1 mb-6">
+                 <div className="mb-6">
                    <Textarea
                      id="searchQuery"
                      value={searchQuery}
                      onChange={(e) => setSearchQuery(e.target.value)}
                      placeholder="e.g., Looking for a Senior React Developer with 5+ years experience in modern web technologies..."
-                     className="min-h-[150px] resize-none text-base"
+                     className="h-[150px] resize-none text-base"
                    />
                  </div>
 
