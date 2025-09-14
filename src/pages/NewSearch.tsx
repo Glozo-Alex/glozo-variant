@@ -239,63 +239,63 @@ const NewSearch = () => {
 
           {/* Right Column - Info Panel (25%) */}
           <div className="lg:col-span-1">
-            <div className="space-y-4">
+            <div className="sticky top-4 h-screen max-h-screen overflow-y-auto space-y-2 pr-2">
               {/* Search Tips */}
-              <Card className="p-6">
-                <h3 className="text-lg font-semibold mb-4 flex items-center">
+              <Card className="p-4">
+                <h3 className="text-lg font-semibold mb-3 flex items-center">
                   <Lightbulb className="mr-2 h-5 w-5" />
                   Tips
                 </h3>
-                <div className="space-y-4">
-                  {searchTips.map((tip, index) => (
+                <div className="space-y-3">
+                  {searchTips.slice(0, 3).map((tip, index) => (
                     <div key={index} className="text-sm">
-                      <p className="font-medium text-foreground mb-2">{tip.title}</p>
-                      <p className="text-muted-foreground leading-relaxed">{tip.description}</p>
+                      <p className="font-medium text-foreground mb-1">{tip.title}</p>
+                      <p className="text-muted-foreground">{tip.description}</p>
                     </div>
                   ))}
                 </div>
               </Card>
 
               {/* Example Queries */}
-              <Card className="p-6">
-                <h3 className="text-lg font-semibold mb-4 flex items-center">
+              <Card className="p-4">
+                <h3 className="text-lg font-semibold mb-3 flex items-center">
                   <FileText className="mr-2 h-5 w-5" />
                   Examples
                 </h3>
-                <div className="space-y-3">
-                  {exampleQueries.map((example, index) => (
+                <div className="space-y-2">
+                  {exampleQueries.slice(0, 4).map((example, index) => (
                     <button
                       key={index}
                       onClick={() => handleExampleClick(example)}
-                      className="w-full text-left p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors text-sm leading-relaxed"
+                      className="w-full text-left p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors text-sm"
                     >
-                      {example.slice(0, 70)}...
+                      {example.slice(0, 60)}...
                     </button>
                   ))}
                 </div>
               </Card>
 
               {/* Statistics */}
-              <Card className="p-6">
-                <h3 className="text-lg font-semibold mb-4 flex items-center">
+              <Card className="p-4">
+                <h3 className="text-lg font-semibold mb-3 flex items-center">
                   <BarChart3 className="mr-2 h-5 w-5" />
                   Statistics
                 </h3>
-                <div className="space-y-4 text-base">
+                <div className="space-y-3 text-sm">
                   <div className="flex justify-between items-center">
                     <span className="text-muted-foreground">Total Candidates</span>
-                    <span className="font-semibold text-xl">2.4M+</span>
+                    <span className="font-semibold">2.4M+</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-muted-foreground">Active Profiles</span>
-                    <span className="font-semibold text-xl">890K+</span>
+                    <span className="font-semibold">890K+</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-muted-foreground">Updated Today</span>
-                    <span className="font-semibold text-xl">45K+</span>
+                    <span className="font-semibold">45K+</span>
                   </div>
-                  <div className="pt-4 border-t">
-                    <div className="text-sm text-muted-foreground text-center">
+                  <div className="pt-2 border-t">
+                    <div className="text-xs text-muted-foreground text-center">
                       Database updated every hour
                     </div>
                   </div>
