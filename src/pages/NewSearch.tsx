@@ -137,11 +137,11 @@ const NewSearch = () => {
     }
   };
   return (
-    <div className="h-screen bg-background flex flex-col">
-      <div className="container mx-auto px-4 py-4 flex-1 flex flex-col">
+    <div className="h-screen bg-background flex flex-col overflow-hidden">
+      <div className="container mx-auto px-4 py-3 flex-1 flex flex-col max-h-screen">
         {/* Compact Header */}
-        <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold text-foreground mb-2">
+        <div className="text-center mb-4">
+          <h1 className="text-xl font-bold text-foreground mb-1">
             Find Candidates
           </h1>
           <p className="text-sm text-muted-foreground">
@@ -150,32 +150,32 @@ const NewSearch = () => {
         </div>
 
         {/* Two Column Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 flex-1 max-w-7xl mx-auto w-full h-full">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 flex-1 max-w-7xl mx-auto w-full min-h-0">
           {/* Left Column - Main Content Area (75%) */}
-          <div className="lg:col-span-3 flex flex-col h-full">
-            {/* Job Description Section - Takes most space */}
-            <Card className="p-8 flex-1 mb-6">
-              <div className="flex flex-col h-full">
-                <div className="mb-6">
-                  <Label htmlFor="searchQuery" className="text-xl font-semibold">
+          <div className="lg:col-span-3 flex flex-col min-h-0">
+            {/* Job Description Section - Visual focal point */}
+            <Card className="p-6 mb-4 border-2 border-primary/20 shadow-lg bg-gradient-to-br from-background to-muted/30">
+              <div className="flex flex-col">
+                <div className="mb-4">
+                  <Label htmlFor="searchQuery" className="text-lg font-bold text-primary">
                     Job Description
                   </Label>
-                  <p className="text-sm text-muted-foreground mt-2 mb-4">
+                  <p className="text-sm text-muted-foreground mt-1">
                     Provide a detailed description of the position
                   </p>
                 </div>
                 
-                <div className="flex-1 mb-6">
+                <div className="mb-4">
                   <Textarea
                     id="searchQuery"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="e.g., Looking for a Senior React Developer with 5+ years experience in modern web technologies..."
-                    className="h-full min-h-[300px] resize-none text-base"
+                    className="h-24 resize-none text-sm border-primary/30 focus:border-primary"
                   />
                 </div>
 
-                <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center space-x-2">
                     <Switch
                       id="similar-roles"
@@ -192,17 +192,17 @@ const NewSearch = () => {
 
                 <Button 
                   onClick={handleCreateProject}
-                  className="w-full h-14 text-lg"
+                  className="w-full h-11 font-semibold"
                   disabled={!searchQuery.trim() || isLoading}
                 >
                   {isLoading ? (
                     <>
-                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       Searching...
                     </>
                   ) : (
                     <>
-                      <Search className="mr-2 h-5 w-5" />
+                      <Search className="mr-2 h-4 w-4" />
                       Search Candidates
                     </>
                   )}
@@ -210,22 +210,22 @@ const NewSearch = () => {
               </div>
             </Card>
 
-            {/* Recent Searches - Below Job Description */}
+            {/* Recent Searches - Compact */}
             {recentSearches.length > 0 && (
-              <Card className="p-6">
-                <h3 className="text-lg font-semibold mb-4 flex items-center">
-                  <History className="mr-2 h-5 w-5" />
+              <Card className="p-4 flex-1 min-h-0">
+                <h3 className="text-sm font-semibold mb-3 flex items-center">
+                  <History className="mr-2 h-4 w-4" />
                   Recent Searches
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 overflow-y-auto">
                   {recentSearches.slice(0, 4).map((search) => (
                     <button
                       key={search.id}
                       onClick={() => handleRecentSearchClick(search)}
-                      className="text-left p-4 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+                      className="text-left p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
                     >
-                      <p className="text-sm font-medium truncate mb-2">
-                        {search.prompt.slice(0, 80)}...
+                      <p className="text-xs font-medium truncate mb-1">
+                        {search.prompt.slice(0, 60)}...
                       </p>
                       <p className="text-xs text-muted-foreground">
                         {new Date(search.created_at).toLocaleDateString()} • {search.candidate_count || 0} candidates
@@ -238,18 +238,18 @@ const NewSearch = () => {
           </div>
 
           {/* Right Column - Info Panel (25%) */}
-          <div className="lg:col-span-1 h-full">
-            <div className="flex flex-col h-full space-y-4">
+          <div className="lg:col-span-1 min-h-0">
+            <div className="flex flex-col h-full space-y-3">
               {/* Search Tips - 1/3 height */}
-              <Card className="p-6 flex-1 flex flex-col">
-                <h3 className="text-lg font-semibold mb-4 flex items-center">
-                  <Lightbulb className="mr-2 h-5 w-5" />
+              <Card className="p-4 flex-1 min-h-0">
+                <h3 className="text-sm font-semibold mb-3 flex items-center">
+                  <Lightbulb className="mr-2 h-4 w-4" />
                   Tips
                 </h3>
-                <div className="space-y-4 flex-1">
+                <div className="space-y-3 overflow-y-auto">
                   {searchTips.map((tip, index) => (
-                    <div key={index} className="text-sm">
-                      <p className="font-medium text-foreground mb-2">{tip.title}</p>
+                    <div key={index} className="text-xs">
+                      <p className="font-medium text-foreground mb-1">{tip.title}</p>
                       <p className="text-muted-foreground leading-relaxed">{tip.description}</p>
                     </div>
                   ))}
@@ -257,46 +257,46 @@ const NewSearch = () => {
               </Card>
 
               {/* Example Queries - 1/3 height */}
-              <Card className="p-6 flex-1 flex flex-col">
-                <h3 className="text-lg font-semibold mb-4 flex items-center">
-                  <FileText className="mr-2 h-5 w-5" />
+              <Card className="p-4 flex-1 min-h-0">
+                <h3 className="text-sm font-semibold mb-3 flex items-center">
+                  <FileText className="mr-2 h-4 w-4" />
                   Examples
                 </h3>
-                <div className="space-y-3 flex-1">
+                <div className="space-y-2 overflow-y-auto">
                   {exampleQueries.map((example, index) => (
                     <button
                       key={index}
                       onClick={() => handleExampleClick(example)}
-                      className="w-full text-left p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors text-sm leading-relaxed"
+                      className="w-full text-left p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors text-xs leading-relaxed"
                     >
-                      {example.slice(0, 70)}...
+                      {example.slice(0, 50)}...
                     </button>
                   ))}
                 </div>
               </Card>
 
               {/* Statistics - 1/3 height */}
-              <Card className="p-6 flex-1 flex flex-col">
-                <h3 className="text-lg font-semibold mb-4 flex items-center">
-                  <BarChart3 className="mr-2 h-5 w-5" />
+              <Card className="p-4 flex-1 min-h-0">
+                <h3 className="text-sm font-semibold mb-3 flex items-center">
+                  <BarChart3 className="mr-2 h-4 w-4" />
                   Statistics
                 </h3>
-                <div className="space-y-4 text-base flex-1">
+                <div className="space-y-3 text-sm">
                   <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">Total Candidates</span>
-                    <span className="font-semibold text-xl">2.4M+</span>
+                    <span className="text-muted-foreground">Total</span>
+                    <span className="font-semibold">2.4M+</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">Active Profiles</span>
-                    <span className="font-semibold text-xl">890K+</span>
+                    <span className="text-muted-foreground">Active</span>
+                    <span className="font-semibold">890K+</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">Updated Today</span>
-                    <span className="font-semibold text-xl">45K+</span>
+                    <span className="text-muted-foreground">Updated</span>
+                    <span className="font-semibold">45K+</span>
                   </div>
-                  <div className="pt-4 border-t mt-auto">
-                    <div className="text-sm text-muted-foreground text-center">
-                      Database updated every hour
+                  <div className="pt-2 border-t">
+                    <div className="text-xs text-muted-foreground text-center">
+                      Updated hourly
                     </div>
                   </div>
                 </div>
