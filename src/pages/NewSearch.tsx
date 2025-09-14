@@ -152,7 +152,7 @@ const NewSearch = () => {
         {/* Two Column Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 max-w-7xl mx-auto w-full">
           {/* Left Column - Main Content Area (75%) */}
-          <div className="lg:col-span-3 flex flex-col">
+          <div className="lg:col-span-3">
             {/* Job Description Section - Takes only needed space */}
             <Card className="p-8 mb-6">
               <div className="flex flex-col">
