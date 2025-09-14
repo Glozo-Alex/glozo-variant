@@ -4,8 +4,9 @@ import { useProject } from "@/contexts/ProjectContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Search, Copy, Clock, FileText, Upload, ExternalLink } from "lucide-react";
+import { Search, Copy, Clock, FileText, Upload, ExternalLink, Lightbulb, History, BarChart3, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Switch } from "@/components/ui/switch";
 import { getCandidatesByChat } from "@/services/candidates";
@@ -20,7 +21,7 @@ const NewSearch = () => {
     toast
   } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
-  const [similarRoles, setSimilarRoles] = useState(false);
+  const [findSimilarRoles, setFindSimilarRoles] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [recentSearches, setRecentSearches] = useState<RecentSearch[]>([]);
 
@@ -109,12 +110,12 @@ const NewSearch = () => {
     setIsLoading(true);
     try {
       // First create the temporary project in Supabase
-      const project = await createProject(projectName, searchQuery, similarRoles, true);
+      const project = await createProject(projectName, searchQuery, findSimilarRoles, true);
       
       // Then perform the search
       const apiRes = await getCandidatesByChat({ 
         message: searchQuery, 
-        similarRoles, 
+        similarRoles: findSimilarRoles, 
         projectId: project.id 
       });
       const count = Array.isArray(apiRes) ? apiRes.length : Array.isArray(apiRes?.data) ? apiRes.data.length : undefined;
@@ -136,179 +137,161 @@ const NewSearch = () => {
     }
   };
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-6 py-8">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-foreground mb-3">Find Your Perfect Candidates</h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Describe the role you're hiring for and let our AI find the best matching candidates from our database
+    <div className="h-screen bg-background flex flex-col">
+      <div className="container mx-auto px-4 py-4 flex-1 flex flex-col">
+        {/* Compact Header */}
+        <div className="text-center mb-6">
+          <h1 className="text-2xl font-bold text-foreground mb-2">
+            Find Candidates
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            Describe your position and let AI find the best candidates
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
-          {/* Main Search Area - Center */}
-          <div className="lg:col-span-3 space-y-8">
-            {/* Search Input Area */}
-            <div className="bg-card rounded-lg border shadow-sm p-8">
-              <div className="space-y-6">
-                <div className="space-y-3">
-                  <Label htmlFor="search-query" className="text-base font-medium">
-                    Describe your ideal candidate
+        {/* Three Column Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 flex-1 max-w-7xl mx-auto w-full">
+          {/* Left Column - Recent Searches (25%) */}
+          <div className="lg:col-span-1">
+            {recentSearches.length > 0 && (
+              <Card className="p-3 h-fit">
+                <h3 className="text-sm font-semibold mb-3 flex items-center">
+                  <History className="mr-2 h-3 w-3" />
+                  Recent Searches
+                </h3>
+                <div className="space-y-2">
+                  {recentSearches.slice(0, 3).map((search) => (
+                    <button
+                      key={search.id}
+                      onClick={() => handleRecentSearchClick(search)}
+                      className="w-full text-left p-2 rounded bg-muted/50 hover:bg-muted transition-colors"
+                    >
+                      <p className="text-xs font-medium truncate">
+                        {search.prompt.slice(0, 60)}...
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {new Date(search.created_at).toLocaleDateString()} • {search.candidate_count || 0} candidates
+                      </p>
+                    </button>
+                  ))}
+                </div>
+              </Card>
+            )}
+          </div>
+
+          {/* Center Column - Main Search (50%) */}
+          <div className="lg:col-span-2 flex flex-col">
+            <Card className="p-6 flex-1 flex flex-col">
+              <div className="flex-1 flex flex-col space-y-4">
+                <div className="flex-1">
+                  <Label htmlFor="searchQuery" className="text-base font-semibold">
+                    Job Description
                   </Label>
-                  <Input
-                    id="search-query"
-                    placeholder="e.g., Senior React developer with 5+ years experience for fintech startup..."
-                    className="text-base h-12"
+                  <p className="text-xs text-muted-foreground mt-1 mb-2">
+                    Provide a detailed description of the position
+                  </p>
+                  <Textarea
+                    id="searchQuery"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="e.g., Looking for a Senior React Developer with 5+ years experience in modern web technologies..."
+                    className="h-32 resize-none"
                   />
-                  <p className="text-sm text-muted-foreground">
-                    Use natural language to describe the role, skills, experience level, and any specific requirements
-                  </p>
                 </div>
 
-                {/* Options Row */}
-                <div className="flex items-center justify-between flex-wrap gap-4">
-                  <div className="flex items-center space-x-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
                     <Switch
                       id="similar-roles"
-                      checked={similarRoles}
-                      onCheckedChange={setSimilarRoles}
+                      checked={findSimilarRoles}
+                      onCheckedChange={setFindSimilarRoles}
                     />
-                    <Label htmlFor="similar-roles" className="text-sm font-medium">
-                      Include similar roles
+                    <Label htmlFor="similar-roles" className="text-sm">
+                      Find similar roles
                     </Label>
                   </div>
                   
                   <FileUploadButton onFileContent={handleFileContent} />
                 </div>
 
-                {/* Search Button */}
                 <Button 
-                  onClick={handleCreateProject} 
-                  className="w-full h-12 text-base font-medium" 
-                  size="lg" 
-                  disabled={isLoading || !searchQuery.trim()}
+                  onClick={handleCreateProject}
+                  className="w-full h-10"
+                  disabled={!searchQuery.trim() || isLoading}
                 >
-                  <Search className="h-5 w-5 mr-2" />
-                  {isLoading ? "Searching candidates..." : "Search Candidates"}
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Searching...
+                    </>
+                  ) : (
+                    <>
+                      <Search className="mr-2 h-4 w-4" />
+                      Search Candidates
+                    </>
+                  )}
                 </Button>
               </div>
-            </div>
-
-            {/* Recent Searches */}
-            {recentSearches.length > 0 && (
-              <div className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-muted-foreground" />
-                  <h2 className="text-lg font-semibold text-foreground">Recent Searches</h2>
-                </div>
-                <div className="grid gap-3">
-                  {recentSearches.map((search) => (
-                    <Button
-                      key={search.id}
-                      variant="outline"
-                      className="h-auto p-4 text-left justify-start hover:bg-muted/50"
-                      onClick={() => handleRecentSearchClick(search)}
-                    >
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-foreground truncate">
-                          {search.prompt}
-                        </p>
-                        <div className="flex items-center gap-4 mt-1 text-xs text-muted-foreground">
-                          <span>{new Date(search.created_at).toLocaleDateString()}</span>
-                          {search.candidate_count && (
-                            <span>{search.candidate_count} candidates found</span>
-                          )}
-                        </div>
-                      </div>
-                      <Copy className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                    </Button>
-                  ))}
-                </div>
-              </div>
-            )}
+            </Card>
           </div>
 
-          {/* Right Sidebar - Information */}
-          <div className="space-y-6">
+          {/* Right Column - Info Panel (25%) */}
+          <div className="lg:col-span-1 space-y-3">
             {/* Search Tips */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base font-semibold">Search Tips</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {searchTips.map((tip, index) => (
-                  <div key={index} className="space-y-1">
-                    <p className="text-sm font-medium text-foreground">{tip.title}</p>
-                    <p className="text-xs text-muted-foreground">{tip.description}</p>
+            <Card className="p-3">
+              <h3 className="text-sm font-semibold mb-3 flex items-center">
+                <Lightbulb className="mr-2 h-3 w-3" />
+                Tips
+              </h3>
+              <div className="space-y-2">
+                {searchTips.slice(0, 3).map((tip, index) => (
+                  <div key={index} className="text-xs">
+                    <p className="font-medium text-foreground">{tip.title}</p>
+                    <p className="text-muted-foreground">{tip.description}</p>
                   </div>
                 ))}
-              </CardContent>
+              </div>
             </Card>
 
             {/* Example Queries */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base font-semibold">Example Searches</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                {exampleQueries.map((example, index) => (
-                  <Button
+            <Card className="p-3">
+              <h3 className="text-sm font-semibold mb-3 flex items-center">
+                <FileText className="mr-2 h-3 w-3" />
+                Examples
+              </h3>
+              <div className="space-y-2">
+                {exampleQueries.slice(0, 3).map((example, index) => (
+                  <button
                     key={index}
-                    variant="ghost"
-                    size="sm"
-                    className="w-full justify-start text-left h-auto p-3 text-xs hover:bg-muted/50 whitespace-normal"
                     onClick={() => handleExampleClick(example)}
+                    className="w-full text-left p-2 rounded bg-muted/50 hover:bg-muted transition-colors text-xs"
                   >
-                    <Copy className="h-3 w-3 mr-2 flex-shrink-0 mt-0.5" />
-                    <span className="flex-1">{example}</span>
-                  </Button>
+                    {example.slice(0, 50)}...
+                  </button>
                 ))}
-              </CardContent>
+              </div>
             </Card>
 
-            {/* Help Articles */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base font-semibold">Help & Resources</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {helpArticles.map((article, index) => (
-                  <a
-                    key={index}
-                    href={article.href}
-                    className="block p-3 rounded-md hover:bg-muted/50 transition-colors"
-                  >
-                    <div className="flex items-start gap-2">
-                      <FileText className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-foreground">{article.title}</p>
-                        <p className="text-xs text-muted-foreground mt-1">{article.description}</p>
-                      </div>
-                      <ExternalLink className="h-3 w-3 text-muted-foreground flex-shrink-0" />
-                    </div>
-                  </a>
-                ))}
-              </CardContent>
-            </Card>
-
-            {/* Quick Stats */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base font-semibold">Search Statistics</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-primary">2.5M+</p>
-                  <p className="text-xs text-muted-foreground">Candidates in database</p>
+            {/* Statistics */}
+            <Card className="p-3">
+              <h3 className="text-sm font-semibold mb-3 flex items-center">
+                <BarChart3 className="mr-2 h-3 w-3" />
+                Statistics
+              </h3>
+              <div className="space-y-1 text-xs">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Total</span>
+                  <span className="font-medium">2.4M+</span>
                 </div>
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-primary">95%</p>
-                  <p className="text-xs text-muted-foreground">Average match accuracy</p>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Active</span>
+                  <span className="font-medium">890K+</span>
                 </div>
-              </CardContent>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Updated</span>
+                  <span className="font-medium">45K+</span>
+                </div>
+              </div>
             </Card>
           </div>
         </div>
