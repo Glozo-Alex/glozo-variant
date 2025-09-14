@@ -56,116 +56,117 @@ const Shortlist = () => {
   
   const project = projects.find(p => p.id === projectId);
 
-  useEffect(() => {
-    const fetchShortlistedCandidates = async () => {
-      if (!projectId) return;
+  const fetchShortlistedCandidates = useCallback(async () => {
+    if (!projectId) return;
+    
+    console.log('Shortlist - Starting fetch for projectId:', projectId);
+    
+    try {
+      setLoading(true);
+      setError(null);
+      const shortlist = await getShortlistForProject(projectId);
+      console.log('Shortlist - Raw shortlist data:', shortlist);
       
-      console.log('Shortlist - Starting fetch for projectId:', projectId);
+      // Get numeric candidate IDs for fetching details
+      const numericIds = shortlist
+        .map(item => {
+          const id = parseInt(item.candidate_id, 10);
+          console.log('Shortlist - Parsing candidate_id:', item.candidate_id, '-> numeric:', id);
+          return id;
+        })
+        .filter(Number.isFinite);
       
-      try {
-        setLoading(true);
-        setError(null);
-        const shortlist = await getShortlistForProject(projectId);
-        console.log('Shortlist - Raw shortlist data:', shortlist);
+      console.log('Shortlist - Numeric IDs:', numericIds);
+      
+      // Fetch cached candidate details
+      const detailsMap = await getCachedCandidateDetails(numericIds, projectId);
+      console.log('Shortlist - Details map:', detailsMap);
+      
+      // Transform the data to match the component's expected format
+      const transformedCandidates = shortlist.map((item, index) => {
+        console.log(`Shortlist - Processing candidate ${index}:`, item);
+        const candidateData = item.candidate_snapshot as any;
+        const numericId = parseInt(item.candidate_id, 10);
+        const details = detailsMap[numericId];
+        console.log(`Shortlist - Candidate ${index} details:`, { candidateData, numericId, details });
         
-        // Get numeric candidate IDs for fetching details
-        const numericIds = shortlist
-          .map(item => {
-            const id = parseInt(item.candidate_id, 10);
-            console.log('Shortlist - Parsing candidate_id:', item.candidate_id, '-> numeric:', id);
-            return id;
-          })
-          .filter(Number.isFinite);
+        // Use details from cache if available, fallback to snapshot
+        const name = details?.name || candidateData.name || 'Unknown';
+        const title = details?.title || details?.role || candidateData.title || 'No title';
+        const company = details?.employer || candidateData.company || 'Unknown company';
+        const location = details?.location || candidateData.location || 'Unknown location';
         
-        console.log('Shortlist - Numeric IDs:', numericIds);
+        // Handle skills - prioritize details, fallback to snapshot
+        let processedSkills: string[] = [];
+        if (details?.skills) {
+          // Flatten skills from details (array of SkillGroup objects)
+          processedSkills = details.skills.flatMap(skillGroup => {
+            // Handle both SkillGroup structure and direct string arrays
+            if (skillGroup && typeof skillGroup === 'object' && 'skills' in skillGroup) {
+              return skillGroup.skills || [];
+            }
+            // Fallback for direct string arrays or single strings
+            return Array.isArray(skillGroup) ? skillGroup : [skillGroup];
+          }).filter(skill => typeof skill === 'string' && skill.trim().length > 0);
+        } else {
+          // Fallback to snapshot skills
+          const skillsArray = candidateData.skills || [];
+          processedSkills = skillsArray.map((skill: any) => 
+            typeof skill === 'string' ? skill : skill.name || skill
+          );
+        }
         
-        // Fetch cached candidate details
-        const detailsMap = await getCachedCandidateDetails(numericIds, projectId);
-        console.log('Shortlist - Details map:', detailsMap);
+        // Handle contacts - prioritize details, fallback to snapshot
+        const contacts = details?.contacts || candidateData.contacts || {
+          emails: candidateData.email && candidateData.email !== 'No email' ? [candidateData.email] : [],
+          phones: candidateData.phone && candidateData.phone !== 'No phone' ? [candidateData.phone] : []
+        };
         
-        // Transform the data to match the component's expected format
-        const transformedCandidates = shortlist.map((item, index) => {
-          console.log(`Shortlist - Processing candidate ${index}:`, item);
-          const candidateData = item.candidate_snapshot as any;
-          const numericId = parseInt(item.candidate_id, 10);
-          const details = detailsMap[numericId];
-          console.log(`Shortlist - Candidate ${index} details:`, { candidateData, numericId, details });
-          
-          // Use details from cache if available, fallback to snapshot
-          const name = details?.name || candidateData.name || 'Unknown';
-          const title = details?.title || details?.role || candidateData.title || 'No title';
-          const company = details?.employer || candidateData.company || 'Unknown company';
-          const location = details?.location || candidateData.location || 'Unknown location';
-          
-          // Handle skills - prioritize details, fallback to snapshot
-          let processedSkills: string[] = [];
-          if (details?.skills) {
-            // Flatten skills from details (array of SkillGroup objects)
-            processedSkills = details.skills.flatMap(skillGroup => {
-              // Handle both SkillGroup structure and direct string arrays
-              if (skillGroup && typeof skillGroup === 'object' && 'skills' in skillGroup) {
-                return skillGroup.skills || [];
-              }
-              // Fallback for direct string arrays or single strings
-              return Array.isArray(skillGroup) ? skillGroup : [skillGroup];
-            }).filter(skill => typeof skill === 'string' && skill.trim().length > 0);
-          } else {
-            // Fallback to snapshot skills
-            const skillsArray = candidateData.skills || [];
-            processedSkills = skillsArray.map((skill: any) => 
-              typeof skill === 'string' ? skill : skill.name || skill
-            );
-          }
-          
-          // Handle contacts - prioritize details, fallback to snapshot
-          const contacts = details?.contacts || candidateData.contacts || {
-            emails: candidateData.email && candidateData.email !== 'No email' ? [candidateData.email] : [],
-            phones: candidateData.phone && candidateData.phone !== 'No phone' ? [candidateData.phone] : []
-          };
-          
-          // Prepare social links if available
-          const socialLinks = details?.social || [];
-          
-          const result = {
-            id: item.candidate_id,
-            numericId,
-            name,
-            title,
-            company,
-            location,
-            match: Math.round(
-              Number(
-                (details as any)?.match_percentage ?? (details as any)?.match_score ?? (details as any)?.match ??
-                candidateData.match_percentage ?? candidateData.match_score ?? candidateData.matchPercentage ?? candidateData.match ?? 0
-              )
-            ),
-            rating: candidateData.rating || 0,
-            skills: processedSkills,
-            experience: candidateData.experience || 'No experience',
-            email: candidateData.email || 'No email',
-            phone: candidateData.phone || 'No phone',
-            contacts,
-            socialLinks,
-            addedAt: item.added_at,
-            avatar: name ? name.split(' ').map((n: string) => n[0]).join('').toUpperCase() : 'UN'
-          };
-          console.log(`Shortlist - Transformed candidate ${index}:`, result);
-          return result;
-        });
+        // Prepare social links if available
+        const socialLinks = details?.social || [];
         
-        console.log('Shortlist - Final transformed candidates:', transformedCandidates);
-        setShortlistedCandidates(transformedCandidates);
-        
-        // Check for candidates without cached details and fetch them in background
-        const missingIds = numericIds.filter(id => !detailsMap[id]);
-        if (missingIds.length > 0) {
-          getCandidateDetails({
-            candidateIds: missingIds,
-            projectId
-          }).then(response => {
-            if (response.success) {
-              // Update the current candidates with new details instead of re-fetching everything
-              const updatedCandidates = transformedCandidates.map(candidate => {
+        const result = {
+          id: item.candidate_id,
+          numericId,
+          name,
+          title,
+          company,
+          location,
+          match: Math.round(
+            Number(
+              (details as any)?.match_percentage ?? (details as any)?.match_score ?? (details as any)?.match ??
+              candidateData.match_percentage ?? candidateData.match_score ?? candidateData.matchPercentage ?? candidateData.match ?? 0
+            )
+          ),
+          rating: candidateData.rating || 0,
+          skills: processedSkills,
+          experience: candidateData.experience || 'No experience',
+          email: candidateData.email || 'No email',
+          phone: candidateData.phone || 'No phone',
+          contacts,
+          socialLinks,
+          addedAt: item.added_at,
+          avatar: name ? name.split(' ').map((n: string) => n[0]).join('').toUpperCase() : 'UN'
+        };
+        console.log(`Shortlist - Transformed candidate ${index}:`, result);
+        return result;
+      });
+      
+      console.log('Shortlist - Final transformed candidates:', transformedCandidates);
+      setShortlistedCandidates(transformedCandidates);
+      
+      // Check for candidates without cached details and fetch them in background
+      const missingIds = numericIds.filter(id => !detailsMap[id]);
+      if (missingIds.length > 0) {
+        // Don't await this - let it run in background
+        getCandidateDetails({
+          candidateIds: missingIds,
+          projectId
+        }).then(response => {
+          if (response.success) {
+            // Update the current candidates with new details instead of re-fetching everything
+            setShortlistedCandidates(currentCandidates => {
+              return currentCandidates.map(candidate => {
                 const newDetails = response.details[candidate.numericId];
                 if (newDetails) {
                   return {
@@ -186,23 +187,24 @@ const Shortlist = () => {
                 }
                 return candidate;
               });
-              setShortlistedCandidates(updatedCandidates);
-            }
-          }).catch(error => {
-            console.error('Failed to fetch missing candidate details:', error);
-          });
-        }
-      } catch (error) {
-        console.error('Shortlist - Error in fetchShortlistedCandidates:', error);
-        console.error('Shortlist - Error stack:', error instanceof Error ? error.stack : 'No stack trace');
-        setError('Failed to load shortlisted candidates');
-      } finally {
-        setLoading(false);
+            });
+          }
+        }).catch(error => {
+          console.error('Failed to fetch missing candidate details:', error);
+        });
       }
-    };
-
-    fetchShortlistedCandidates();
+    } catch (error) {
+      console.error('Shortlist - Error in fetchShortlistedCandidates:', error);
+      console.error('Shortlist - Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+      setError('Failed to load shortlisted candidates');
+    } finally {
+      setLoading(false);
+    }
   }, [projectId]);
+
+  useEffect(() => {
+    fetchShortlistedCandidates();
+  }, [fetchShortlistedCandidates]);
 
   const handleRemoveFromShortlist = useCallback(async (candidateId: string, candidateName: string) => {
     if (!projectId) return;
