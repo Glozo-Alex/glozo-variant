@@ -240,13 +240,13 @@ const NewSearch = () => {
           {/* Right Column - Info Panel (25%) */}
           <div className="lg:col-span-1">
             <div className="flex flex-col space-y-4">
-              {/* Search Tips - 1/3 height */}
-              <Card className="p-6 flex-1 flex flex-col">
+              {/* Search Tips */}
+              <Card className="p-6">
                 <h3 className="text-lg font-semibold mb-4 flex items-center">
                   <Lightbulb className="mr-2 h-5 w-5" />
                   Tips
                 </h3>
-                <div className="space-y-4 flex-1">
+                <div className="space-y-4">
                   {searchTips.map((tip, index) => (
                     <div key={index} className="text-sm">
                       <p className="font-medium text-foreground mb-2">{tip.title}</p>
@@ -256,13 +256,13 @@ const NewSearch = () => {
                 </div>
               </Card>
 
-              {/* Example Queries - 1/3 height */}
-              <Card className="p-6 flex-1 flex flex-col">
+              {/* Example Queries */}
+              <Card className="p-6">
                 <h3 className="text-lg font-semibold mb-4 flex items-center">
                   <FileText className="mr-2 h-5 w-5" />
                   Examples
                 </h3>
-                <div className="space-y-3 flex-1">
+                <div className="space-y-3">
                   {exampleQueries.map((example, index) => (
                     <button
                       key={index}
@@ -275,13 +275,13 @@ const NewSearch = () => {
                 </div>
               </Card>
 
-              {/* Statistics - 1/3 height */}
-              <Card className="p-6 flex-1 flex flex-col">
+              {/* Statistics */}
+              <Card className="p-6">
                 <h3 className="text-lg font-semibold mb-4 flex items-center">
                   <BarChart3 className="mr-2 h-5 w-5" />
                   Statistics
                 </h3>
-                <div className="space-y-4 text-base flex-1">
+                <div className="space-y-4 text-base">
                   <div className="flex justify-between items-center">
                     <span className="text-muted-foreground">Total Candidates</span>
                     <span className="font-semibold text-xl">2.4M+</span>
@@ -294,7 +294,7 @@ const NewSearch = () => {
                     <span className="text-muted-foreground">Updated Today</span>
                     <span className="font-semibold text-xl">45K+</span>
                   </div>
-                  <div className="pt-4 border-t mt-auto">
+                  <div className="pt-4 border-t">
                     <div className="text-sm text-muted-foreground text-center">
                       Database updated every hour
                     </div>
