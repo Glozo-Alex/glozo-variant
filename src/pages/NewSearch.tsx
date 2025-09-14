@@ -239,7 +239,7 @@ const NewSearch = () => {
 
           {/* Right Column - Info Panel (25%) */}
           <div className="lg:col-span-1">
-            <div className="flex flex-col space-y-4">
+            <div className="space-y-4">
               {/* Search Tips */}
               <Card className="p-6">
                 <h3 className="text-lg font-semibold mb-4 flex items-center">
