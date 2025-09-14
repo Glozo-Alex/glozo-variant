@@ -239,7 +239,7 @@ const NewSearch = () => {
 
           {/* Right Column - Info Panel (25%) */}
           <div className="lg:col-span-1">
-            <div className="sticky top-4 h-screen max-h-screen overflow-y-auto space-y-2 pr-2">
+            <div className="sticky top-4 max-h-screen overflow-y-auto space-y-2 pr-2">
               {/* Search Tips */}
               <Card className="p-4">
                 <h3 className="text-lg font-semibold mb-3 flex items-center">
