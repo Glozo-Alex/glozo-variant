@@ -171,7 +171,7 @@ const NewSearch = () => {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="e.g., Looking for a Senior React Developer with 5+ years experience in modern web technologies..."
-                    className="h-24 resize-none text-sm border-primary/30 focus:border-primary"
+                    className="h-20 resize-none text-sm border-primary/30 focus:border-primary"
                   />
                 </div>
 
