@@ -236,7 +236,7 @@ const NewSearch = () => {
           <div className="lg:col-span-1 h-full">
             <div className="flex flex-col h-full space-y-3">
               {/* Search Tips */}
-              <Card className="p-4 flex-1">
+              <Card className="p-4 h-32 overflow-y-auto">
                 <h3 className="text-base font-semibold mb-3 flex items-center">
                   <Lightbulb className="mr-2 h-4 w-4" />
                   Tips
@@ -253,12 +253,12 @@ const NewSearch = () => {
 
               {/* Recent Searches */}
               {recentSearches.length > 0 && (
-                <Card className="p-4 flex-1">
+                <Card className="p-4 h-32 overflow-y-auto">
                   <h3 className="text-base font-semibold mb-3 flex items-center">
                     <History className="mr-2 h-4 w-4" />
                     Recent Searches
                   </h3>
-                  <div className="space-y-2 overflow-y-auto">
+                  <div className="space-y-2">
                     {recentSearches.slice(0, 3).map((search) => (
                       <button
                         key={search.id}
