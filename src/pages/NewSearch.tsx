@@ -137,10 +137,10 @@ const NewSearch = () => {
     }
   };
   return (
-    <div className="bg-background h-screen flex flex-col overflow-hidden">
-      <div className="container mx-auto px-4 py-4 flex-1 flex flex-col">
+    <div className="bg-background min-h-screen">
+      <div className="container mx-auto px-4 py-4">
         {/* Compact Header */}
-        <div className="text-center mb-4 flex-shrink-0">
+        <div className="text-center mb-4">
           <h1 className="text-2xl font-bold text-foreground mb-1">
             Find Candidates
           </h1>
@@ -149,10 +149,10 @@ const NewSearch = () => {
           </p>
         </div>
 
-        {/* Two Column Layout - takes remaining space */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 max-w-7xl mx-auto w-full flex-1 overflow-hidden">
+        {/* Two Column Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 max-w-7xl mx-auto w-full">
           {/* Left Column - Main Content Area (75%) */}
-          <div className="lg:col-span-3 flex flex-col overflow-hidden">
+          <div className="lg:col-span-3 space-y-4">
             {/* Job Description Section - Takes fixed space */}
             <Card className="p-6 mb-4 flex-shrink-0">
               <div className="flex flex-col">
@@ -238,8 +238,8 @@ const NewSearch = () => {
           </div>
 
           {/* Right Column - Info Panel (25%) */}
-          <div className="lg:col-span-1 flex flex-col overflow-hidden">
-            <div className="space-y-3 flex-1 overflow-y-auto">
+          <div className="lg:col-span-1">
+            <div className="space-y-3">
               {/* Search Tips */}
               <Card className="p-4 flex-shrink-0">
                 <h3 className="text-base font-semibold mb-3 flex items-center">
