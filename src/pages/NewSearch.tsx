@@ -154,7 +154,7 @@ const NewSearch = () => {
           {/* Left Column - Main Content Area (75%) */}
           <div className="lg:col-span-3 space-y-4">
             {/* Job Description Section - Takes fixed space */}
-            <Card className="p-6 mb-4 flex-shrink-0">
+            <Card className="p-6 mb-4"ket->
               <div className="flex flex-col">
                 <div className="mb-4">
                   <Label htmlFor="searchQuery" className="text-lg font-semibold">
@@ -212,7 +212,7 @@ const NewSearch = () => {
 
             {/* Recent Searches - Fixed height */}
             {recentSearches.length > 0 && (
-              <Card className="p-4 flex-shrink-0">
+              <Card className="p-4">
                 <h3 className="text-lg font-semibold mb-3 flex items-center">
                   <History className="mr-2 h-5 w-5" />
                   Recent Searches
@@ -241,7 +241,7 @@ const NewSearch = () => {
           <div className="lg:col-span-1">
             <div className="space-y-3">
               {/* Search Tips */}
-              <Card className="p-4 flex-shrink-0">
+              <Card className="p-4">
                 <h3 className="text-base font-semibold mb-3 flex items-center">
                   <Lightbulb className="mr-2 h-4 w-4" />
                   Tips
@@ -257,7 +257,7 @@ const NewSearch = () => {
               </Card>
 
               {/* Example Queries */}
-              <Card className="p-4 flex-shrink-0">
+              <Card className="p-4">
                 <h3 className="text-base font-semibold mb-3 flex items-center">
                   <FileText className="mr-2 h-4 w-4" />
                   Examples
@@ -276,7 +276,7 @@ const NewSearch = () => {
               </Card>
 
               {/* Statistics */}
-              <Card className="p-4 flex-shrink-0">
+              <Card className="p-4">
                 <h3 className="text-base font-semibold mb-3 flex items-center">
                   <BarChart3 className="mr-2 h-4 w-4" />
                   Statistics
