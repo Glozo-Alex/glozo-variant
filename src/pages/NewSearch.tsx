@@ -22,6 +22,7 @@ const NewSearch = () => {
   } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [findSimilarRoles, setFindSimilarRoles] = useState(false);
+  const [testCandidates, setTestCandidates] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [recentSearches, setRecentSearches] = useState<RecentSearch[]>([]);
 
@@ -116,6 +117,7 @@ const NewSearch = () => {
       const apiRes = await getCandidatesByChat({ 
         message: searchQuery, 
         similarRoles: findSimilarRoles, 
+        test: testCandidates,
         projectId: project.id 
       });
       const count = Array.isArray(apiRes) ? apiRes.length : Array.isArray(apiRes?.data) ? apiRes.data.length : undefined;
@@ -176,15 +178,28 @@ const NewSearch = () => {
                 </div>
 
                 <div className="flex items-center justify-between mb-4 flex-shrink-0">
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      id="similar-roles"
-                      checked={findSimilarRoles}
-                      onCheckedChange={setFindSimilarRoles}
-                    />
-                    <Label htmlFor="similar-roles" className="text-sm">
-                      Find similar roles
-                    </Label>
+                  <div className="flex items-center space-x-6">
+                    <div className="flex items-center space-x-2">
+                      <Switch
+                        id="similar-roles"
+                        checked={findSimilarRoles}
+                        onCheckedChange={setFindSimilarRoles}
+                      />
+                      <Label htmlFor="similar-roles" className="text-sm">
+                        Find similar roles
+                      </Label>
+                    </div>
+                    
+                    <div className="flex items-center space-x-2">
+                      <Switch
+                        id="test-candidates"
+                        checked={testCandidates}
+                        onCheckedChange={setTestCandidates}
+                      />
+                      <Label htmlFor="test-candidates" className="text-sm">
+                        Test candidates
+                      </Label>
+                    </div>
                   </div>
                   
                   <FileUploadButton onFileContent={handleFileContent} />

@@ -4,6 +4,7 @@ export interface GetCandidatesByChatParams {
   message: string;
   count?: number;
   similarRoles?: boolean;
+  test?: boolean;
   projectId: string;
 }
 
@@ -28,7 +29,7 @@ export interface CandidateForCRM {
   basic_data: any;
 }
 
-export async function getCandidatesByChat({ message, count, similarRoles, projectId }: GetCandidatesByChatParams) {
+export async function getCandidatesByChat({ message, count, similarRoles, test, projectId }: GetCandidatesByChatParams) {
   const safeCount = typeof count === 'number' ? count : 200;
 
   const body: Record<string, any> = {
@@ -36,6 +37,7 @@ export async function getCandidatesByChat({ message, count, similarRoles, projec
     projectId,
     count: safeCount,
     similarRoles: Boolean(similarRoles),
+    test: Boolean(test),
   };
 
   const { data, error } = await supabase.functions.invoke('get-candidates-by-chat', {
