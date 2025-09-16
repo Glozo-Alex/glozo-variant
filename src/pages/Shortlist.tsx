@@ -8,33 +8,117 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Users, Star, Mail, Phone, MapPin, Calendar, ArrowLeft, Trash2, Grid3X3, List } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState, useCallback, memo } from "react";
+import { useState, useCallback, memo, useMemo } from "react";
 import { getShortlistForProject, removeFromShortlist } from "@/services/shortlist";
-import { getCachedCandidateDetails, getCandidateDetails } from "@/services/candidateDetails";
+import { getCachedCandidateDetails } from "@/services/candidateDetails";
 import { useToast } from "@/hooks/use-toast";
 import { ContactInfo } from "@/components/ContactInfo";
 import { CandidateProfile } from "@/components/CandidateProfile";
 import ShortlistProjectSelector from "@/components/ShortlistProjectSelector";
 import { ShortlistSequenceDialog } from "@/components/ShortlistSequenceDialog";
+import ShortlistCandidateCard from "@/components/ShortlistCandidateCard";
+import ShortlistCandidateRow from "@/components/ShortlistCandidateRow";
 import { supabase } from "@/integrations/supabase/client";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 type ViewMode = 'cards' | 'table';
+
+// Transform candidate data into the expected format
+const transformCandidateData = (shortlistItem: any, detailsMap: Record<number, any>) => {
+  const candidateData = shortlistItem.candidate_snapshot;
+  const numericId = parseInt(shortlistItem.candidate_id, 10);
+  const details = detailsMap[numericId];
+  
+  // Use details from cache if available, fallback to snapshot
+  const name = details?.name || candidateData.name || 'Unknown';
+  const title = details?.title || details?.role || candidateData.title || 'No title';
+  const company = details?.employer || candidateData.company || 'Unknown company';
+  const location = details?.location || candidateData.location || 'Unknown location';
+  
+  // Handle skills - prioritize details, fallback to snapshot
+  let processedSkills: string[] = [];
+  if (details?.skills) {
+    processedSkills = details.skills.flatMap((skillGroup: any) => {
+      if (skillGroup && typeof skillGroup === 'object' && 'skills' in skillGroup) {
+        return skillGroup.skills || [];
+      }
+      return Array.isArray(skillGroup) ? skillGroup : [skillGroup];
+    }).filter((skill: any) => typeof skill === 'string' && skill.trim().length > 0);
+  } else {
+    const skillsArray = candidateData.skills || [];
+    processedSkills = skillsArray.map((skill: any) => 
+      typeof skill === 'string' ? skill : skill.name || skill
+    );
+  }
+  
+  // Handle contacts - prioritize details, fallback to snapshot
+  const contacts = details?.contacts || candidateData.contacts || {
+    emails: candidateData.email && candidateData.email !== 'No email' ? [candidateData.email] : [],
+    phones: candidateData.phone && candidateData.phone !== 'No phone' ? [candidateData.phone] : []
+  };
+  
+  return {
+    id: shortlistItem.candidate_id,
+    numericId,
+    name,
+    title,
+    company,
+    location,
+    match: Math.round(
+      Number(
+        (details as any)?.match_percentage ?? (details as any)?.match_score ?? (details as any)?.match ??
+        candidateData.match_percentage ?? candidateData.match_score ?? candidateData.matchPercentage ?? candidateData.match ?? 0
+      )
+    ),
+    rating: candidateData.rating || 0,
+    skills: processedSkills,
+    experience: candidateData.experience || 'No experience',
+    email: candidateData.email || 'No email',
+    phone: candidateData.phone || 'No phone',
+    contacts,
+    socialLinks: details?.social || [],
+    addedAt: shortlistItem.added_at,
+    avatar: name ? name.split(' ').map((n: string) => n[0]).join('').toUpperCase() : 'UN'
+  };
+};
 
 const Shortlist = () => {
   const { projectId } = useParams();
   const { projects, updateShortlistCount } = useProject();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   
-  const [shortlistedCandidates, setShortlistedCandidates] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
     const saved = localStorage.getItem('shortlist-view-mode');
     return (saved as ViewMode) || 'cards';
   });
   const [sequenceDialogOpen, setSequenceDialogOpen] = useState(false);
+  
+  // Fetch shortlisted candidates using React Query
+  const { data: shortlistedCandidates = [], isLoading: loading, error } = useQuery({
+    queryKey: ['shortlist', projectId],
+    queryFn: async () => {
+      if (!projectId) throw new Error('No project ID provided');
+      
+      // Get shortlist data
+      const shortlist = await getShortlistForProject(projectId);
+      
+      // Get numeric candidate IDs for fetching details
+      const numericIds = shortlist
+        .map(item => parseInt(item.candidate_id, 10))
+        .filter(Number.isFinite);
+      
+      // Fetch cached candidate details
+      const detailsMap = await getCachedCandidateDetails(numericIds, projectId);
+      
+      // Transform the data
+      return shortlist.map(item => transformCandidateData(item, detailsMap));
+    },
+    enabled: !!projectId,
+    staleTime: 30000, // Cache for 30 seconds
+    refetchOnWindowFocus: false
+  });
   
   // Fetch global templates for sequence creation
   const { data: globalTemplates = [] } = useQuery({
@@ -56,155 +140,6 @@ const Shortlist = () => {
   
   const project = projects.find(p => p.id === projectId);
 
-  const fetchShortlistedCandidates = useCallback(async () => {
-    if (!projectId) return;
-    
-    console.log('Shortlist - Starting fetch for projectId:', projectId);
-    
-    try {
-      setLoading(true);
-      setError(null);
-      const shortlist = await getShortlistForProject(projectId);
-      console.log('Shortlist - Raw shortlist data:', shortlist);
-      
-      // Get numeric candidate IDs for fetching details
-      const numericIds = shortlist
-        .map(item => {
-          const id = parseInt(item.candidate_id, 10);
-          console.log('Shortlist - Parsing candidate_id:', item.candidate_id, '-> numeric:', id);
-          return id;
-        })
-        .filter(Number.isFinite);
-      
-      console.log('Shortlist - Numeric IDs:', numericIds);
-      
-      // Fetch cached candidate details
-      const detailsMap = await getCachedCandidateDetails(numericIds, projectId);
-      console.log('Shortlist - Details map:', detailsMap);
-      
-      // Transform the data to match the component's expected format
-      const transformedCandidates = shortlist.map((item, index) => {
-        console.log(`Shortlist - Processing candidate ${index}:`, item);
-        const candidateData = item.candidate_snapshot as any;
-        const numericId = parseInt(item.candidate_id, 10);
-        const details = detailsMap[numericId];
-        console.log(`Shortlist - Candidate ${index} details:`, { candidateData, numericId, details });
-        
-        // Use details from cache if available, fallback to snapshot
-        const name = details?.name || candidateData.name || 'Unknown';
-        const title = details?.title || details?.role || candidateData.title || 'No title';
-        const company = details?.employer || candidateData.company || 'Unknown company';
-        const location = details?.location || candidateData.location || 'Unknown location';
-        
-        // Handle skills - prioritize details, fallback to snapshot
-        let processedSkills: string[] = [];
-        if (details?.skills) {
-          // Flatten skills from details (array of SkillGroup objects)
-          processedSkills = details.skills.flatMap(skillGroup => {
-            // Handle both SkillGroup structure and direct string arrays
-            if (skillGroup && typeof skillGroup === 'object' && 'skills' in skillGroup) {
-              return skillGroup.skills || [];
-            }
-            // Fallback for direct string arrays or single strings
-            return Array.isArray(skillGroup) ? skillGroup : [skillGroup];
-          }).filter(skill => typeof skill === 'string' && skill.trim().length > 0);
-        } else {
-          // Fallback to snapshot skills
-          const skillsArray = candidateData.skills || [];
-          processedSkills = skillsArray.map((skill: any) => 
-            typeof skill === 'string' ? skill : skill.name || skill
-          );
-        }
-        
-        // Handle contacts - prioritize details, fallback to snapshot
-        const contacts = details?.contacts || candidateData.contacts || {
-          emails: candidateData.email && candidateData.email !== 'No email' ? [candidateData.email] : [],
-          phones: candidateData.phone && candidateData.phone !== 'No phone' ? [candidateData.phone] : []
-        };
-        
-        // Prepare social links if available
-        const socialLinks = details?.social || [];
-        
-        const result = {
-          id: item.candidate_id,
-          numericId,
-          name,
-          title,
-          company,
-          location,
-          match: Math.round(
-            Number(
-              (details as any)?.match_percentage ?? (details as any)?.match_score ?? (details as any)?.match ??
-              candidateData.match_percentage ?? candidateData.match_score ?? candidateData.matchPercentage ?? candidateData.match ?? 0
-            )
-          ),
-          rating: candidateData.rating || 0,
-          skills: processedSkills,
-          experience: candidateData.experience || 'No experience',
-          email: candidateData.email || 'No email',
-          phone: candidateData.phone || 'No phone',
-          contacts,
-          socialLinks,
-          addedAt: item.added_at,
-          avatar: name ? name.split(' ').map((n: string) => n[0]).join('').toUpperCase() : 'UN'
-        };
-        console.log(`Shortlist - Transformed candidate ${index}:`, result);
-        return result;
-      });
-      
-      console.log('Shortlist - Final transformed candidates:', transformedCandidates);
-      setShortlistedCandidates(transformedCandidates);
-      
-      // Check for candidates without cached details and fetch them in background
-      const missingIds = numericIds.filter(id => !detailsMap[id]);
-      if (missingIds.length > 0) {
-        // Don't await this - let it run in background
-        getCandidateDetails({
-          candidateIds: missingIds,
-          projectId
-        }).then(response => {
-          if (response.success) {
-            // Update the current candidates with new details instead of re-fetching everything
-            setShortlistedCandidates(currentCandidates => {
-              return currentCandidates.map(candidate => {
-                const newDetails = response.details[candidate.numericId];
-                if (newDetails) {
-                  return {
-                    ...candidate,
-                    name: newDetails.name || candidate.name,
-                    title: newDetails.title || newDetails.role || candidate.title,
-                    company: newDetails.employer || candidate.company,
-                    location: newDetails.location || candidate.location,
-                    skills: newDetails.skills ? newDetails.skills.flatMap(skillGroup => {
-                      if (skillGroup && typeof skillGroup === 'object' && 'skills' in skillGroup) {
-                        return skillGroup.skills || [];
-                      }
-                      return Array.isArray(skillGroup) ? skillGroup : [skillGroup];
-                    }).filter(skill => typeof skill === 'string' && skill.trim().length > 0) : candidate.skills,
-                    contacts: newDetails.contacts || candidate.contacts,
-                    socialLinks: newDetails.social || candidate.socialLinks
-                  };
-                }
-                return candidate;
-              });
-            });
-          }
-        }).catch(error => {
-          console.error('Failed to fetch missing candidate details:', error);
-        });
-      }
-    } catch (error) {
-      console.error('Shortlist - Error in fetchShortlistedCandidates:', error);
-      console.error('Shortlist - Error stack:', error instanceof Error ? error.stack : 'No stack trace');
-      setError('Failed to load shortlisted candidates');
-    } finally {
-      setLoading(false);
-    }
-  }, [projectId]);
-
-  useEffect(() => {
-    fetchShortlistedCandidates();
-  }, [fetchShortlistedCandidates]);
 
   const handleRemoveFromShortlist = useCallback(async (candidateId: string, candidateName: string) => {
     if (!projectId) return;
@@ -212,8 +147,8 @@ const Shortlist = () => {
     try {
       await removeFromShortlist(projectId, candidateId);
       
-      // Update local state
-      setShortlistedCandidates(prev => prev.filter(c => c.id !== candidateId));
+      // Invalidate and refetch the shortlist query
+      queryClient.invalidateQueries({ queryKey: ['shortlist', projectId] });
       
       // Update project shortlist count
       const newCount = shortlistedCandidates.length - 1;
@@ -231,12 +166,15 @@ const Shortlist = () => {
         variant: "destructive",
       });
     }
-  }, [projectId, shortlistedCandidates.length, updateShortlistCount, toast]);
+  }, [projectId, shortlistedCandidates.length, updateShortlistCount, toast, queryClient]);
 
   const handleViewModeChange = useCallback((mode: ViewMode) => {
     setViewMode(mode);
     localStorage.setItem('shortlist-view-mode', mode);
   }, []);
+
+  // Memoize error message
+  const errorMessage = useMemo(() => error?.message || 'Failed to load shortlisted candidates', [error]);
 
   if (!project) {
     return (
@@ -357,8 +295,8 @@ const Shortlist = () => {
           <CardContent className="pt-12 pb-12 text-center">
             <Users className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-xl font-medium mb-2">Error loading shortlist</h3>
-            <p className="text-muted-foreground mb-6">{error}</p>
-            <Button onClick={() => window.location.reload()}>
+            <p className="text-muted-foreground mb-6">{errorMessage}</p>
+            <Button onClick={() => queryClient.invalidateQueries({ queryKey: ['shortlist', projectId] })}>
               Try Again
             </Button>
           </CardContent>
@@ -368,249 +306,38 @@ const Shortlist = () => {
           /* Cards View */
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
             {shortlistedCandidates.map((candidate) => (
-              <Card key={candidate.id} className="glass-card hover-lift h-[440px] flex flex-col">
-                <CardHeader className="pb-4 flex-shrink-0">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3 min-w-0">
-                      <Avatar className="w-12 h-12 ring-2 ring-primary/20">
-                        <AvatarFallback className="bg-primary/10 text-primary font-semibold">
-                          {candidate.avatar}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="min-w-0 flex-1">
-                        <CardTitle className="text-lg truncate">{candidate.name}</CardTitle>
-                        <CardDescription className="truncate" title={candidate.title}>
-                          {candidate.title}
-                        </CardDescription>
-                      </div>
-                    </div>
-                    <Badge className={`${getMatchColor(candidate.match)} text-white font-semibold flex-shrink-0`}>
-                      {candidate.match}%
-                    </Badge>
-                  </div>
-                </CardHeader>
-                
-                <CardContent className="flex-1 flex flex-col">
-                  <div className="space-y-4 flex-1">
-                    {/* Company & Location */}
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <span className="font-medium truncate">{candidate.company}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <MapPin className="h-4 w-4 flex-shrink-0" />
-                        <span className="truncate">{candidate.location}</span>
-                      </div>
-                    </div>
-
-                    {/* Rating & Experience */}
-                    <div className="flex items-center justify-between text-sm">
-                      <div className="flex items-center gap-1">
-                        <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                        <span className="font-medium">{candidate.rating}</span>
-                      </div>
-                      <span className="text-muted-foreground truncate">{candidate.experience}</span>
-                    </div>
-
-                    {/* Skills */}
-                    <div className="space-y-2">
-                      <div className="flex flex-wrap gap-1">
-                        {candidate.skills.slice(0, 3).map((skill) => (
-                          <Badge key={skill} variant="secondary" className="text-xs">
-                            {skill}
-                          </Badge>
-                        ))}
-                        {candidate.skills.length > 3 && (
-                          <CandidateProfile 
-                            candidateData={{
-                              id: candidate.numericId,
-                              name: candidate.name,
-                              title: candidate.title,
-                              employer: candidate.company,
-                              location: candidate.location,
-                              contacts: candidate.contacts,
-                              skills: candidate.skills
-                            }}
-                            socialLinks={candidate.socialLinks}
-                            projectId={projectId || ''}
-                          >
-                            <Badge variant="outline" className="text-xs cursor-pointer hover:bg-muted">
-                              +{candidate.skills.length - 3}
-                            </Badge>
-                          </CandidateProfile>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Contact Info */}
-                    <div className="pt-2 border-t border-border/50">
-                      <ContactInfo candidate={candidate} />
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground mt-2">
-                        <Calendar className="h-4 w-4" />
-                        Added {new Date(candidate.addedAt).toLocaleDateString()}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Actions - Always at bottom */}
-                  <div className="flex gap-2 pt-4 mt-auto flex-shrink-0">
-                    <Button size="sm" className="flex-1">
-                      <Mail className="h-4 w-4 mr-2" />
-                      Contact
-                    </Button>
-                    <CandidateProfile 
-                      candidateData={{
-                        id: candidate.numericId,
-                        name: candidate.name,
-                        title: candidate.title,
-                        employer: candidate.company,
-                        location: candidate.location,
-                        contacts: candidate.contacts,
-                        skills: candidate.skills
-                      }}
-                      socialLinks={candidate.socialLinks}
-                      projectId={projectId || ''}
-                    >
-                      <Button variant="outline" size="sm" className="flex-1">
-                        View Profile
-                      </Button>
-                    </CandidateProfile>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => handleRemoveFromShortlist(candidate.id, candidate.name)}
-                      className="text-destructive hover:text-destructive"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+              <ShortlistCandidateCard
+                key={candidate.id}
+                candidate={candidate}
+                onRemove={handleRemoveFromShortlist}
+                getMatchColor={getMatchColor}
+              />
             ))}
           </div>
         ) : (
-          /* Table View - Compact */
+          /* Table View */
           <div className="rounded-lg border bg-card overflow-hidden">
             <Table>
               <TableHeader>
-                <TableRow className="h-10">
-                  <TableHead className="w-[200px]">Candidate</TableHead>
-                  <TableHead className="w-[180px]">Company</TableHead>
-                  <TableHead className="w-16 text-center">Match</TableHead>
-                  <TableHead className="w-[150px]">Skills</TableHead>
-                  <TableHead className="w-20 text-center">Contact</TableHead>
-                  <TableHead className="w-24 text-center">Actions</TableHead>
+                <TableRow>
+                  <TableHead>Candidate</TableHead>
+                  <TableHead>Company</TableHead>
+                  <TableHead>Match</TableHead>
+                  <TableHead>Rating</TableHead>
+                  <TableHead>Skills</TableHead>
+                  <TableHead>Contact</TableHead>
+                  <TableHead>Added</TableHead>
+                  <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {shortlistedCandidates.map((candidate) => (
-                  <TableRow key={candidate.id} className="h-12 group hover:bg-muted/50">
-                    <TableCell className="p-2">
-                      <div className="flex items-center gap-2 min-w-0">
-                        <Avatar className="w-8 h-8 flex-shrink-0">
-                          <AvatarFallback className="bg-muted text-muted-foreground text-xs">
-                            {candidate.avatar}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="min-w-0 flex-1">
-                          <div className="font-medium text-sm truncate" title={candidate.name}>
-                            {candidate.name}
-                          </div>
-                          <div className="text-xs text-muted-foreground truncate" title={candidate.title}>
-                            {candidate.title}
-                          </div>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell className="p-2">
-                      <div className="min-w-0">
-                        <div className="font-medium text-sm truncate" title={candidate.company}>
-                          {candidate.company}
-                        </div>
-                        <div className="text-xs text-muted-foreground truncate" title={candidate.location}>
-                          <MapPin className="h-3 w-3 inline mr-1" />
-                          {candidate.location}
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell className="p-2 text-center">
-                      <Badge className={`${getMatchColor(candidate.match)} text-white text-xs`}>
-                        {candidate.match}%
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="p-2">
-                      <div className="flex gap-1 overflow-hidden">
-                        {candidate.skills.slice(0, 2).map((skill) => (
-                          <Badge key={skill} variant="secondary" className="text-xs whitespace-nowrap" title={skill}>
-                            {skill.length > 8 ? `${skill.substring(0, 8)}...` : skill}
-                          </Badge>
-                        ))}
-                        {candidate.skills.length > 2 && (
-                          <CandidateProfile 
-                            candidateData={{
-                              id: candidate.numericId,
-                              name: candidate.name,
-                              title: candidate.title,
-                              employer: candidate.company,
-                              location: candidate.location,
-                              contacts: candidate.contacts,
-                              skills: candidate.skills
-                            }}
-                            socialLinks={candidate.socialLinks}
-                            projectId={projectId || ''}
-                          >
-                            <Badge variant="outline" className="text-xs cursor-pointer hover:bg-muted whitespace-nowrap">
-                              +{candidate.skills.length - 2}
-                            </Badge>
-                          </CandidateProfile>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell className="p-2 text-center">
-                      <div className="flex justify-center gap-1">
-                        {candidate.contacts?.emails?.length > 0 && (
-                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0" title="Email available">
-                            <Mail className="h-3 w-3" />
-                          </Button>
-                        )}
-                        {candidate.contacts?.phones?.length > 0 && (
-                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0" title="Phone available">
-                            <Phone className="h-3 w-3" />
-                          </Button>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell className="p-2 text-center">
-                      <div className="flex justify-center gap-1">
-                        <CandidateProfile 
-                          candidateData={{
-                            id: candidate.numericId,
-                            name: candidate.name,
-                            title: candidate.title,
-                            employer: candidate.company,
-                            location: candidate.location,
-                            contacts: candidate.contacts,
-                            skills: candidate.skills
-                          }}
-                          socialLinks={candidate.socialLinks}
-                          projectId={projectId || ''}
-                        >
-                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0" title="View Profile">
-                            <Users className="h-3 w-3" />
-                          </Button>
-                        </CandidateProfile>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-6 w-6 p-0 text-destructive hover:text-destructive"
-                          onClick={() => handleRemoveFromShortlist(candidate.id, candidate.name)}
-                          title="Remove from shortlist"
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
+                  <ShortlistCandidateRow
+                    key={candidate.id}
+                    candidate={candidate}
+                    onRemove={handleRemoveFromShortlist}
+                    getMatchColor={getMatchColor}
+                  />
                 ))}
               </TableBody>
             </Table>
