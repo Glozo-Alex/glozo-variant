@@ -210,26 +210,56 @@ const NewSearch = () => {
               </div>
             </Card>
 
-            {/* Examples - Fixed height */}
-            <Card className="p-4 mt-4">
-              <h3 className="text-lg font-semibold mb-3 flex items-center">
-                <FileText className="mr-2 h-5 w-5" />
-                Examples
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 h-32 overflow-y-auto">
-                {exampleQueries.slice(0, 4).map((example, index) => (
-                  <button
-                    key={index}
-                    onClick={() => handleExampleClick(example)}
-                    className="text-left p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors h-fit"
-                  >
-                    <p className="text-sm font-medium truncate">
-                      {example.slice(0, 60)}...
-                    </p>
-                  </button>
-                ))}
-              </div>
-            </Card>
+            {/* Examples and Statistics Row - Same height */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
+              {/* Examples */}
+              <Card className="p-4 h-32">
+                <h3 className="text-lg font-semibold mb-3 flex items-center">
+                  <FileText className="mr-2 h-5 w-5" />
+                  Examples
+                </h3>
+                <div className="grid grid-cols-1 gap-2 h-20 overflow-y-auto">
+                  {exampleQueries.slice(0, 4).map((example, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handleExampleClick(example)}
+                      className="text-left p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors h-fit"
+                    >
+                      <p className="text-sm font-medium truncate">
+                        {example.slice(0, 80)}...
+                      </p>
+                    </button>
+                  ))}
+                </div>
+              </Card>
+
+              {/* Statistics */}
+              <Card className="p-4 h-32">
+                <h3 className="text-lg font-semibold mb-3 flex items-center">
+                  <BarChart3 className="mr-2 h-5 w-5" />
+                  Statistics
+                </h3>
+                <div className="space-y-2 text-sm h-20 overflow-y-auto">
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Total Candidates</span>
+                    <span className="font-semibold">2.4M+</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Active Profiles</span>
+                    <span className="font-semibold">890K+</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Updated Today</span>
+                    <span className="font-semibold">45K+</span>
+                  </div>
+                  <div className="pt-1 border-t">
+                    <div className="text-xs text-muted-foreground text-center">
+                      Database updated every hour
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            </div>
           </div>
 
           {/* Right Column - Info Panel (25%) */}
@@ -277,32 +307,6 @@ const NewSearch = () => {
                 </Card>
               )}
 
-              {/* Statistics */}
-              <Card className="p-4 h-32 overflow-y-auto">
-                <h3 className="text-base font-semibold mb-3 flex items-center">
-                  <BarChart3 className="mr-2 h-4 w-4" />
-                  Statistics
-                </h3>
-                <div className="space-y-2 text-xs">
-                  <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">Total Candidates</span>
-                    <span className="font-semibold">2.4M+</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">Active Profiles</span>
-                    <span className="font-semibold">890K+</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">Updated Today</span>
-                    <span className="font-semibold">45K+</span>
-                  </div>
-                  <div className="pt-2 border-t">
-                    <div className="text-xs text-muted-foreground text-center">
-                      Database updated every hour
-                    </div>
-                  </div>
-                </div>
-              </Card>
             </div>
           </div>
         </div>
