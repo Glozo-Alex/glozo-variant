@@ -138,9 +138,9 @@ const NewSearch = () => {
   };
   return (
     <div className="h-screen overflow-hidden">
-      <div className="max-w-7xl mx-auto h-full p-4">
+      <div className="max-w-7xl mx-auto h-full p-4 flex flex-col">
         {/* Compact Header */}
-        <div className="text-center mb-4">
+        <div className="text-center mb-4 flex-shrink-0">
           <h1 className="text-2xl font-bold text-foreground mb-1">
             Find Candidates
           </h1>
@@ -150,13 +150,13 @@ const NewSearch = () => {
         </div>
 
         {/* Two Column Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 h-[calc(100vh-120px)] overflow-hidden">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 flex-1 min-h-0">
           {/* Left Column - Main Content Area (75%) */}
-          <div className="lg:col-span-3 flex flex-col h-full space-y-4">
+          <div className="lg:col-span-3 flex flex-col space-y-4 min-h-0">
             {/* Job Description Section - Takes main space */}
-            <Card className="p-6 flex-1 flex flex-col">
+            <Card className="p-6 flex-1 flex flex-col min-h-0">
               <div className="flex flex-col h-full">
-                <div className="mb-4">
+                <div className="mb-4 flex-shrink-0">
                   <Label htmlFor="searchQuery" className="text-lg font-semibold">
                     Job Description
                   </Label>
@@ -165,17 +165,17 @@ const NewSearch = () => {
                   </p>
                 </div>
                 
-                <div className="mb-4 flex-1">
+                <div className="mb-4 flex-1 min-h-0">
                   <Textarea
                     id="searchQuery"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="e.g., Looking for a Senior React Developer with 5+ years experience in modern web technologies..."
-                    className="h-full resize-none text-base min-h-[200px]"
+                    className="h-full resize-none text-base"
                   />
                 </div>
 
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between mb-4 flex-shrink-0">
                   <div className="flex items-center space-x-2">
                     <Switch
                       id="similar-roles"
@@ -192,7 +192,7 @@ const NewSearch = () => {
 
                 <Button 
                   onClick={handleCreateProject}
-                  className="w-full h-12 text-lg"
+                  className="w-full h-12 text-lg flex-shrink-0"
                   disabled={!searchQuery.trim() || isLoading}
                 >
                   {isLoading ? (
@@ -210,8 +210,8 @@ const NewSearch = () => {
               </div>
             </Card>
 
-            {/* Examples Section - Now in left column */}
-            <Card className="p-4 h-48">
+            {/* Examples Section */}
+            <Card className="p-4 h-48 flex-shrink-0">
               <h3 className="text-lg font-semibold mb-3 flex items-center">
                 <FileText className="mr-2 h-5 w-5" />
                 Examples
@@ -233,77 +233,75 @@ const NewSearch = () => {
           </div>
 
           {/* Right Column - Info Panel (25%) */}
-          <div className="lg:col-span-1 h-full">
-            <div className="flex flex-col h-full space-y-3">
-              {/* Search Tips */}
-              <Card className="p-4 h-32 overflow-y-auto">
+          <div className="lg:col-span-1 flex flex-col space-y-3 min-h-0">
+            {/* Search Tips */}
+            <Card className="p-4 h-32 flex-shrink-0">
+              <h3 className="text-base font-semibold mb-3 flex items-center">
+                <Lightbulb className="mr-2 h-4 w-4" />
+                Tips
+              </h3>
+              <div className="space-y-2 overflow-y-auto h-20">
+                {searchTips.slice(0, 3).map((tip, index) => (
+                  <div key={index} className="text-xs">
+                    <p className="font-medium text-foreground mb-1">{tip.title}</p>
+                    <p className="text-muted-foreground">{tip.description}</p>
+                  </div>
+                ))}
+              </div>
+            </Card>
+
+            {/* Recent Searches */}
+            {recentSearches.length > 0 && (
+              <Card className="p-4 h-32 flex-shrink-0">
                 <h3 className="text-base font-semibold mb-3 flex items-center">
-                  <Lightbulb className="mr-2 h-4 w-4" />
-                  Tips
+                  <History className="mr-2 h-4 w-4" />
+                  Recent Searches
                 </h3>
-                <div className="space-y-2">
-                  {searchTips.slice(0, 3).map((tip, index) => (
-                    <div key={index} className="text-xs">
-                      <p className="font-medium text-foreground mb-1">{tip.title}</p>
-                      <p className="text-muted-foreground">{tip.description}</p>
-                    </div>
+                <div className="space-y-2 overflow-y-auto h-20">
+                  {recentSearches.slice(0, 3).map((search) => (
+                    <button
+                      key={search.id}
+                      onClick={() => handleRecentSearchClick(search)}
+                      className="w-full text-left p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors text-xs"
+                    >
+                      <p className="font-medium truncate mb-1">
+                        {search.prompt.slice(0, 40)}...
+                      </p>
+                      <p className="text-muted-foreground">
+                        {new Date(search.created_at).toLocaleDateString()} • {search.candidate_count || 0} candidates
+                      </p>
+                    </button>
                   ))}
                 </div>
               </Card>
+            )}
 
-              {/* Recent Searches */}
-              {recentSearches.length > 0 && (
-                <Card className="p-4 h-32 overflow-y-auto">
-                  <h3 className="text-base font-semibold mb-3 flex items-center">
-                    <History className="mr-2 h-4 w-4" />
-                    Recent Searches
-                  </h3>
-                  <div className="space-y-2">
-                    {recentSearches.slice(0, 3).map((search) => (
-                      <button
-                        key={search.id}
-                        onClick={() => handleRecentSearchClick(search)}
-                        className="w-full text-left p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors text-xs"
-                      >
-                        <p className="font-medium truncate mb-1">
-                          {search.prompt.slice(0, 40)}...
-                        </p>
-                        <p className="text-muted-foreground">
-                          {new Date(search.created_at).toLocaleDateString()} • {search.candidate_count || 0} candidates
-                        </p>
-                      </button>
-                    ))}
-                  </div>
-                </Card>
-              )}
-
-              {/* Statistics - Now in right column */}
-              <Card className="p-4 h-32 overflow-y-auto">
-                <h3 className="text-base font-semibold mb-3 flex items-center">
-                  <BarChart3 className="mr-2 h-4 w-4" />
-                  Statistics
-                </h3>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">Total Candidates</span>
-                    <span className="font-semibold">2.4M+</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">Active Profiles</span>
-                    <span className="font-semibold">890K+</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">Updated Today</span>
-                    <span className="font-semibold">45K+</span>
-                  </div>
-                  <div className="pt-1 border-t">
-                    <div className="text-xs text-muted-foreground text-center">
-                      Database updated every hour
-                    </div>
+            {/* Statistics */}
+            <Card className="p-4 h-32 flex-shrink-0">
+              <h3 className="text-base font-semibold mb-3 flex items-center">
+                <BarChart3 className="mr-2 h-4 w-4" />
+                Statistics
+              </h3>
+              <div className="space-y-2 text-sm h-20 overflow-y-auto">
+                <div className="flex justify-between items-center">
+                  <span className="text-muted-foreground">Total Candidates</span>
+                  <span className="font-semibold">2.4M+</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-muted-foreground">Active Profiles</span>
+                  <span className="font-semibold">890K+</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-muted-foreground">Updated Today</span>
+                  <span className="font-semibold">45K+</span>
+                </div>
+                <div className="pt-1 border-t">
+                  <div className="text-xs text-muted-foreground text-center">
+                    Database updated every hour
                   </div>
                 </div>
-              </Card>
-            </div>
+              </div>
+            </Card>
           </div>
         </div>
       </div>
