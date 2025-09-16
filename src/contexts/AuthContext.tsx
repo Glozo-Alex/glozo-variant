@@ -34,6 +34,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     console.log('Auth Debug - Setting up auth listener, current origin:', window.location.origin);
     
+    let initialLoadComplete = false;
+    
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
@@ -41,9 +43,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         console.log('Auth Debug - Session object:', session);
         console.log('Auth Debug - Access token:', session?.access_token ? 'Present' : 'Missing');
         console.log('Auth Debug - Refresh token:', session?.refresh_token ? 'Present' : 'Missing');
+        
         setSession(session);
         setUser(session?.user ?? null);
-        setLoading(false);
+        
+        // Only set loading to false after the initial session check
+        if (initialLoadComplete) {
+          setLoading(false);
+        }
       }
     );
 
@@ -52,8 +59,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.log('Auth Debug - Initial session check:', session?.user?.email);
       console.log('Auth Debug - Initial session error:', error);
       console.log('Auth Debug - Initial session tokens:', session?.access_token ? 'Present' : 'Missing');
+      
       setSession(session);
       setUser(session?.user ?? null);
+      initialLoadComplete = true;
       setLoading(false);
     });
 
