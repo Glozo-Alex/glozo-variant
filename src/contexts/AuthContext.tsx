@@ -34,30 +34,57 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     console.log('Auth Debug - Setting up auth listener, current origin:', window.location.origin);
     
-    // Set up auth state listener
+    let hasInitialized = false;
+    let hasValidSession = false;
+    
+    // First, check for existing session
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      console.log('Auth Debug - Initial session check:', session?.user?.email);
+      console.log('Auth Debug - Initial session error:', error);
+      console.log('Auth Debug - Initial session tokens:', session?.access_token ? 'Present' : 'Missing');
+      
+      hasInitialized = true;
+      hasValidSession = !!session?.access_token;
+      
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
+
+    // Then set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         console.log('Auth Debug - Auth state change:', event, session?.user?.email);
         console.log('Auth Debug - Session object:', session);
         console.log('Auth Debug - Access token:', session?.access_token ? 'Present' : 'Missing');
         console.log('Auth Debug - Refresh token:', session?.refresh_token ? 'Present' : 'Missing');
+        console.log('Auth Debug - Has initialized:', hasInitialized, 'Has valid session:', hasValidSession);
+        
+        // Ignore INITIAL_SESSION events that come after we already have a valid session
+        if (event === 'INITIAL_SESSION' && hasValidSession && hasInitialized) {
+          console.log('Auth Debug - Ignoring INITIAL_SESSION after valid session');
+          return;
+        }
+        
+        // Don't clear a valid session with an invalid one unless it's a SIGNED_OUT event
+        if (hasValidSession && !session?.access_token && event !== 'SIGNED_OUT') {
+          console.log('Auth Debug - Protecting valid session from being cleared');
+          return;
+        }
+        
+        // Update session state
+        const isValidSession = !!session?.access_token;
+        hasValidSession = isValidSession;
         
         setSession(session);
         setUser(session?.user ?? null);
-        setLoading(false);
+        
+        // Only set loading to false if we've initialized
+        if (hasInitialized) {
+          setLoading(false);
+        }
       }
     );
-
-    // Check for existing session
-    supabase.auth.getSession().then(({ data: { session }, error }) => {
-      console.log('Auth Debug - Initial session check:', session?.user?.email);
-      console.log('Auth Debug - Initial session error:', error);
-      console.log('Auth Debug - Initial session tokens:', session?.access_token ? 'Present' : 'Missing');
-      
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
 
     return () => subscription.unsubscribe();
   }, []);
