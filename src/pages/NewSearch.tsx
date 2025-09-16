@@ -138,7 +138,7 @@ const NewSearch = () => {
   };
   return (
     <div className="relative min-h-screen">
-      <div className="max-w-7xl mx-auto pb-52">
+      <div className="max-w-7xl mx-auto">
         {/* Compact Header */}
         <div className="text-center mb-4">
           <h1 className="text-2xl font-bold text-foreground mb-1">
@@ -152,7 +152,7 @@ const NewSearch = () => {
         {/* Two Column Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 max-w-7xl mx-auto w-full h-full">
           {/* Left Column - Main Content Area (75%) */}
-          <div className="lg:col-span-3 flex flex-col h-full">
+          <div className="lg:col-span-3 flex flex-col h-full space-y-4">
             {/* Job Description Section - Takes main space */}
             <Card className="p-6 flex-1 flex flex-col">
               <div className="flex flex-col h-full">
@@ -209,6 +209,27 @@ const NewSearch = () => {
                 </Button>
               </div>
             </Card>
+
+            {/* Examples Section - Now in left column */}
+            <Card className="p-4 h-48">
+              <h3 className="text-lg font-semibold mb-3 flex items-center">
+                <FileText className="mr-2 h-5 w-5" />
+                Examples
+              </h3>
+              <div className="grid grid-cols-1 gap-2 h-32 overflow-y-auto">
+                {exampleQueries.slice(0, 4).map((example, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleExampleClick(example)}
+                    className="text-left p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors h-fit"
+                  >
+                    <p className="text-sm font-medium truncate">
+                      {example.slice(0, 80)}...
+                    </p>
+                  </button>
+                ))}
+              </div>
+            </Card>
           </div>
 
           {/* Right Column - Info Panel (25%) */}
@@ -255,59 +276,37 @@ const NewSearch = () => {
                   </div>
                 </Card>
               )}
+
+              {/* Statistics - Now in right column */}
+              <Card className="p-4 h-32 overflow-y-auto">
+                <h3 className="text-base font-semibold mb-3 flex items-center">
+                  <BarChart3 className="mr-2 h-4 w-4" />
+                  Statistics
+                </h3>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Total Candidates</span>
+                    <span className="font-semibold">2.4M+</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Active Profiles</span>
+                    <span className="font-semibold">890K+</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Updated Today</span>
+                    <span className="font-semibold">45K+</span>
+                  </div>
+                  <div className="pt-1 border-t">
+                    <div className="text-xs text-muted-foreground text-center">
+                      Database updated every hour
+                    </div>
+                  </div>
+                </div>
+              </Card>
             </div>
           </div>
         </div>
       </div>
-
-      {/* Fixed Bottom Elements */}
-      {/* Examples - Bottom Left */}
-      <Card className="fixed bottom-4 left-4 w-80 h-48 p-4 z-10">
-        <h3 className="text-lg font-semibold mb-3 flex items-center">
-          <FileText className="mr-2 h-5 w-5" />
-          Examples
-        </h3>
-        <div className="grid grid-cols-1 gap-2 h-32 overflow-y-auto">
-          {exampleQueries.slice(0, 4).map((example, index) => (
-            <button
-              key={index}
-              onClick={() => handleExampleClick(example)}
-              className="text-left p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors h-fit"
-            >
-              <p className="text-sm font-medium truncate">
-                {example.slice(0, 80)}...
-              </p>
-            </button>
-          ))}
-        </div>
-      </Card>
-
-      {/* Statistics - Bottom Right */}
-      <Card className="fixed bottom-4 right-4 w-80 h-48 p-4 z-10">
-        <h3 className="text-lg font-semibold mb-3 flex items-center">
-          <BarChart3 className="mr-2 h-5 w-5" />
-          Statistics
-        </h3>
-        <div className="space-y-2 text-sm h-32 overflow-y-auto">
-          <div className="flex justify-between items-center">
-            <span className="text-muted-foreground">Total Candidates</span>
-            <span className="font-semibold">2.4M+</span>
-          </div>
-          <div className="flex justify-between items-center">
-            <span className="text-muted-foreground">Active Profiles</span>
-            <span className="font-semibold">890K+</span>
-          </div>
-          <div className="flex justify-between items-center">
-            <span className="text-muted-foreground">Updated Today</span>
-            <span className="font-semibold">45K+</span>
-          </div>
-          <div className="pt-1 border-t">
-            <div className="text-xs text-muted-foreground text-center">
-              Database updated every hour
-            </div>
-          </div>
-        </div>
-      </Card>
     </div>
   );
 };
