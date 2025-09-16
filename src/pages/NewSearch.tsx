@@ -210,14 +210,14 @@ const NewSearch = () => {
               </div>
             </Card>
 
-            {/* Recent Searches - Takes remaining space */}
+            {/* Recent Searches - Fixed height */}
             {recentSearches.length > 0 && (
-              <Card className="p-4 flex-1 overflow-hidden">
+              <Card className="p-4 flex-shrink-0">
                 <h3 className="text-lg font-semibold mb-3 flex items-center">
                   <History className="mr-2 h-5 w-5" />
                   Recent Searches
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 h-[calc(100%-3rem)] overflow-y-auto">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-32 overflow-y-auto">
                   {recentSearches.slice(0, 4).map((search) => (
                     <button
                       key={search.id}
