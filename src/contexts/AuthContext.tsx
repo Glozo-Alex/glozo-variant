@@ -34,8 +34,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     console.log('Auth Debug - Setting up auth listener, current origin:', window.location.origin);
     
-    let initialLoadComplete = false;
-    
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
@@ -46,11 +44,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         
         setSession(session);
         setUser(session?.user ?? null);
-        
-        // Only set loading to false after the initial session check
-        if (initialLoadComplete) {
-          setLoading(false);
-        }
+        setLoading(false);
       }
     );
 
@@ -62,7 +56,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       setSession(session);
       setUser(session?.user ?? null);
-      initialLoadComplete = true;
       setLoading(false);
     });
 
