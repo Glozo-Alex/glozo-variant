@@ -150,12 +150,12 @@ const NewSearch = () => {
         </div>
 
         {/* Two Column Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 max-w-7xl mx-auto w-full">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 max-w-7xl mx-auto w-full h-full">
           {/* Left Column - Main Content Area (75%) */}
-          <div className="lg:col-span-3 space-y-4">
-            {/* Job Description Section - Takes fixed space */}
-            <Card className="p-6 mb-4"ket->
-              <div className="flex flex-col">
+          <div className="lg:col-span-3 flex flex-col h-full">
+            {/* Job Description Section - Takes main space */}
+            <Card className="p-6 flex-1 flex flex-col">
+              <div className="flex flex-col h-full">
                 <div className="mb-4">
                   <Label htmlFor="searchQuery" className="text-lg font-semibold">
                     Job Description
@@ -165,15 +165,15 @@ const NewSearch = () => {
                   </p>
                 </div>
                 
-                 <div className="mb-4">
-                   <Textarea
-                     id="searchQuery"
-                     value={searchQuery}
-                     onChange={(e) => setSearchQuery(e.target.value)}
-                     placeholder="e.g., Looking for a Senior React Developer with 5+ years experience in modern web technologies..."
-                     className="h-[120px] resize-none text-base"
-                   />
-                 </div>
+                <div className="mb-4 flex-1">
+                  <Textarea
+                    id="searchQuery"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="e.g., Looking for a Senior React Developer with 5+ years experience in modern web technologies..."
+                    className="h-full resize-none text-base min-h-[200px]"
+                  />
+                </div>
 
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center space-x-2">
@@ -210,38 +210,33 @@ const NewSearch = () => {
               </div>
             </Card>
 
-            {/* Recent Searches - Fixed height */}
-            {recentSearches.length > 0 && (
-              <Card className="p-4">
-                <h3 className="text-lg font-semibold mb-3 flex items-center">
-                  <History className="mr-2 h-5 w-5" />
-                  Recent Searches
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-32 overflow-y-auto">
-                  {recentSearches.slice(0, 4).map((search) => (
-                    <button
-                      key={search.id}
-                      onClick={() => handleRecentSearchClick(search)}
-                      className="text-left p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors h-fit"
-                    >
-                      <p className="text-sm font-medium truncate mb-1">
-                        {search.prompt.slice(0, 60)}...
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {new Date(search.created_at).toLocaleDateString()} • {search.candidate_count || 0} candidates
-                      </p>
-                    </button>
-                  ))}
-                </div>
-              </Card>
-            )}
+            {/* Examples - Fixed height */}
+            <Card className="p-4 mt-4">
+              <h3 className="text-lg font-semibold mb-3 flex items-center">
+                <FileText className="mr-2 h-5 w-5" />
+                Examples
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-32 overflow-y-auto">
+                {exampleQueries.slice(0, 4).map((example, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleExampleClick(example)}
+                    className="text-left p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors h-fit"
+                  >
+                    <p className="text-sm font-medium truncate">
+                      {example.slice(0, 60)}...
+                    </p>
+                  </button>
+                ))}
+              </div>
+            </Card>
           </div>
 
           {/* Right Column - Info Panel (25%) */}
-          <div className="lg:col-span-1">
-            <div className="space-y-3">
+          <div className="lg:col-span-1 h-full">
+            <div className="flex flex-col h-full space-y-3">
               {/* Search Tips */}
-              <Card className="p-4">
+              <Card className="p-4 flex-1">
                 <h3 className="text-base font-semibold mb-3 flex items-center">
                   <Lightbulb className="mr-2 h-4 w-4" />
                   Tips
@@ -256,27 +251,34 @@ const NewSearch = () => {
                 </div>
               </Card>
 
-              {/* Example Queries */}
-              <Card className="p-4">
-                <h3 className="text-base font-semibold mb-3 flex items-center">
-                  <FileText className="mr-2 h-4 w-4" />
-                  Examples
-                </h3>
-                <div className="space-y-2">
-                  {exampleQueries.slice(0, 3).map((example, index) => (
-                    <button
-                      key={index}
-                      onClick={() => handleExampleClick(example)}
-                      className="w-full text-left p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors text-xs"
-                    >
-                      {example.slice(0, 45)}...
-                    </button>
-                  ))}
-                </div>
-              </Card>
+              {/* Recent Searches */}
+              {recentSearches.length > 0 && (
+                <Card className="p-4 flex-1">
+                  <h3 className="text-base font-semibold mb-3 flex items-center">
+                    <History className="mr-2 h-4 w-4" />
+                    Recent Searches
+                  </h3>
+                  <div className="space-y-2 overflow-y-auto">
+                    {recentSearches.slice(0, 3).map((search) => (
+                      <button
+                        key={search.id}
+                        onClick={() => handleRecentSearchClick(search)}
+                        className="w-full text-left p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors text-xs"
+                      >
+                        <p className="font-medium truncate mb-1">
+                          {search.prompt.slice(0, 40)}...
+                        </p>
+                        <p className="text-muted-foreground">
+                          {new Date(search.created_at).toLocaleDateString()} • {search.candidate_count || 0} candidates
+                        </p>
+                      </button>
+                    ))}
+                  </div>
+                </Card>
+              )}
 
               {/* Statistics */}
-              <Card className="p-4">
+              <Card className="p-4 flex-1">
                 <h3 className="text-base font-semibold mb-3 flex items-center">
                   <BarChart3 className="mr-2 h-4 w-4" />
                   Statistics
