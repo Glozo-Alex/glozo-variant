@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Candidates - RecruiterPlatform</title>
+    <link rel="stylesheet" href="base-styles.css">
+    <style>
+        .sidebar {
+            width: 16rem;
+            background: hsl(var(--sidebar-bg));
+            border-right: 1px solid hsl(var(--sidebar-border));
+            padding: 1.5rem;
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        
+        .main-content {
+            margin-left: 16rem;
+            padding: 1.5rem;
+            min-height: 100vh;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius);
+            color: hsl(var(--sidebar-text));
+            text-decoration: none;
+            transition: var(--transition-all);
+            margin-bottom: 0.25rem;
+        }
+        
+        .nav-item:hover {
+            background: hsl(var(--sidebar-hover));
+            color: hsl(var(--sidebar-text-active));
+        }
+        
+        .nav-item.active {
+            background: hsl(var(--sidebar-accent));
+            color: hsl(var(--primary));
+        }
+        
+        .nav-icon {
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+        
+        .search-bar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            align-items: center;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: 1px solid hsl(var(--border));
+            border-radius: var(--radius);
+            background: hsl(var(--input));
+            color: hsl(var(--foreground));
+            font-size: 0.875rem;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: hsl(var(--ring));
+            box-shadow: 0 0 0 2px hsl(var(--ring) / 0.2);
+        }
+        
+        .filter-select {
+            padding: 0.75rem 1rem;
+            border: 1px solid hsl(var(--border));
+            border-radius: var(--radius);
+            background: hsl(var(--input));
+            color: hsl(var(--foreground));
+            font-size: 0.875rem;
+            min-width: 150px;
+        }
+        
+        .candidate-card {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.5rem;
+            border-bottom: 1px solid hsl(var(--border));
+        }
+        
+        .candidate-card:last-child {
+            border-bottom: none;
+        }
+        
+        .candidate-avatar {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.125rem;
+        }
+        
+        .candidate-info {
+            flex: 1;
+        }
+        
+        .candidate-name {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: hsl(var(--foreground));
+            margin-bottom: 0.25rem;
+        }
+        
+        .candidate-role {
+            color: hsl(var(--muted-foreground));
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .candidate-company {
+            color: hsl(var(--muted-foreground));
+            font-size: 0.875rem;
+        }
+        
+        .candidate-meta {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 0.5rem;
+        }
+        
+        .match-score {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .match-excellent {
+            background: hsl(var(--success) / 0.1);
+            color: hsl(var(--success));
+        }
+        
+        .match-good {
+            background: hsl(var(--warning) / 0.1);
+            color: hsl(var(--warning));
+        }
+        
+        .match-fair {
+            background: hsl(25 95% 53% / 0.1);
+            color: hsl(25 95% 53%);
+        }
+        
+        .candidate-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            border-radius: var(--radius);
+            border: 1px solid hsl(var(--border));
+            background: hsl(var(--card));
+            color: hsl(var(--foreground));
+            cursor: pointer;
+            transition: var(--transition-all);
+        }
+        
+        .btn-sm:hover {
+            background: hsl(var(--accent));
+        }
+        
+        .btn-primary {
+            background: hsl(var(--primary));
+            color: hsl(var(--primary-foreground));
+            border-color: hsl(var(--primary));
+        }
+        
+        .btn-primary:hover {
+            background: hsl(var(--primary-hover));
+        }
+        
+        .stats-bar {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: hsl(var(--card));
+            border-radius: var(--radius);
+            border: 1px solid hsl(var(--card-border));
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: hsl(var(--primary));
+        }
+        
+        .stat-label {
+            font-size: 0.875rem;
+            color: hsl(var(--muted-foreground));
+        }
+    </style>
+</head>
+<body class="theme-default">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo" style="margin: 0 0 2rem 0;">R</div>
+        
+        <nav>
+            <a href="dashboard.html" class="nav-item">
+                <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v2H8V5z"/>
+                </svg>
+                Dashboard
+            </a>
+            <a href="#" class="nav-item">
+                <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+                New Search
+            </a>
+            <a href="#" class="nav-item active">
+                <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                </svg>
+                Candidates
+            </a>
+            <a href="#" class="nav-item">
+                <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                Shortlist
+            </a>
+            <a href="#" class="nav-item">
+                <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                </svg>
+                Analytics
+            </a>
+            <a href="#" class="nav-item">
+                <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                Settings
+            </a>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="max-w-7xl mx-auto">
+            <!-- Header -->
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-foreground mb-2">Candidates</h1>
+                <p class="text-muted-foreground">Manage and review your candidate pipeline</p>
+            </div>
+
+            <!-- Stats Bar -->
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <div class="stat-number">1,247</div>
+                    <div class="stat-label">Total Candidates</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">89</div>
+                    <div class="stat-label">Shortlisted</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">23</div>
+                    <div class="stat-label">In Review</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">12</div>
+                    <div class="stat-label">Hired</div>
+                </div>
+            </div>
+
+            <!-- Search and Filters -->
+            <div class="search-bar">
+                <input type="text" class="search-input" placeholder="Search candidates by name, role, or company...">
+                <select class="filter-select">
+                    <option value="all">All Status</option>
+                    <option value="new">New</option>
+                    <option value="reviewed">Reviewed</option>
+                    <option value="shortlisted">Shortlisted</option>
+                    <option value="hired">Hired</option>
+                </select>
+                <select class="filter-select">
+                    <option value="recent">Most Recent</option>
+                    <option value="name">Name A-Z</option>
+                    <option value="match">Match Score</option>
+                </select>
+            </div>
+
+            <!-- Candidates List -->
+            <div class="card">
+                <div class="candidate-card">
+                    <div class="candidate-avatar">JS</div>
+                    <div class="candidate-info">
+                        <div class="candidate-name">John Smith</div>
+                        <div class="candidate-role">Senior Frontend Developer</div>
+                        <div class="candidate-company">Google • San Francisco, CA</div>
+                    </div>
+                    <div class="candidate-meta">
+                        <span class="match-score match-excellent">94%</span>
+                        <div class="candidate-actions">
+                            <button class="btn-sm">View</button>
+                            <button class="btn-sm btn-primary">Shortlist</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="candidate-card">
+                    <div class="candidate-avatar">MJ</div>
+                    <div class="candidate-info">
+                        <div class="candidate-name">Maria Johnson</div>
+                        <div class="candidate-role">Product Manager</div>
+                        <div class="candidate-company">Microsoft • Seattle, WA</div>
+                    </div>
+                    <div class="candidate-meta">
+                        <span class="match-score match-good">87%</span>
+                        <div class="candidate-actions">
+                            <button class="btn-sm">View</button>
+                            <button class="btn-sm btn-primary">Shortlist</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="candidate-card">
+                    <div class="candidate-avatar">DK</div>
+                    <div class="candidate-info">
+                        <div class="candidate-name">David Kim</div>
+                        <div class="candidate-role">DevOps Engineer</div>
+                        <div class="candidate-company">Amazon • Austin, TX</div>
+                    </div>
+                    <div class="candidate-meta">
+                        <span class="match-score match-excellent">91%</span>
+                        <div class="candidate-actions">
+                            <button class="btn-sm">View</button>
+                            <button class="btn-sm btn-primary">Shortlist</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="candidate-card">
+                    <div class="candidate-avatar">SC</div>
+                    <div class="candidate-info">
+                        <div class="candidate-name">Sarah Chen</div>
+                        <div class="candidate-role">UX Designer</div>
+                        <div class="candidate-company">Figma • New York, NY</div>
+                    </div>
+                    <div class="candidate-meta">
+                        <span class="match-score match-fair">76%</span>
+                        <div class="candidate-actions">
+                            <button class="btn-sm">View</button>
+                            <button class="btn-sm btn-primary">Shortlist</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="candidate-card">
+                    <div class="candidate-avatar">AL</div>
+                    <div class="candidate-info">
+                        <div class="candidate-name">Alex Lee</div>
+                        <div class="candidate-role">Backend Developer</div>
+                        <div class="candidate-company">Stripe • San Francisco, CA</div>
+                    </div>
+                    <div class="candidate-meta">
+                        <span class="match-score match-excellent">89%</span>
+                        <div class="candidate-actions">
+                            <button class="btn-sm">View</button>
+                            <button class="btn-sm btn-primary">Shortlist</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

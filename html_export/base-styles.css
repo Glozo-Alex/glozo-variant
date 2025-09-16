@@ -1,0 +1,235 @@
+/* Modern SaaS Design System - Gradient & Glassmorphism */
+/* Base styles for HTML export */
+
+:root {
+  /* Border radius */
+  --radius: 0.75rem;
+  
+  /* Transitions */
+  --transition-all: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Default theme (Emerald scheme) */
+.theme-default {
+  /* Base surfaces - Warm neutrals */
+  --background: 45 23% 97%; /* Warm off-white */
+  --foreground: 200 20% 12%; /* Deep slate text */
+  
+  /* Primary gradient system - Emerald to Teal */
+  --primary: 168 76% 42%; /* Deep emerald (#059669) */
+  --primary-glow: 187 85% 53%; /* Warm teal (#14B8A6) */
+  --primary-foreground: 0 0% 100%;
+  --primary-hover: 168 76% 48%;
+  
+  /* Glassmorphism surfaces */
+  --glass: 45 23% 99% / 0.8; /* Warm semi-transparent white */
+  --glass-border: 168 25% 95% / 0.2; /* Subtle sage border */
+  --glass-shadow: 200 15% 15% / 0.08; /* Soft slate shadow */
+  
+  /* Card system with elevation */
+  --card: 45 23% 99%; /* Warm white cards */
+  --card-foreground: 200 20% 12%; /* Deep slate text */
+  --card-border: 168 15% 92% / 0.3; /* Sage border */
+  --card-shadow: 200 15% 15% / 0.04; /* Elegant slate shadow */
+  --card-hover: 168 76% 42% / 0.02; /* Subtle emerald tint */
+  
+  /* Accent system */
+  --accent: 168 50% 96%; /* Very light sage */
+  --accent-foreground: 168 76% 25%; /* Deep emerald text */
+  --accent-glow: 168 76% 42% / 0.12; /* Emerald glow */
+  
+  /* Secondary surfaces */
+  --secondary: 168 25% 94%; /* Light sage */
+  --secondary-foreground: 200 15% 40%; /* Muted slate */
+  
+  /* Muted elements */
+  --muted: 168 25% 94%; /* Light sage */
+  --muted-foreground: 200 15% 40%; /* Muted slate */
+  
+  /* Status colors */
+  --success: 142 76% 36%;
+  --warning: 38 92% 50%;
+  --destructive: 0 84% 60%;
+  
+  /* Form elements */
+  --border: 168 15% 88%; /* Sage border */
+  --input: 45 23% 99%; /* Warm white input */
+  --ring: 168 76% 42%; /* Emerald focus ring */
+}
+
+/* Base styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Glass card component */
+.glass-card {
+  background: hsl(var(--glass));
+  border: 1px solid hsl(var(--glass-border));
+  border-radius: var(--radius);
+  box-shadow: 0 4px 6px -1px hsl(var(--glass-shadow));
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Gradient button */
+.btn-gradient {
+  background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+  color: hsl(var(--primary-foreground));
+  border: none;
+  border-radius: var(--radius);
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-all);
+  box-shadow: 0 4px 14px 0 hsl(var(--primary) / 0.25);
+}
+
+.btn-gradient:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 25px 0 hsl(var(--primary) / 0.35);
+}
+
+/* Card styles */
+.card {
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--card-border));
+  border-radius: var(--radius);
+  box-shadow: 0 1px 3px 0 hsl(var(--card-shadow));
+  transition: var(--transition-all);
+}
+
+.card:hover {
+  background: hsl(var(--card-hover));
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px 0 hsl(var(--card-shadow));
+}
+
+.card-header {
+  padding: 1.5rem 1.5rem 0;
+}
+
+.card-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: hsl(var(--card-foreground));
+  margin-bottom: 0.5rem;
+}
+
+.card-description {
+  color: hsl(var(--muted-foreground));
+  font-size: 0.875rem;
+}
+
+.card-content {
+  padding: 1.5rem;
+}
+
+/* Grid layouts */
+.grid {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+.grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+@media (min-width: 768px) {
+  .md\\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .md\\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .md\\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+@media (min-width: 1024px) {
+  .lg\\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .lg\\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+/* Flex utilities */
+.flex { display: flex; }
+.items-center { align-items: center; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.gap-2 { gap: 0.5rem; }
+.gap-4 { gap: 1rem; }
+.gap-6 { gap: 1.5rem; }
+
+/* Spacing */
+.p-4 { padding: 1rem; }
+.p-6 { padding: 1.5rem; }
+.px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
+.py-4 { padding-top: 1rem; padding-bottom: 1rem; }
+.mb-2 { margin-bottom: 0.5rem; }
+.mb-4 { margin-bottom: 1rem; }
+.mb-6 { margin-bottom: 1.5rem; }
+.mb-8 { margin-bottom: 2rem; }
+
+/* Typography */
+.text-2xl { font-size: 1.5rem; line-height: 2rem; }
+.text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
+.font-bold { font-weight: 700; }
+.font-semibold { font-weight: 600; }
+.text-center { text-align: center; }
+
+/* Colors */
+.text-foreground { color: hsl(var(--foreground)); }
+.text-muted-foreground { color: hsl(var(--muted-foreground)); }
+.text-primary { color: hsl(var(--primary)); }
+
+/* Icons */
+.icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  display: inline-block;
+}
+
+/* Container */
+.max-w-7xl { max-width: 80rem; }
+.mx-auto { margin-left: auto; margin-right: auto; }
+
+/* Hover effects */
+.hover-lift {
+  transition: var(--transition-all);
+  cursor: pointer;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+}
+
+/* Gradient text */
+.text-gradient {
+  background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Logo */
+.logo {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 0 auto 1rem;
+}
