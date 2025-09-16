@@ -38,6 +38,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         console.log('Auth Debug - Auth state change:', event, session?.user?.email);
+        console.log('Auth Debug - Session object:', session);
+        console.log('Auth Debug - Access token:', session?.access_token ? 'Present' : 'Missing');
+        console.log('Auth Debug - Refresh token:', session?.refresh_token ? 'Present' : 'Missing');
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
@@ -45,7 +48,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     );
 
     // Check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      console.log('Auth Debug - Initial session check:', session?.user?.email);
+      console.log('Auth Debug - Initial session error:', error);
+      console.log('Auth Debug - Initial session tokens:', session?.access_token ? 'Present' : 'Missing');
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
