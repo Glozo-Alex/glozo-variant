@@ -137,8 +137,8 @@ const NewSearch = () => {
     }
   };
   return (
-    <div className="relative min-h-screen">
-      <div className="max-w-7xl mx-auto">
+    <div className="h-screen overflow-hidden">
+      <div className="max-w-7xl mx-auto h-full p-4">
         {/* Compact Header */}
         <div className="text-center mb-4">
           <h1 className="text-2xl font-bold text-foreground mb-1">
@@ -150,7 +150,7 @@ const NewSearch = () => {
         </div>
 
         {/* Two Column Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 max-w-7xl mx-auto w-full h-full">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 h-[calc(100vh-120px)] overflow-hidden">
           {/* Left Column - Main Content Area (75%) */}
           <div className="lg:col-span-3 flex flex-col h-full space-y-4">
             {/* Job Description Section - Takes main space */}
