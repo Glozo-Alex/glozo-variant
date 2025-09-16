@@ -137,11 +137,11 @@ const NewSearch = () => {
     }
   };
   return (
-    <div className="bg-background min-h-screen">
-      <div className="container mx-auto px-4 py-2 h-full">
+    <div className="bg-background h-screen flex flex-col overflow-hidden">
+      <div className="container mx-auto px-4 py-4 flex-1 flex flex-col">
         {/* Compact Header */}
-        <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold text-foreground mb-2">
+        <div className="text-center mb-4 flex-shrink-0">
+          <h1 className="text-2xl font-bold text-foreground mb-1">
             Find Candidates
           </h1>
           <p className="text-sm text-muted-foreground">
@@ -149,33 +149,33 @@ const NewSearch = () => {
           </p>
         </div>
 
-        {/* Two Column Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 max-w-7xl mx-auto w-full">
+        {/* Two Column Layout - takes remaining space */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 max-w-7xl mx-auto w-full flex-1 overflow-hidden">
           {/* Left Column - Main Content Area (75%) */}
-          <div className="lg:col-span-3">
-            {/* Job Description Section - Takes only needed space */}
-            <Card className="p-8 mb-6">
+          <div className="lg:col-span-3 flex flex-col overflow-hidden">
+            {/* Job Description Section - Takes fixed space */}
+            <Card className="p-6 mb-4 flex-shrink-0">
               <div className="flex flex-col">
-                <div className="mb-6">
-                  <Label htmlFor="searchQuery" className="text-xl font-semibold">
+                <div className="mb-4">
+                  <Label htmlFor="searchQuery" className="text-lg font-semibold">
                     Job Description
                   </Label>
-                  <p className="text-sm text-muted-foreground mt-2 mb-4">
+                  <p className="text-sm text-muted-foreground mt-1 mb-3">
                     Provide a detailed description of the position
                   </p>
                 </div>
                 
-                 <div className="mb-6">
+                 <div className="mb-4">
                    <Textarea
                      id="searchQuery"
                      value={searchQuery}
                      onChange={(e) => setSearchQuery(e.target.value)}
                      placeholder="e.g., Looking for a Senior React Developer with 5+ years experience in modern web technologies..."
-                     className="h-[150px] resize-none text-base"
+                     className="h-[120px] resize-none text-base"
                    />
                  </div>
 
-                <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center space-x-2">
                     <Switch
                       id="similar-roles"
@@ -192,7 +192,7 @@ const NewSearch = () => {
 
                 <Button 
                   onClick={handleCreateProject}
-                  className="w-full h-14 text-lg"
+                  className="w-full h-12 text-lg"
                   disabled={!searchQuery.trim() || isLoading}
                 >
                   {isLoading ? (
@@ -210,22 +210,22 @@ const NewSearch = () => {
               </div>
             </Card>
 
-            {/* Recent Searches - Below Job Description */}
+            {/* Recent Searches - Takes remaining space */}
             {recentSearches.length > 0 && (
-              <Card className="p-6">
-                <h3 className="text-lg font-semibold mb-4 flex items-center">
+              <Card className="p-4 flex-1 overflow-hidden">
+                <h3 className="text-lg font-semibold mb-3 flex items-center">
                   <History className="mr-2 h-5 w-5" />
                   Recent Searches
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 h-[calc(100%-3rem)] overflow-y-auto">
                   {recentSearches.slice(0, 4).map((search) => (
                     <button
                       key={search.id}
                       onClick={() => handleRecentSearchClick(search)}
-                      className="text-left p-4 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+                      className="text-left p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors h-fit"
                     >
-                      <p className="text-sm font-medium truncate mb-2">
-                        {search.prompt.slice(0, 80)}...
+                      <p className="text-sm font-medium truncate mb-1">
+                        {search.prompt.slice(0, 60)}...
                       </p>
                       <p className="text-xs text-muted-foreground">
                         {new Date(search.created_at).toLocaleDateString()} • {search.candidate_count || 0} candidates
@@ -238,17 +238,17 @@ const NewSearch = () => {
           </div>
 
           {/* Right Column - Info Panel (25%) */}
-          <div className="lg:col-span-1">
-            <div className="sticky top-4 max-h-screen overflow-y-auto space-y-2 pr-2">
+          <div className="lg:col-span-1 flex flex-col overflow-hidden">
+            <div className="space-y-3 flex-1 overflow-y-auto">
               {/* Search Tips */}
-              <Card className="p-4">
-                <h3 className="text-lg font-semibold mb-3 flex items-center">
-                  <Lightbulb className="mr-2 h-5 w-5" />
+              <Card className="p-4 flex-shrink-0">
+                <h3 className="text-base font-semibold mb-3 flex items-center">
+                  <Lightbulb className="mr-2 h-4 w-4" />
                   Tips
                 </h3>
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {searchTips.slice(0, 3).map((tip, index) => (
-                    <div key={index} className="text-sm">
+                    <div key={index} className="text-xs">
                       <p className="font-medium text-foreground mb-1">{tip.title}</p>
                       <p className="text-muted-foreground">{tip.description}</p>
                     </div>
@@ -257,31 +257,31 @@ const NewSearch = () => {
               </Card>
 
               {/* Example Queries */}
-              <Card className="p-4">
-                <h3 className="text-lg font-semibold mb-3 flex items-center">
-                  <FileText className="mr-2 h-5 w-5" />
+              <Card className="p-4 flex-shrink-0">
+                <h3 className="text-base font-semibold mb-3 flex items-center">
+                  <FileText className="mr-2 h-4 w-4" />
                   Examples
                 </h3>
                 <div className="space-y-2">
-                  {exampleQueries.slice(0, 4).map((example, index) => (
+                  {exampleQueries.slice(0, 3).map((example, index) => (
                     <button
                       key={index}
                       onClick={() => handleExampleClick(example)}
-                      className="w-full text-left p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors text-sm"
+                      className="w-full text-left p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors text-xs"
                     >
-                      {example.slice(0, 60)}...
+                      {example.slice(0, 45)}...
                     </button>
                   ))}
                 </div>
               </Card>
 
               {/* Statistics */}
-              <Card className="p-4">
-                <h3 className="text-lg font-semibold mb-3 flex items-center">
-                  <BarChart3 className="mr-2 h-5 w-5" />
+              <Card className="p-4 flex-shrink-0">
+                <h3 className="text-base font-semibold mb-3 flex items-center">
+                  <BarChart3 className="mr-2 h-4 w-4" />
                   Statistics
                 </h3>
-                <div className="space-y-3 text-sm">
+                <div className="space-y-2 text-xs">
                   <div className="flex justify-between items-center">
                     <span className="text-muted-foreground">Total Candidates</span>
                     <span className="font-semibold">2.4M+</span>
