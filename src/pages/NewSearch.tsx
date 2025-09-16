@@ -216,7 +216,7 @@ const NewSearch = () => {
                 <FileText className="mr-2 h-5 w-5" />
                 Examples
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-32 overflow-y-auto">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 h-32 overflow-y-auto">
                 {exampleQueries.slice(0, 4).map((example, index) => (
                   <button
                     key={index}
@@ -278,7 +278,7 @@ const NewSearch = () => {
               )}
 
               {/* Statistics */}
-              <Card className="p-4 flex-1">
+              <Card className="p-4 h-32 overflow-y-auto">
                 <h3 className="text-base font-semibold mb-3 flex items-center">
                   <BarChart3 className="mr-2 h-4 w-4" />
                   Statistics
