@@ -164,57 +164,55 @@ const TopNavigation = () => {
   const Icon = pageInfo.icon;
 
   return (
-    <header className="glass-surface border-b border-sidebar-border px-6 py-4 flex-shrink-0">
-      <div className="flex items-center justify-between">
-        {/* Left side - Breadcrumbs only */}
-        <div className="flex items-center">
-          <Breadcrumb>
-            <BreadcrumbList>
-              {pageInfo.breadcrumbs.map((crumb, index) => (
-                <React.Fragment key={index}>
-                  <BreadcrumbItem>
-                    {crumb.href ? (
-                      <BreadcrumbLink href={crumb.href} className="text-muted-foreground hover:text-foreground">
-                        {crumb.label}
-                      </BreadcrumbLink>
-                    ) : (
-                      <BreadcrumbPage className="font-medium">{crumb.label}</BreadcrumbPage>
-                    )}
-                  </BreadcrumbItem>
-                  {index < pageInfo.breadcrumbs.length - 1 && <BreadcrumbSeparator />}
-                </React.Fragment>
-              ))}
-            </BreadcrumbList>
-          </Breadcrumb>
-        </div>
+    <div className="flex items-center justify-between w-full">
+      {/* Left side - Breadcrumbs only */}
+      <div className="flex items-center">
+        <Breadcrumb>
+          <BreadcrumbList>
+            {pageInfo.breadcrumbs.map((crumb, index) => (
+              <React.Fragment key={index}>
+                <BreadcrumbItem>
+                  {crumb.href ? (
+                    <BreadcrumbLink href={crumb.href} className="text-muted-foreground hover:text-foreground">
+                      {crumb.label}
+                    </BreadcrumbLink>
+                  ) : (
+                    <BreadcrumbPage className="font-medium">{crumb.label}</BreadcrumbPage>
+                  )}
+                </BreadcrumbItem>
+                {index < pageInfo.breadcrumbs.length - 1 && <BreadcrumbSeparator />}
+              </React.Fragment>
+            ))}
+          </BreadcrumbList>
+        </Breadcrumb>
+      </div>
 
-        {/* Right side - Status indicators */}
-        <div className="flex items-center gap-3">
-          {/* Active project indicator */}
-          {activeProject && !location.pathname.includes('/project/') && (
-            <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-lg bg-primary/5 border border-primary/20">
-              <FolderOpen className="h-4 w-4 text-primary" />
-              <span className="text-sm font-medium text-primary">{activeProject.name}</span>
-              <Badge variant="secondary" className="text-xs">
-                Active
-              </Badge>
-            </div>
-          )}
-          
-          {/* Project count */}
-          {projects.length > 0 && (
-            <div className="hidden lg:flex items-center gap-2 text-sm text-muted-foreground">
-              <span>{projects.length} project{projects.length !== 1 ? 's' : ''}</span>
-            </div>
-          )}
-          
-          {/* Current time */}
-          <div className="hidden xl:block text-sm text-muted-foreground">
-            {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+      {/* Right side - Status indicators */}
+      <div className="flex items-center gap-3">
+        {/* Active project indicator */}
+        {activeProject && !location.pathname.includes('/project/') && (
+          <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-lg bg-primary/5 border border-primary/20">
+            <FolderOpen className="h-4 w-4 text-primary" />
+            <span className="text-sm font-medium text-primary">{activeProject.name}</span>
+            <Badge variant="secondary" className="text-xs">
+              Active
+            </Badge>
           </div>
+        )}
+        
+        {/* Project count */}
+        {projects.length > 0 && (
+          <div className="hidden lg:flex items-center gap-2 text-sm text-muted-foreground">
+            <span>{projects.length} project{projects.length !== 1 ? 's' : ''}</span>
+          </div>
+        )}
+        
+        {/* Current time */}
+        <div className="hidden xl:block text-sm text-muted-foreground">
+          {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
         </div>
       </div>
-    </header>
+    </div>
   );
 };
 
