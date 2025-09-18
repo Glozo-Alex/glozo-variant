@@ -964,4 +964,30 @@
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
   }
+  
+  /* Sidebar styling to match original glassmorphism design */
+  .glass-sidebar {
+    @apply bg-gradient-to-b from-sidebar-bg to-sidebar-bg/90;
+    @apply backdrop-blur-xl border-r border-sidebar-border/50;
+    @apply shadow-lg;
+  }
+  
+  /* SidebarMenuButton styling for glassmorphism effect */
+  .glass-sidebar [data-sidebar="menu-button"] {
+    @apply text-sidebar-text hover:bg-sidebar-hover hover:text-sidebar-text-active;
+    @apply transition-all duration-300 rounded-md;
+  }
+  
+  .glass-sidebar [data-sidebar="menu-button"][data-active="true"] {
+    @apply bg-sidebar-accent text-sidebar-text-active;
+  }
+  
+  .glass-sidebar [data-sidebar="menu-sub-button"] {
+    @apply text-sidebar-text hover:bg-sidebar-hover hover:text-sidebar-text-active;
+    @apply transition-all duration-300 rounded-md ml-6;
+  }
+  
+  .glass-sidebar [data-sidebar="menu-sub-button"][data-active="true"] {
+    @apply bg-sidebar-accent text-sidebar-text-active;
+  }
 }

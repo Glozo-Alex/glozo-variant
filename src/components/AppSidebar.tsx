@@ -71,8 +71,8 @@ const AppSidebar = () => {
   const isOutreachActive = location.pathname.startsWith('/email-sequences') || location.pathname.startsWith('/outreach');
 
   return (
-    <Sidebar className="glass-sidebar">
-      <SidebarHeader className="h-14 flex items-center justify-center px-2">
+    <Sidebar className="glass-sidebar backdrop-blur-xl border-r border-sidebar-border/50" collapsible="icon">
+      <SidebarHeader className="h-14 flex items-center justify-center px-2 border-b border-sidebar-border/30">
         <img
           src={collapsed ? "/lovable-uploads/3958ba4b-ab9f-4bc4-9677-5bc99ead0c0a.png" : "/lovable-uploads/fc31fa24-db3f-423a-b235-da6a49bb2bdd.png"}
           alt={collapsed ? "GLOZO mark logo (orange FC5B26)" : "GLOZO logo (orange FC5B26)"}
