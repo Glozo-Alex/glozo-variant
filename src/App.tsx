@@ -54,183 +54,147 @@ const App = () => (
               <Route
                 path="/"
                 element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <Dashboard />
-                    </Layout>
-                  </ProtectedRoute>
+                  <Layout>
+                    <Dashboard />
+                  </Layout>
                 }
               />
               <Route
                 path="/new-search"
                 element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <NewSearch />
-                    </Layout>
-                  </ProtectedRoute>
+                  <Layout>
+                    <NewSearch />
+                  </Layout>
                 }
               />
               <Route
                 path="/project/:projectId/results"
                 element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <SearchResults />
-                    </Layout>
-                  </ProtectedRoute>
+                  <Layout>
+                    <SearchResults />
+                  </Layout>
                 }
               />
               <Route
                 path="/project/:projectId/shortlist"
                 element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <Shortlist />
-                    </Layout>
-                  </ProtectedRoute>
+                  <Layout>
+                    <Shortlist />
+                  </Layout>
                 }
               />
-                 <Route
-                  path="/projects"
-                  element={
-                    <ProtectedRoute>
-                      <Layout>
-                        <Projects />
-                      </Layout>
-                    </ProtectedRoute>
-                  }
-                />
-                 <Route
-                  path="/candidates"
-                  element={
-                    <ProtectedRoute>
-                      <Layout>
-                        <Candidates />
-                      </Layout>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/email-sequences"
-                  element={
-                    <ProtectedRoute>
-                      <Layout>
-                        <EmailSequences />
-                      </Layout>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/email-sequences/:sequenceId"
-                  element={
-                    <ProtectedRoute>
-                      <Layout>
-                        <EmailSequenceDetails />
-                      </Layout>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/outreach/templates"
-                  element={
-                    <ProtectedRoute>
-                      <Layout>
-                        <GlobalTemplates />
-                      </Layout>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/outreach/templates/new"
-                  element={
-                    <ProtectedRoute>
-                      <Layout>
-                        <GlobalTemplateBuilder />
-                      </Layout>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/outreach/templates/:templateId"
-                  element={
-                    <ProtectedRoute>
-                      <Layout>
-                        <GlobalTemplateBuilder />
-                      </Layout>
-                    </ProtectedRoute>
-                  }
-                />
-          <Route 
-            path="/analytics" 
-            element={
-              <ProtectedRoute>
-                <Layout>
-                  <Analytics />
-                </Layout>
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/outreach/analytics" 
-            element={
-              <ProtectedRoute>
-                <Layout>
-                  <OutreachAnalytics />
-                </Layout>
-              </ProtectedRoute>
-            } 
-          />
-                <Route
-                  path="/pipeline"
-                  element={
-                    <ProtectedRoute>
-                      <Layout>
-                        <Pipeline />
-                      </Layout>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/team"
-                  element={
-                    <ProtectedRoute>
-                      <Layout>
-                        <Team />
-                      </Layout>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/integrations"
-                  element={
-                    <ProtectedRoute>
-                      <Layout>
-                        <Integrations />
-                      </Layout>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/settings"
-                  element={
-                    <ProtectedRoute>
-                      <Layout>
-                        <Settings />
-                      </Layout>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/test-candidate-details"
-                  element={
-                    <ProtectedRoute>
-                      <Layout>
-                        <TestCandidateDetails />
-                      </Layout>
-                    </ProtectedRoute>
-                  }
-                />
+               <Route
+                path="/projects"
+                element={
+                  <Layout>
+                    <Projects />
+                  </Layout>
+                }
+              />
+               <Route
+                path="/candidates"
+                element={
+                  <Layout>
+                    <Candidates />
+                  </Layout>
+                }
+              />
+              <Route
+                path="/email-sequences"
+                element={
+                  <Layout>
+                    <EmailSequences />
+                  </Layout>
+                }
+              />
+              <Route
+                path="/email-sequences/:sequenceId"
+                element={
+                  <Layout>
+                    <EmailSequenceDetails />
+                  </Layout>
+                }
+              />
+              <Route
+                path="/outreach/templates"
+                element={
+                  <Layout>
+                    <GlobalTemplates />
+                  </Layout>
+                }
+              />
+              <Route
+                path="/outreach/templates/new"
+                element={
+                  <Layout>
+                    <GlobalTemplateBuilder />
+                  </Layout>
+                }
+              />
+              <Route
+                path="/outreach/templates/:templateId"
+                element={
+                  <Layout>
+                    <GlobalTemplateBuilder />
+                  </Layout>
+                }
+              />
+        <Route 
+          path="/analytics" 
+          element={
+            <Layout>
+              <Analytics />
+            </Layout>
+          } 
+        />
+        <Route 
+          path="/outreach/analytics" 
+          element={
+            <Layout>
+              <OutreachAnalytics />
+            </Layout>
+          } 
+        />
+              <Route
+                path="/pipeline"
+                element={
+                  <Layout>
+                    <Pipeline />
+                  </Layout>
+                }
+              />
+              <Route
+                path="/team"
+                element={
+                  <Layout>
+                    <Team />
+                  </Layout>
+                }
+              />
+              <Route
+                path="/integrations"
+                element={
+                  <Layout>
+                    <Integrations />
+                  </Layout>
+                }
+              />
+              <Route
+                path="/settings"
+                element={
+                  <Layout>
+                    <Settings />
+                  </Layout>
+                }
+              />
+              <Route
+                path="/test-candidate-details"
+                element={
+                  <Layout>
+                    <TestCandidateDetails />
+                  </Layout>
+                }
+              />
                <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
